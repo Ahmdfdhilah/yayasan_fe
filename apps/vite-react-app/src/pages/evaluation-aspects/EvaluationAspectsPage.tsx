@@ -72,11 +72,12 @@ export const EvaluationAspectsPage: React.FC = () => {
 
       setAspects(aspectsResponse.items);
       setCategories(categoriesData);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading evaluation aspects:', error);
+      const errorMessage = error?.message || 'Gagal memuat data aspek evaluasi. Silakan coba lagi.';
       toast({
         title: 'Error',
-        description: 'Gagal memuat data aspek evaluasi.',
+        description: errorMessage,
         variant: 'destructive'
       });
     } finally {
@@ -143,11 +144,12 @@ export const EvaluationAspectsPage: React.FC = () => {
       }
 
       handleCancelEdit();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving aspect:', error);
+      const errorMessage = error?.message || 'Gagal menyimpan aspek evaluasi. Silakan coba lagi.';
       toast({
         title: 'Error',
-        description: 'Gagal menyimpan aspek evaluasi.',
+        description: errorMessage,
         variant: 'destructive'
       });
     } finally {
@@ -171,14 +173,15 @@ export const EvaluationAspectsPage: React.FC = () => {
       setAspects(prev => prev.filter(aspect => aspect.id !== aspectToDelete.id));
 
       toast({
-        title: 'Berhasil',
-        description: 'Aspek evaluasi berhasil dihapus.',
+        title: 'Aspek evaluasi berhasil dihapus',
+        description: `Aspek "${aspectToDelete.aspect_name}" telah dihapus dari sistem.`,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting aspect:', error);
+      const errorMessage = error?.message || 'Gagal menghapus aspek evaluasi. Silakan coba lagi.';
       toast({
         title: 'Error',
-        description: 'Gagal menghapus aspek evaluasi.',
+        description: errorMessage,
         variant: 'destructive'
       });
     } finally {
