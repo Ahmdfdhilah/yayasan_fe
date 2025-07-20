@@ -93,14 +93,6 @@ enum EvaluationGrade {
 }
 ```
 
-### PeriodType
-```typescript
-enum PeriodType {
-  EVALUATION = "evaluation"      // Evaluation period
-  RPP_SUBMISSION = "rpp_submission"  // RPP submission period
-  ACADEMIC = "academic"          // Academic period
-}
-```
 
 ## API Endpoints
 
@@ -397,7 +389,6 @@ Get periods with filters.
 **Query Parameters**:
 - `academic_year`: string - Filter by academic year
 - `semester`: string - Filter by semester  
-- `period_type`: PeriodType - Filter by type
 - `is_active`: boolean - Filter by active status
 - `skip`: number (default: 0, min: 0) - Items to skip
 - `limit`: number (default: 100, max: 1000) - Max items
@@ -421,7 +412,6 @@ Create new period (Admin/Manager only).
 {
   academic_year: string;   // e.g., "2023/2024" (max 20 chars)
   semester: string;        // e.g., "Ganjil", "Genap" (max 20 chars)
-  period_type: PeriodType; // Type of period
   start_date: string;      // Period start date (YYYY-MM-DD)
   end_date: string;        // Period end date (must be after start_date)
   description?: string;    // Optional description
@@ -434,7 +424,6 @@ Create new period (Admin/Manager only).
   id: number;
   academic_year: string;
   semester: string;
-  period_type: PeriodType;
   start_date: string;
   end_date: string;
   description?: string;
@@ -449,16 +438,10 @@ Create new period (Admin/Manager only).
 ### GET /periods/active
 Get active periods.
 
-**Query Parameters**:
-- `period_type`: PeriodType - Filter by type
-
 **Response**: `PeriodResponse[]`
 
 ### GET /periods/current
 Get current periods (active by date).
-
-**Query Parameters**:
-- `period_type`: PeriodType - Filter by type
 
 **Response**: `PeriodResponse[]`
 
@@ -960,7 +943,6 @@ Get dashboard data (role-based).
     id: number;
     academic_year: string;
     semester: string;
-    period_type: PeriodType;
     is_active: boolean;
   };
   rpp_stats: {

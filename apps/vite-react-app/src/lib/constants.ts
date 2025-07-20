@@ -68,22 +68,6 @@ export const GRADE_LABELS = {
   [EVALUATION_GRADES.D]: 'Perlu Perbaikan (1)'
 } as const;
 
-// Period Type Constants
-export const PERIOD_TYPES = {
-  EVALUATION: 'evaluation',
-  RPP_SUBMISSION: 'rpp_submission',
-  ACADEMIC: 'academic'
-} as const;
-
-export type PeriodType = typeof PERIOD_TYPES[keyof typeof PERIOD_TYPES];
-
-// Period Type Display Labels
-export const PERIOD_TYPE_LABELS = {
-  [PERIOD_TYPES.EVALUATION]: 'Periode Evaluasi',
-  [PERIOD_TYPES.RPP_SUBMISSION]: 'Periode Pengumpulan RPP',
-  [PERIOD_TYPES.ACADEMIC]: 'Periode Akademik'
-} as const;
-
 
 // API Pagination defaults
 export const PAGINATION_DEFAULTS = {
@@ -91,13 +75,6 @@ export const PAGINATION_DEFAULTS = {
   SIZE: 20,
   MAX_SIZE: 100
 } as const;
-
-// Academic Year Options (example)
-export const ACADEMIC_YEARS = [
-  { value: '2023/2024', label: '2023/2024' },
-  { value: '2024/2025', label: '2024/2025' },
-  { value: '2025/2026', label: '2025/2026' }
-] as const;
 
 // Semester Options
 export const SEMESTERS = [

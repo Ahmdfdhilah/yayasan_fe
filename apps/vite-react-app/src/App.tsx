@@ -15,6 +15,7 @@ import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { EmailSentSuccessPage } from './pages/auth/EmailSentSuccessPage';
 import { ResetPasswordPage } from './pages/auth/ResetPasswordPage';
 import ProfilePage from './pages/profile/ProfilePage';
+import { DashboardPage } from './pages/DashboardPage';
 import { PublicRoute, AuthGuard } from './components/Auth/AuthGuard';
 import { RoleBasedHome } from './components/Auth/RoleBasedHome';
 
@@ -62,6 +63,8 @@ function App() {
                     {/* Home route - redirects based on role */}
                     <Route index element={<RoleBasedHome />} />
                     
+                    {/* Dashboard - All authenticated users */}
+                    <Route path="dashboard" element={<DashboardPage />} />
                   
                     {/* Profile - All authenticated users */}
                     <Route path="profile" element={<ProfilePage />} />

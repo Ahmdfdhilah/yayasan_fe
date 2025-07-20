@@ -1,10 +1,22 @@
-import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, Users, ClipboardList, ClipboardCopyIcon, CheckSquare } from "lucide-react";
+import { 
+  BookOpen, 
+  FileText, 
+  Users, 
+  GraduationCap, 
+  Calendar, 
+  BarChart3, 
+  Building, 
+  Settings,
+  ClipboardCheck,
+  Upload,
+  Download
+} from "lucide-react";
 
-// Role definitions - UPPERCASE to match backend
+// PKG System Role definitions
 export type UserRole =
-  | 'ADMIN'
-  | 'INSPEKTORAT'
-  | 'PERWADAG';
+  | 'admin'
+  | 'guru'
+  | 'kepala_sekolah';
 
 export interface SidebarItem {
   title: string;
@@ -18,91 +30,98 @@ export interface SidebarItem {
 
 
 export const appMenuItems: SidebarItem[] = [
-
-  // Risk Assessment - Only ADMIN and INSPEKTORAT
+  // Dashboard - All roles
   {
-    title: 'Penilaian Risiko',
-    href: '/penilaian-resiko',
-    icon: AlertTriangle,
-    allowedRoles: ['ADMIN'],
-  },
-  // Surat Tugas - All roles
-  {
-    title: 'Surat Tugas',
-    href: '/surat-tugas',
-    icon: Mail,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
-  },
-  // Surat Pemberitahuan - All roles
-  {
-    title: 'Surat Pemberitahuan',
-    href: '/surat-pemberitahuan',
-    icon: MailWarningIcon,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
-  },
-    // Kuesioner - All roles
-    {
-      title: 'Kuesioner',
-      href: '/kuesioner',
-      icon: ClipboardList,
-      allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
-    },
-  
-  // Entry Meeting - All roles
-  {
-    title: 'Entry Meeting',
-    href: '/entry-meeting',
-    icon: PhoneIncoming,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+    title: 'Dashboard',
+    href: '/',
+    icon: BarChart3,
+    allowedRoles: ['admin', 'guru', 'kepala_sekolah'],
   },
 
-  // Konfirmasi Meeting - All roles
+  // RPP Management - Teachers and Principals
   {
-    title: 'Konfirmasi Meeting',
-    href: '/konfirmasi-meeting',
-    icon: CheckSquare,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
-  },
-  // Matriks - All roles
-  {
-    title: 'Matriks',
-    href: '/matriks',
-    icon: Grid2X2,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
-  },
-
-  // Exit Meeting - All roles
-  {
-    title: 'Exit Meeting',
-    href: '/exit-meeting',
-    icon: PhoneOutgoing,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
-  },
-
-
-
-  // Laporan Hasil - All roles
-  {
-    title: 'Laporan Hasil',
-    href: '/laporan-hasil',
-    icon: FileInput,
-    allowedRoles: ['ADMIN'],
+    title: 'RPP',
+    icon: FileText,
+    allowedRoles: ['guru', 'kepala_sekolah', 'admin'],
+    children: [
+      {
+        title: 'Pengumpulan RPP',
+        href: '/rpp/submissions',
+        icon: Upload,
+        allowedRoles: ['guru'],
+      },
+      {
+        title: 'Review RPP',
+        href: '/rpp/review',
+        icon: ClipboardCheck,
+        allowedRoles: ['kepala_sekolah', 'admin'],
+      },
+      {
+        title: 'Laporan RPP',
+        href: '/rpp/reports',
+        icon: Download,
+        allowedRoles: ['kepala_sekolah', 'admin'],
+      },
+    ],
   },
 
-  // Template Kuesioner - All roles
+  // Teacher Evaluations - Principals and Admin
   {
-    title: 'Template Kuesioner',
-    href: '/template-kuesioner',
-    icon: ClipboardCopyIcon,
-    allowedRoles: ['ADMIN'],
+    title: 'Evaluasi Guru',
+    icon: GraduationCap,
+    allowedRoles: ['kepala_sekolah', 'admin'],
+    children: [
+      {
+        title: 'Penilaian Kinerja',
+        href: '/evaluations/performance',
+        icon: ClipboardCheck,
+        allowedRoles: ['kepala_sekolah', 'admin'],
+      },
+      {
+        title: 'Aspek Evaluasi',
+        href: '/evaluations/aspects',
+        icon: BookOpen,
+        allowedRoles: ['admin'],
+      },
+      {
+        title: 'Laporan Evaluasi',
+        href: '/evaluations/reports',
+        icon: BarChart3,
+        allowedRoles: ['kepala_sekolah', 'admin'],
+      },
+    ],
   },
 
-  // User Management - ADMIN only
+  // Period Management - Admin and Principals
+  {
+    title: 'Periode',
+    href: '/periods',
+    icon: Calendar,
+    allowedRoles: ['admin', 'kepala_sekolah'],
+  },
+
+  // Organization Management - Admin only
+  {
+    title: 'Organisasi',
+    href: '/organizations',
+    icon: Building,
+    allowedRoles: ['admin'],
+  },
+
+  // User Management - Admin only
   {
     title: 'Manajemen User',
     href: '/users',
     icon: Users,
-    allowedRoles: ['ADMIN'],
+    allowedRoles: ['admin'],
+  },
+
+  // System Settings - Admin only
+  {
+    title: 'Pengaturan',
+    href: '/settings',
+    icon: Settings,
+    allowedRoles: ['admin'],
   },
 ];
 
