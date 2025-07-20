@@ -18,7 +18,7 @@ export function SidebarHeader({ collapsed, onToggleCollapse }: SidebarHeaderProp
   
   return (
     <>
-      <div className={cn("flex h-16 items-center flex-shrink-0 border-b border-sidebar-border", collapsed ? "px-3 justify-center" : "px-6 justify-between")}>
+      <div className={cn("flex h-16 items-center flex-shrink-0", collapsed ? "px-3 justify-center" : "px-6 justify-between")}>
         <Link to="/admin" className={cn("flex items-center", collapsed ? "justify-center" : "space-x-2")}>
           <img 
             src={collapsed ? (isDarkMode ? logoMiniDarkMode : logoMiniLightMode) : (isDarkMode ? logoDarkMode : logoLightMode)} 
@@ -40,7 +40,7 @@ export function SidebarHeader({ collapsed, onToggleCollapse }: SidebarHeaderProp
       </div>
 
       {collapsed && (
-        <div className="flex justify-center px-3 py-2 border-b border-sidebar-border flex-shrink-0">
+        <div className="flex justify-center px-3 py-2  flex-shrink-0">
           <Button
             variant="ghost"
             size="sm"

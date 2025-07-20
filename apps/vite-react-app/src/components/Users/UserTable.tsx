@@ -9,9 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
-import ActionDropdown  from '@/components/common/ActionDropdown';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
+import ActionDropdown from '@/components/common/ActionDropdown';
 
 interface UserTableProps {
   users: User[];
@@ -35,13 +33,12 @@ export const UserTable: React.FC<UserTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>User</TableHead>
-            <TableHead>Position</TableHead>
+            <TableHead>Nama</TableHead>
+            <TableHead>Posisi</TableHead>
             <TableHead>Email</TableHead>
-            <TableHead>Roles</TableHead>
-            <TableHead>Phone</TableHead>
+            <TableHead>Role</TableHead>
+            <TableHead>Telepon</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Last Login</TableHead>
             <TableHead className="text-right">Aksi</TableHead>
           </TableRow>
         </TableHeader>
@@ -62,32 +59,22 @@ export const UserTable: React.FC<UserTableProps> = ({
             users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>
-                  <div>
-                    <p className="font-medium">{user.profile?.name || user.display_name}</p>
-                    <p className="text-sm text-muted-foreground">ID: {user.id}</p>
-                  </div>
+                  {user.profile?.name || user.display_name}
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">{user.profile?.position || '-'}</span>
+                  {user.profile?.position || '-'}
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">{user.email}</span>
+                  {user.email}
                 </TableCell>
                 <TableCell>
-                 {user.roles}
+                  {user.roles}
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">
-                    {user.profile?.phone || '-'}
-                  </span>
+                  {user.profile?.phone || '-'}
                 </TableCell>
                 <TableCell>
                   {user.status === UserStatus.ACTIVE ? 'Aktif' : 'Tidak Aktif'}
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm text-muted-foreground">
-                    {user.last_login_at ? format(new Date(user.last_login_at), 'dd MMM yyyy', { locale: id }) : '-'}
-                  </span>
                 </TableCell>
                 <TableCell className="text-right">
                   <ActionDropdown

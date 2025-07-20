@@ -57,7 +57,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         "hidden md:fixed md:inset-y-0 md:z-50 md:flex md:flex-col transition-all duration-300",
         isCollapsed ? "md:w-20" : "md:w-64" 
       )}>
-        <div className="flex grow flex-col gap-y-0 border-r border-sidebar-border bg-sidebar">
+        <div className="flex grow flex-col gap-y-0  bg-sidebar">
           <SidebarContent 
             collapsed={isCollapsed}
             expandedMenus={expandedMenus}

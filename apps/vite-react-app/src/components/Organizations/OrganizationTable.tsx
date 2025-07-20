@@ -58,19 +58,10 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
             organizations.map((organization) => (
               <TableRow key={organization.id}>
                 <TableCell>
-                  <div>
-                    <p className="font-medium">{organization.name}</p>
-                    <p className="text-sm text-muted-foreground">ID: {organization.id}</p>
-                  </div>
+                  {organization.name}
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">
-                    {organization.description ? (
-                      <span className="line-clamp-2">{organization.description}</span>
-                    ) : (
-                      <span className="text-muted-foreground italic">Tidak ada deskripsi</span>
-                    )}
-                  </span>
+                  {organization.description || 'Tidak ada deskripsi'}
                 </TableCell>
                 <TableCell>
                   {organization.head_name || 'Belum ada'}
@@ -79,9 +70,7 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
                   {organization.user_count}
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm text-muted-foreground">
-                    {format(new Date(organization.created_at), 'dd MMM yyyy', { locale: id })}
-                  </span>
+                  {format(new Date(organization.created_at), 'dd MMM yyyy', { locale: id })}
                 </TableCell>
                 <TableCell className="text-right">
                   <ActionDropdown
