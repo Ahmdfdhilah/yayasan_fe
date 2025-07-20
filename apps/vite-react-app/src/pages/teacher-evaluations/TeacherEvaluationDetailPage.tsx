@@ -286,22 +286,6 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     );
   }
 
-  if (!loading && evaluations.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Evaluasi Tidak Ditemukan</h2>
-          <p className="text-muted-foreground mb-4">
-            Tidak ada evaluasi untuk guru ini pada periode terkini.
-          </p>
-          <Button onClick={handleBack}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   const handlePeriodFilterChange = (period_id: string) => {
     updateURL({ period_id });
@@ -372,8 +356,26 @@ const TeacherEvaluationDetailPage: React.FC = () => {
         </div>
       </Filtering>
 
+      {/* No evaluations found message */}
+      {!loading && evaluations.length === 0 && (
+        <Card>
+          <CardContent className="py-12">
+            <div className="text-center">
+              <h3 className="text-lg font-medium mb-2">Evaluasi Tidak Ditemukan</h3>
+              <p className="text-muted-foreground mb-4">
+                Tidak ada evaluasi untuk guru ini pada periode yang dipilih.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Coba pilih periode lain atau hubungi administrator untuk informasi lebih lanjut.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Evaluation Info Card */}
-      <Card>
+      {evaluations.length > 0 && (
+        <Card>
         <CardHeader>
           <CardTitle>Informasi Evaluasi</CardTitle>
         </CardHeader>
@@ -418,11 +420,13 @@ const TeacherEvaluationDetailPage: React.FC = () => {
             )}
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      )}
 
       {/* Evaluation Form */}
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      {evaluations.length > 0 && (
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {categories.map((category, index) => (
             <EvaluationCategorySection
               key={category}
@@ -475,8 +479,9 @@ const TeacherEvaluationDetailPage: React.FC = () => {
               </Button>
             </div>
           )}
-        </form>
-      </Form>
+          </form>
+        </Form>
+      )}
     </div>
   );
 };

@@ -10,6 +10,7 @@ export { organizationService } from "./organizations";
 export { periodService } from "./periods";
 export { evaluationAspectService } from "./evaluation-aspects";
 export { teacherEvaluationService } from "./teacher-evaluations";
+export { rppSubmissionService } from "./rpp-submissions";
 
 // Export types with explicit imports to avoid conflicts
 export type {
@@ -77,3 +78,17 @@ export type {
   EvaluationData,
   EvaluationRating,
 } from "./teacher-evaluations";
+
+export type {
+  RPPSubmission,
+  RPPSubmissionCreate,
+  RPPSubmissionUpdate,
+  RPPSubmissionReview,
+  RPPSubmissionResubmit,
+  RPPSubmissionResponse,
+  RPPSubmissionListResponse,
+  RPPSubmissionFilterParams,
+  RPPStatus,
+  RPPStatusInfo,
+  RPPMessageResponse,
+} from "./rpp-submissions";
