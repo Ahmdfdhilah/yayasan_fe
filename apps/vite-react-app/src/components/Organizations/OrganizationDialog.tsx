@@ -27,7 +27,7 @@ import { User } from '@/services/users/types';
 import { userService } from '@/services/users';
 
 const organizationFormSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(255, 'Name must be 255 characters or less'),
+  name: z.string().min(1, 'Nama wajib diisi').max(255, 'Nama maksimal 255 karakter'),
   description: z.string().optional().or(z.literal('')),
   head_id: z.number().optional().or(z.literal('')),
 });
@@ -76,7 +76,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
       console.error('Failed to load users:', error);
       toast({
         title: 'Error',
-        description: 'Failed to load users for head selection.',
+        description: 'Gagal memuat data pengguna untuk pemilihan kepala.',
         variant: 'destructive'
       });
     } finally {
@@ -120,7 +120,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
       console.error('Error saving organization:', error);
       toast({
         title: 'Error',
-        description: 'Failed to save organization. Please try again.',
+        description: 'Gagal menyimpan organisasi. Silakan coba lagi.',
         variant: 'destructive'
       });
     } finally {
@@ -157,7 +157,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>
-            {isEdit ? 'Edit Organization' : 'Add New Organization'}
+            {isEdit ? 'Edit Organisasi' : 'Tambah Organisasi Baru'}
           </DialogTitle>
         </DialogHeader>
 
@@ -170,10 +170,10 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Organization Name</FormLabel>
+                      <FormLabel>Nama Organisasi</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter organization name"
+                          placeholder="Masukkan nama organisasi"
                           disabled={loading}
                           {...field}
                         />
@@ -188,10 +188,10 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel>Deskripsi</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Enter organization description (optional)"
+                          placeholder="Masukkan deskripsi organisasi (opsional)"
                           disabled={loading}
                           rows={3}
                           {...field}
@@ -207,16 +207,16 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
                   name="head_id"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Organization Head</FormLabel>
+                      <FormLabel>Kepala Organisasi</FormLabel>
                       <FormControl>
                         <Combobox
                           options={userOptions}
                           value={selectedUser ? selectedUser.id.toString() : ''}
                           onValueChange={handleUserSelect}
                           onSearch={handleUserSearch}
-                          placeholder="Search and select organization head..."
-                          emptyText="No users found"
-                          searchPlaceholder="Search users..."
+                          placeholder="Cari dan pilih kepala organisasi..."
+                          emptyText="Tidak ada pengguna ditemukan"
+                          searchPlaceholder="Cari pengguna..."
                           disabled={loading}
                           loading={usersLoading}
                         />
@@ -224,7 +224,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
                       <FormMessage />
                       {selectedUser && (
                         <div className="text-sm text-muted-foreground mt-1">
-                          Selected: {selectedUser.profile?.name || selectedUser.display_name} ({selectedUser.email})
+                          Dipilih: {selectedUser.profile?.name || selectedUser.display_name} ({selectedUser.email})
                         </div>
                       )}
                     </FormItem>
@@ -242,13 +242,13 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
             onClick={handleCancel}
             disabled={loading}
           >
-            Cancel
+            Batal
           </Button>
           <Button
             onClick={form.handleSubmit(onSubmit)}
             disabled={loading}
           >
-            {loading ? 'Saving...' : isEdit ? 'Update Organization' : 'Create Organization'}
+            {loading ? 'Menyimpan...' : isEdit ? 'Perbarui Organisasi' : 'Buat Organisasi'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -242,7 +242,7 @@ const UsersPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="User Management"
+        title="Manajemen Pengguna"
         description="Kelola pengguna sistem, peran, dan hak akses"
         actions={
           <Button onClick={handleCreate}>

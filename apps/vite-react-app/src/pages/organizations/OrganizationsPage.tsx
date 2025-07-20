@@ -99,7 +99,7 @@ const OrganizationsPage: React.FC = () => {
       console.error('Failed to fetch organizations:', error);
       toast({
         title: 'Error',
-        description: 'Failed to fetch organizations. Please try again.',
+        description: 'Gagal memuat data organisasi. Silakan coba lagi.',
         variant: 'destructive'
       });
     } finally {
@@ -138,14 +138,14 @@ const OrganizationsPage: React.FC = () => {
         setOrganizationToDelete(null);
         fetchOrganizations(); // Refresh the list
         toast({
-          title: 'Organization deleted',
-          description: `Organization ${organizationToDelete.name} has been deleted successfully.`,
+          title: 'Organisasi berhasil dihapus',
+          description: `Organisasi ${organizationToDelete.name} telah dihapus dari sistem.`,
         });
       } catch (error) {
         console.error('Failed to delete organization:', error);
         toast({
           title: 'Error',
-          description: 'Failed to delete organization. Please try again.',
+          description: 'Gagal menghapus organisasi. Silakan coba lagi.',
           variant: 'destructive'
         });
       }
@@ -163,15 +163,15 @@ const OrganizationsPage: React.FC = () => {
         // Update existing organization
         await organizationService.updateOrganization(editingOrganization.id, organizationData);
         toast({
-          title: 'Organization updated',
-          description: `Organization ${organizationData.name} has been updated successfully.`,
+          title: 'Organisasi berhasil diperbarui',
+          description: `Organisasi ${organizationData.name} telah diperbarui.`,
         });
       } else {
         // Create new organization
         await organizationService.createOrganization(organizationData);
         toast({
-          title: 'Organization created',
-          description: `Organization ${organizationData.name} has been created successfully.`,
+          title: 'Organisasi berhasil dibuat',
+          description: `Organisasi ${organizationData.name} telah ditambahkan ke sistem.`,
         });
       }
       setIsDialogOpen(false);
@@ -181,7 +181,7 @@ const OrganizationsPage: React.FC = () => {
       console.error('Failed to save organization:', error);
       toast({
         title: 'Error',
-        description: 'Failed to save organization. Please try again.',
+        description: 'Gagal menyimpan organisasi. Silakan coba lagi.',
         variant: 'destructive'
       });
     }
@@ -210,15 +210,15 @@ const OrganizationsPage: React.FC = () => {
 
   // Generate composite title
   const getCompositeTitle = () => {
-    let title = "Organizations";
+    let title = "Daftar Organisasi";
     const activeFilters = [];
     
     if (filters.has_users !== 'all') {
-      activeFilters.push(filters.has_users === 'true' ? 'With Users' : 'Without Users');
+      activeFilters.push(filters.has_users === 'true' ? 'Dengan Pengguna' : 'Tanpa Pengguna');
     }
     
     if (filters.has_head !== 'all') {
-      activeFilters.push(filters.has_head === 'true' ? 'With Head' : 'Without Head');
+      activeFilters.push(filters.has_head === 'true' ? 'Dengan Kepala' : 'Tanpa Kepala');
     }
     
     if (activeFilters.length > 0) {
@@ -233,9 +233,9 @@ const OrganizationsPage: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
+          <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
           <p className="text-muted-foreground">
-            You don't have permission to view this page.
+            Anda tidak memiliki akses untuk melihat halaman ini.
           </p>
         </div>
       </div>
@@ -245,41 +245,41 @@ const OrganizationsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Organization Management"
-        description="Manage organizations, assign heads, and view user counts"
+        title="Manajemen Organisasi"
+        description="Kelola organisasi, tetapkan kepala organisasi, dan lihat jumlah pengguna"
         actions={
           <Button onClick={handleCreate}>
             <Plus className="w-4 h-4 mr-2" />
-            Add Organization
+            Tambah Organisasi
           </Button>
         }
       />
 
       <Filtering>
         <div className="space-y-2">
-          <Label htmlFor="users-filter">Users</Label>
+          <Label htmlFor="users-filter">Pengguna</Label>
           <Select value={filters.has_users} onValueChange={handleUsersFilterChange}>
             <SelectTrigger id="users-filter">
-              <SelectValue placeholder="Filter by users" />
+              <SelectValue placeholder="Filter berdasarkan pengguna" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Organizations</SelectItem>
-              <SelectItem value="true">With Users</SelectItem>
-              <SelectItem value="false">Without Users</SelectItem>
+              <SelectItem value="all">Semua Organisasi</SelectItem>
+              <SelectItem value="true">Dengan Pengguna</SelectItem>
+              <SelectItem value="false">Tanpa Pengguna</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="head-filter">Head Assigned</Label>
+          <Label htmlFor="head-filter">Kepala Organisasi</Label>
           <Select value={filters.has_head} onValueChange={handleHeadFilterChange}>
             <SelectTrigger id="head-filter">
-              <SelectValue placeholder="Filter by head" />
+              <SelectValue placeholder="Filter berdasarkan kepala" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Organizations</SelectItem>
-              <SelectItem value="true">With Head</SelectItem>
-              <SelectItem value="false">Without Head</SelectItem>
+              <SelectItem value="all">Semua Organisasi</SelectItem>
+              <SelectItem value="true">Dengan Kepala</SelectItem>
+              <SelectItem value="false">Tanpa Kepala</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -290,13 +290,13 @@ const OrganizationsPage: React.FC = () => {
           <div className="space-y-4">
             <ListHeaderComposite
               title={getCompositeTitle()}
-              subtitle="Manage organizations, assign heads, and view user counts"
+              subtitle="Kelola organisasi, tetapkan kepala organisasi, dan lihat jumlah pengguna"
             />
 
             <SearchContainer
               searchQuery={filters.q}
               onSearchChange={handleSearchChange}
-              placeholder="Search organizations by name or description..."
+              placeholder="Cari organisasi berdasarkan nama atau deskripsi..."
             />
 
             {/* Desktop Table */}
@@ -349,52 +349,52 @@ const OrganizationsPage: React.FC = () => {
         <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Organization Details</DialogTitle>
+              <DialogTitle>Detail Organisasi</DialogTitle>
             </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label>Name</Label>
+                <Label>Nama</Label>
                 <div className="p-2 bg-muted rounded text-sm">
                   {viewingOrganization.name}
                 </div>
               </div>
               <div>
-                <Label>Display Name</Label>
+                <Label>Nama Tampilan</Label>
                 <div className="p-2 bg-muted rounded text-sm">
                   {viewingOrganization.display_name}
                 </div>
               </div>
               <div>
-                <Label>User Count</Label>
+                <Label>Jumlah Pengguna</Label>
                 <div className="p-2 bg-muted rounded text-sm">
-                  {viewingOrganization.user_count} users
+                  {viewingOrganization.user_count} pengguna
                 </div>
               </div>
               <div>
-                <Label>Head</Label>
+                <Label>Kepala Organisasi</Label>
                 <div className="p-2 bg-muted rounded text-sm">
-                  {viewingOrganization.head_name || 'No head assigned'}
+                  {viewingOrganization.head_name || 'Belum ada kepala'}
                 </div>
               </div>
               {viewingOrganization.description && (
                 <div className="md:col-span-2">
-                  <Label>Description</Label>
+                  <Label>Deskripsi</Label>
                   <div className="p-2 bg-muted rounded text-sm">
                     {viewingOrganization.description}
                   </div>
                 </div>
               )}
               <div>
-                <Label>Created</Label>
+                <Label>Dibuat</Label>
                 <div className="p-2 bg-muted rounded text-sm">
-                  {new Date(viewingOrganization.created_at).toLocaleDateString()}
+                  {new Date(viewingOrganization.created_at).toLocaleDateString('id-ID')}
                 </div>
               </div>
               {viewingOrganization.updated_at && (
                 <div>
-                  <Label>Last Updated</Label>
+                  <Label>Terakhir Diperbarui</Label>
                   <div className="p-2 bg-muted rounded text-sm">
-                    {new Date(viewingOrganization.updated_at).toLocaleDateString()}
+                    {new Date(viewingOrganization.updated_at).toLocaleDateString('id-ID')}
                   </div>
                 </div>
               )}
@@ -407,20 +407,20 @@ const OrganizationsPage: React.FC = () => {
       <AlertDialog open={!!organizationToDelete} onOpenChange={() => setOrganizationToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Delete</AlertDialogTitle>
+            <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. Organization{' '}
-              <span className="font-semibold">{organizationToDelete?.name}</span> will be permanently
-              deleted from the system.
+              Tindakan ini tidak dapat dibatalkan. Organisasi{' '}
+              <span className="font-semibold">{organizationToDelete?.name}</span> akan dihapus
+              secara permanen dari sistem.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteOrganization}
               className="bg-red-600 hover:bg-red-700"
             >
-              Delete Organization
+              Hapus Organisasi
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

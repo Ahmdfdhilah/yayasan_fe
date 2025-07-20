@@ -47,7 +47,7 @@ export const UserCards: React.FC<UserCardsProps> = ({
   if (loading) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        Loading users...
+        Memuat pengguna...
       </div>
     );
   }

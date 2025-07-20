@@ -165,7 +165,7 @@ export const UserDialog: React.FC<UserDialogProps> = ({
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>
-            {isEdit ? 'Edit User' : 'Tambah User Baru'}
+            {isEdit ? 'Edit Pengguna' : 'Tambah Pengguna Baru'}
           </DialogTitle>
         </DialogHeader>
 
@@ -356,7 +356,7 @@ export const UserDialog: React.FC<UserDialogProps> = ({
             onClick={form.handleSubmit(onSubmit)}
             disabled={loading}
           >
-            {loading ? 'Menyimpan...' : isEdit ? 'Update User' : 'Tambah User'}
+            {loading ? 'Menyimpan...' : isEdit ? 'Perbarui Pengguna' : 'Tambah Pengguna'}
           </Button>
         </DialogFooter>
       </DialogContent>

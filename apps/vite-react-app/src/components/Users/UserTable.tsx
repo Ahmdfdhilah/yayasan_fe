@@ -56,14 +56,14 @@ export const UserTable: React.FC<UserTableProps> = ({
             <TableHead>Phone</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Last Login</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-right">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {loading ? (
             <TableRow>
               <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                Loading users...
+                Memuat pengguna...
               </TableCell>
             </TableRow>
           ) : users.length === 0 ? (

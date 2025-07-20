@@ -31,7 +31,7 @@ export const OrganizationCards: React.FC<OrganizationCardsProps> = ({
   const getUserCountBadge = (userCount: number) => {
     return (
       <Badge variant={userCount > 0 ? 'default' : 'secondary'} className="text-xs">
-        {userCount} users
+        {userCount} pengguna
       </Badge>
     );
   };
@@ -39,7 +39,7 @@ export const OrganizationCards: React.FC<OrganizationCardsProps> = ({
   const getHeadBadge = (headName?: string) => {
     return (
       <Badge variant={headName ? 'default' : 'outline'} className="text-xs">
-        {headName || 'No head assigned'}
+        {headName || 'Belum ada kepala'}
       </Badge>
     );
   };
@@ -47,7 +47,7 @@ export const OrganizationCards: React.FC<OrganizationCardsProps> = ({
   if (loading) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        Loading organizations...
+        Memuat organisasi...
       </div>
     );
   }
@@ -55,7 +55,7 @@ export const OrganizationCards: React.FC<OrganizationCardsProps> = ({
   if (organizations.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        No organizations found
+        Tidak ada organisasi ditemukan
       </div>
     );
   }
@@ -96,18 +96,18 @@ export const OrganizationCards: React.FC<OrganizationCardsProps> = ({
             {/* Head */}
             <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
               <User className="w-4 h-4" />
-              <span>{organization.head_name || 'No head assigned'}</span>
+              <span>{organization.head_name || 'Belum ada kepala'}</span>
             </div>
 
             {/* User Count */}
             <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
               <Users className="w-4 h-4" />
-              <span>{organization.user_count} users</span>
+              <span>{organization.user_count} pengguna</span>
             </div>
 
             {/* Head Badge */}
             <div className="mb-3">
-              <p className="text-xs text-muted-foreground mb-1">Head Status:</p>
+              <p className="text-xs text-muted-foreground mb-1">Status Kepala:</p>
               {getHeadBadge(organization.head_name)}
             </div>
 
@@ -115,11 +115,11 @@ export const OrganizationCards: React.FC<OrganizationCardsProps> = ({
             <div className="flex items-center space-x-2 text-xs text-muted-foreground pt-2 border-t">
               <Calendar className="w-3 h-3" />
               <span>
-                Created: {format(new Date(organization.created_at), 'dd MMM yyyy', { locale: id })}
+                Dibuat: {format(new Date(organization.created_at), 'dd MMM yyyy', { locale: id })}
               </span>
               {organization.updated_at && (
                 <span className="ml-auto">
-                  Updated: {format(new Date(organization.updated_at), 'dd MMM', { locale: id })}
+                  Diperbarui: {format(new Date(organization.updated_at), 'dd MMM', { locale: id })}
                 </span>
               )}
             </div>

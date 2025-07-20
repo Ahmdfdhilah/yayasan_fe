@@ -42,7 +42,7 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
     return (
       <Badge variant={headName ? 'default' : 'outline'} className="flex items-center gap-1">
         <User className="w-3 h-3" />
-        {headName || 'No head'}
+        {headName || 'Belum ada'}
       </Badge>
     );
   };
@@ -52,25 +52,25 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Organization</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Head</TableHead>
-            <TableHead>Users</TableHead>
-            <TableHead>Created</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>Organisasi</TableHead>
+            <TableHead>Deskripsi</TableHead>
+            <TableHead>Kepala</TableHead>
+            <TableHead>Pengguna</TableHead>
+            <TableHead>Dibuat</TableHead>
+            <TableHead className="text-right">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {loading ? (
             <TableRow>
               <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                Loading organizations...
+                Memuat organisasi...
               </TableCell>
             </TableRow>
           ) : organizations.length === 0 ? (
             <TableRow>
               <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                No organizations found
+                Tidak ada organisasi ditemukan
               </TableCell>
             </TableRow>
           ) : (
@@ -92,7 +92,7 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
                     {organization.description ? (
                       <span className="line-clamp-2">{organization.description}</span>
                     ) : (
-                      <span className="text-muted-foreground italic">No description</span>
+                      <span className="text-muted-foreground italic">Tidak ada deskripsi</span>
                     )}
                   </span>
                 </TableCell>
