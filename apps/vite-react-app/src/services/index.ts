@@ -6,6 +6,7 @@ export * from "./base";
 // Export services with explicit type re-exports to avoid naming conflicts
 export { authService } from "./auth";
 export { userService } from "./users";
+export { organizationService } from "./organizations";
 
 // Export types with explicit imports to avoid conflicts
 export type {
@@ -26,3 +27,12 @@ export type {
   UserListResponse,
   UserFilterParams,
 } from "./users";
+
+export type {
+  Organization,
+  OrganizationCreate,
+  OrganizationUpdate,
+  OrganizationResponse,
+  OrganizationListResponse,
+  OrganizationFilterParams,
+} from "./organizations";

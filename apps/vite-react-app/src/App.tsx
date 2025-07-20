@@ -17,6 +17,7 @@ import { ResetPasswordPage } from './pages/auth/ResetPasswordPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import { DashboardPage } from './pages/DashboardPage';
 import UsersPage from './pages/users/UsersPage';
+import OrganizationsPage from './pages/organizations/OrganizationsPage';
 import { PublicRoute, AuthGuard } from './components/Auth/AuthGuard';
 import { RoleBasedHome } from './components/Auth/RoleBasedHome';
 import { RoleProtectedRoute } from './components/Auth/RoleProtectedRoute';
@@ -74,6 +75,12 @@ function App() {
                     <Route path="users" element={
                       <RoleProtectedRoute allowedRoles={['admin']}>
                         <UsersPage />
+                      </RoleProtectedRoute>
+                    } />
+                    
+                    <Route path="organizations" element={
+                      <RoleProtectedRoute allowedRoles={['admin']}>
+                        <OrganizationsPage />
                       </RoleProtectedRoute>
                     } />
                   </Route>
