@@ -9,6 +9,7 @@ export { userService } from "./users";
 export { organizationService } from "./organizations";
 export { periodService } from "./periods";
 export { evaluationAspectService } from "./evaluation-aspects";
+export { teacherEvaluationService } from "./teacher-evaluations";
 
 // Export types with explicit imports to avoid conflicts
 export type {
@@ -58,3 +59,21 @@ export type {
   EvaluationAspectListResponse,
   EvaluationAspectFilterParams,
 } from "./evaluation-aspects";
+
+export type {
+  TeacherEvaluation,
+  TeacherEvaluationCreate,
+  TeacherEvaluationUpdate,
+  TeacherEvaluationResponse,
+  TeacherEvaluationWithDetails,
+  TeacherEvaluationListResponse,
+  TeacherEvaluationFilterParams,
+  MyEvaluationsFilterParams,
+  TeacherEvaluationMessageResponse,
+  AssignTeachersToPeriodRequest,
+  AssignTeachersResponse,
+  TeacherEvaluationStats,
+  TeacherEvaluationStatus,
+  EvaluationData,
+  EvaluationRating,
+} from "./teacher-evaluations";
