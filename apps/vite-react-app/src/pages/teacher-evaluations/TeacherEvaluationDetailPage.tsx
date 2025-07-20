@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -17,7 +17,7 @@ import {
   SelectValue
 } from '@workspace/ui/components/select';
 import { Label } from '@workspace/ui/components/label';
-import { ArrowLeft, Eye, Edit, CheckCircle, Download } from 'lucide-react';
+import {  Eye, Edit, CheckCircle, Download } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { EvaluationCategorySection } from '@/components/TeacherEvaluations';
 import Filtering from '@/components/common/Filtering';
@@ -41,7 +41,6 @@ interface DetailPageFilters {
 
 const TeacherEvaluationDetailPage: React.FC = () => {
   const { teacherId } = useParams<{ teacherId: string }>();
-  const navigate = useNavigate();
   const { isAdmin, isKepalaSekolah } = useRole();
   const { toast } = useToast();
 
@@ -207,9 +206,6 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     }
   };
 
-  const handleBack = () => {
-    navigate('/teacher-evaluations');
-  };
 
   const toggleMode = () => {
     const canEdit = (isAdmin() || isKepalaSekolah()) && evaluations.length > 0;
@@ -479,8 +475,8 @@ const TeacherEvaluationDetailPage: React.FC = () => {
               </Button>
             </div>
           )}
-          </form>
-        </Form>
+        </form>
+      </Form>
       )}
     </div>
   );

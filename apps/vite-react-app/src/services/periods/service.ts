@@ -82,10 +82,6 @@ class PeriodService extends BaseService {
     return this.delete(`/${periodId}`);
   }
 
-  // Get active periods
-  async getActivePeriods(): Promise<PeriodResponse[]> {
-    return this.get("/active");
-  }
 
   // Get current periods (active by date)
   async getCurrentPeriods(): Promise<PeriodResponse[]> {
