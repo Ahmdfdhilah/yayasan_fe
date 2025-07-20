@@ -147,8 +147,8 @@ const MyRPPSubmissionsPage: React.FC = () => {
   };
 
   const handleView = (submission: RPPSubmissionResponse) => {
-    // Navigate to submission detail page
-    navigate(`/rpp-submissions/my-submission/${submission.period_id}`);
+    // Navigate to submission detail page with teacher ID and period ID in URL
+    navigate(`/rpp-submissions/teacher/${submission.teacher_id}?period_id=${submission.period_id}`);
   };
 
   const handleSubmit = async (submission: RPPSubmissionResponse) => {

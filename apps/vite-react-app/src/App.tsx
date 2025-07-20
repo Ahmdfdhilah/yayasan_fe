@@ -152,7 +152,7 @@ function App() {
                                       
                     {/* RPP Submission Detail - Admin/Kepala Sekolah viewing teacher's submission */}
                     <Route path="rpp-submissions/teacher/:teacherId" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah']}>
+                      <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
                         <RPPSubmissionDetailPage />
                       </RoleProtectedRoute>
                     } />
