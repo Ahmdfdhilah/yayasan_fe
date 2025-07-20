@@ -18,6 +18,7 @@ interface CategorySectionProps {
   newAspectCategory: string | null;
   onCancelEdit: () => void;
   loading?: boolean;
+  sectionNumber?: number;
 }
 
 export const CategorySection: React.FC<CategorySectionProps> = ({
@@ -32,83 +33,93 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   newAspectCategory,
   onCancelEdit,
   loading = false,
+  sectionNumber = 1,
 }) => {
-  const [isOpen, setIsOpen] = useState(true);
-
   const isAddingToThisCategory = newAspectCategory === category;
   const categoryAspects = aspects.filter(aspect => aspect.category === category);
 
   return (
-    <Card className="mb-4">
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleTrigger asChild>
-          <CardHeader className="pb-3 cursor-pointer hover:bg-muted/50">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium flex items-center">
-                {isOpen ? (
-                  <ChevronDown className="h-4 w-4 mr-2" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 mr-2" />
-                )}
-                {category}
-                <span className="ml-2 text-xs text-muted-foreground">
-                  ({categoryAspects.length} aspek)
-                </span>
-              </CardTitle>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onAddAspect(category);
-                }}
-                disabled={loading || isAddingToThisCategory}
-              >
-                <Plus className="h-3 w-3 mr-1" />
-                Tambah Aspek
-              </Button>
+    <div className="bg-card rounded-lg border overflow-hidden">
+      {/* Section Header - Google Forms style */}
+      <div className="border-l-4 border-primary bg-muted/50 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-primary font-medium">
+                Bagian {sectionNumber}
+              </span>
+              <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
+              <span className="text-muted-foreground text-sm">
+                {categoryAspects.length} pertanyaan
+              </span>
             </div>
-          </CardHeader>
-        </CollapsibleTrigger>
+            <h2 className="text-xl font-medium mt-1">
+              {category}
+            </h2>
+          </div>
+          <Button
+            onClick={() => onAddAspect(category)}
+            disabled={loading || isAddingToThisCategory}
+            variant="outline"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Tambah Pertanyaan
+          </Button>
+        </div>
+      </div>
 
-        <CollapsibleContent>
-          <CardContent className="pt-0">
-            {isAddingToThisCategory && (
+      {/* Section Content */}
+      <div className="p-6">
+        {isAddingToThisCategory && (
+          <div className="mb-6">
+            <AspectFormItem
+              categories={categories}
+              isEditing={true}
+              onEdit={() => {}}
+              onCancel={onCancelEdit}
+              onSave={(data) => onSaveAspect(null, data)}
+              loading={loading}
+              defaultCategory={category}
+            />
+          </div>
+        )}
+
+        {categoryAspects.length === 0 && !isAddingToThisCategory ? (
+          <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
+            <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
+              <Plus className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground text-sm mb-3">
+              Belum ada pertanyaan dalam bagian ini
+            </p>
+            <Button
+              onClick={() => onAddAspect(category)}
+              variant="outline"
+              size="sm"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah Pertanyaan Pertama
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {categoryAspects.map((aspect, index) => (
               <AspectFormItem
+                key={aspect.id}
+                aspect={aspect}
                 categories={categories}
-                isEditing={true}
-                onEdit={() => {}}
+                isEditing={editingAspectId === aspect.id}
+                onEdit={() => onEditAspect(aspect)}
                 onCancel={onCancelEdit}
-                onSave={(data) => onSaveAspect(null, data)}
+                onSave={(data) => onSaveAspect(aspect.id, data)}
+                onDelete={onDeleteAspect}
                 loading={loading}
-                defaultCategory={category}
+                questionNumber={index + 1}
               />
-            )}
-
-            {categoryAspects.length === 0 && !isAddingToThisCategory ? (
-              <div className="text-center py-6 text-muted-foreground text-sm">
-                Belum ada aspek evaluasi dalam kategori ini
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {categoryAspects.map((aspect) => (
-                  <AspectFormItem
-                    key={aspect.id}
-                    aspect={aspect}
-                    categories={categories}
-                    isEditing={editingAspectId === aspect.id}
-                    onEdit={() => onEditAspect(aspect)}
-                    onCancel={onCancelEdit}
-                    onSave={(data) => onSaveAspect(aspect.id, data)}
-                    onDelete={onDeleteAspect}
-                    loading={loading}
-                  />
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </CollapsibleContent>
-      </Collapsible>
-    </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 };

@@ -42,6 +42,7 @@ interface AspectFormItemProps {
   onDelete?: (aspect: EvaluationAspect) => void;
   loading?: boolean;
   defaultCategory?: string;
+  questionNumber?: number;
 }
 
 export const AspectFormItem: React.FC<AspectFormItemProps> = ({
@@ -54,6 +55,7 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
   onDelete,
   loading = false,
   defaultCategory,
+  questionNumber,
 }) => {
   const isNewAspect = !aspect;
 
@@ -100,68 +102,143 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
 
   if (!isEditing && !isNewAspect) {
     return (
-      <Card className="mb-4">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <h4 className="font-medium text-sm">{aspect?.aspect_name}</h4>
-              <p className="text-xs text-muted-foreground mt-1">{aspect?.category}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={onEdit}>
-                <Edit className="h-3 w-3" />
-              </Button>
-              {onDelete && (
-                <Button variant="ghost" size="sm" onClick={handleDelete}>
-                  <Trash2 className="h-3 w-3" />
+      <div className="group bg-card border rounded-lg p-6 hover:shadow-md transition-shadow">
+        <div className="flex items-start gap-4">
+          {/* Question Number */}
+          <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+            <span className="text-sm font-medium text-primary">
+              {questionNumber || '?'}
+            </span>
+          </div>
+          
+          {/* Question Content */}
+          <div className="flex-1">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h3 className="text-lg font-normal mb-2">
+                  {aspect?.aspect_name}
+                </h3>
+                {aspect?.description && (
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {aspect.description}
+                  </p>
+                )}
+                <div className="inline-flex items-center px-2 py-1 bg-muted rounded text-xs text-muted-foreground">
+                  Tipe: Text
+                </div>
+              </div>
+              
+              {/* Actions */}
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={onEdit}
+                  className="h-8 w-8 p-0"
+                >
+                  <Edit className="h-4 w-4" />
                 </Button>
-              )}
+                {onDelete && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleDelete}
+                    className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+            
+            {/* Preview Answer Area */}
+            <div className="mt-4 p-3 bg-muted/50 border rounded-md">
+              <p className="text-sm text-muted-foreground italic">
+                Jawaban akan ditampilkan di sini...
+              </p>
             </div>
           </div>
-        </CardHeader>
-        {aspect?.description && (
-          <CardContent className="pt-0">
-            <p className="text-xs text-muted-foreground">{aspect.description}</p>
-          </CardContent>
-        )}
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="mb-4 border-primary/20">
-      <CardContent className="p-4">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="bg-card border-2 border-primary/30 rounded-lg p-6 shadow-md">
+      <div className="flex items-start gap-4">
+        {/* Question Number */}
+        <div className="flex-shrink-0 w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+          <span className="text-sm font-medium text-primary">
+            {questionNumber || 'N'}
+          </span>
+        </div>
+        
+        {/* Form Content */}
+        <div className="flex-1">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Question Title Field */}
               <FormField
                 control={form.control}
                 name="aspect_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs">Nama Aspek</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Masukkan nama aspek..."
-                        className="text-sm"
+                        placeholder="Pertanyaan tanpa judul"
+                        className="text-lg font-normal border-0 border-b-2 border-border rounded-none px-0 py-3 focus:border-primary bg-transparent"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-xs" />
+                    <FormMessage className="text-sm mt-1" />
                   </FormItem>
                 )}
               />
 
+              {/* Description Field */}
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Deskripsi pertanyaan (opsional)"
+                        className="border-0 border-b border-border rounded-none px-0 py-2 resize-none focus:border-primary bg-transparent"
+                        rows={2}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm mt-1" />
+                  </FormItem>
+                )}
+              />
+
+              {/* Answer Type Preview */}
+              <div className="space-y-3">
+                <div className="text-sm text-muted-foreground">
+                  Tipe jawaban
+                </div>
+                <div className="p-3 bg-muted/50 border rounded-md">
+                  <p className="text-sm text-muted-foreground italic">
+                    Jawaban teks panjang
+                  </p>
+                </div>
+              </div>
+
+              {/* Category Selection */}
               <FormField
                 control={form.control}
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs">Kategori</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      Bagian
+                    </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || undefined}>
                       <FormControl>
-                        <SelectTrigger className="text-sm">
-                          <SelectValue placeholder="Pilih atau tulis kategori" />
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih bagian" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -172,51 +249,44 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage className="text-xs" />
+                    <FormMessage className="text-sm mt-1" />
                   </FormItem>
                 )}
               />
-            </div>
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs">Deskripsi (Opsional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Deskripsi aspek evaluasi..."
-                      className="resize-none text-sm"
-                      rows={2}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-xs" />
-                </FormItem>
-              )}
-            />
-
-
-            <div className="flex justify-end gap-2 pt-2">
-              <Button 
-                type="button" 
-                variant="outline" 
-                size="sm"
-                onClick={onCancel}
-                disabled={loading}
-              >
-                <X className="h-3 w-3 mr-1" />
-                Batal
-              </Button>
-              <Button type="submit" size="sm" disabled={loading}>
-                <Check className="h-3 w-3 mr-1" />
-                {loading ? 'Menyimpan...' : 'Simpan'}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between pt-4 border-t">
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                  >
+                    <Check className="h-4 w-4 mr-2" />
+                    {loading ? 'Menyimpan...' : 'Selesai'}
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="ghost"
+                    onClick={onCancel}
+                    disabled={loading}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Batal
+                  </Button>
+                </div>
+                
+                {/* Additional Options */}
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="text-xs">Wajib diisi</span>
+                  <div className="w-8 h-4 bg-muted rounded-full relative">
+                    <div className="w-3 h-3 bg-background rounded-full absolute top-0.5 left-0.5 shadow-sm"></div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </Form>
+        </div>
+      </div>
+    </div>
   );
 };

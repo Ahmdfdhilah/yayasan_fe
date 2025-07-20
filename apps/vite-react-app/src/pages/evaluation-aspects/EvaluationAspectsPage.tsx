@@ -273,10 +273,16 @@ export const EvaluationAspectsPage: React.FC = () => {
       <PageHeader
         title="Manajemen Aspek Evaluasi"
         description="Kelola aspek-aspek yang digunakan dalam evaluasi kinerja guru"
+        actions={
+          <Button onClick={handleCreateNewCategory} disabled={saving}>
+            <Plus className="h-4 w-4 mr-2" />
+            Tambah Bagian Baru
+          </Button>
+        }
       />
 
-      {/* Search and Actions */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      {/* Search */}
+      <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -286,27 +292,30 @@ export const EvaluationAspectsPage: React.FC = () => {
             className="pl-10"
           />
         </div>
-        <Button onClick={handleCreateNewCategory} disabled={saving}>
-          <Plus className="h-4 w-4 mr-2" />
-          Kategori Baru
-        </Button>
       </div>
 
-      {/* Categories */}
+      {/* Form Content - Google Forms style */}
       {displayCategories.length === 0 ? (
-        <div className="text-center py-12">
-          <h3 className="text-lg font-medium mb-2">Belum Ada Aspek Evaluasi</h3>
-          <p className="text-muted-foreground mb-4">
-            Mulai dengan membuat kategori dan aspek evaluasi pertama.
-          </p>
-          <Button onClick={handleCreateNewCategory}>
-            <Plus className="h-4 w-4 mr-2" />
-            Buat Kategori Pertama
-          </Button>
+        <div className="text-center py-16">
+          <div className="bg-card rounded-lg border p-12 max-w-md mx-auto">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Plus className="h-8 w-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-medium mb-2">
+              Mulai membuat formulir evaluasi
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              Buat bagian dan pertanyaan pertama untuk formulir evaluasi Anda
+            </p>
+            <Button onClick={handleCreateNewCategory}>
+              <Plus className="h-4 w-4 mr-2" />
+              Buat Bagian Pertama
+            </Button>
+          </div>
         </div>
       ) : (
-        <div className="space-y-4">
-          {displayCategories.map((category) => (
+        <div className="space-y-6">
+          {displayCategories.map((category, index) => (
             <CategorySection
               key={category}
               category={category}
@@ -320,34 +329,53 @@ export const EvaluationAspectsPage: React.FC = () => {
               newAspectCategory={newAspectCategory}
               onCancelEdit={handleCancelEdit}
               loading={saving}
+              sectionNumber={index + 1}
             />
           ))}
+          
+          {/* Add Section Button */}
+          <div className="flex justify-center mt-8">
+            <Button 
+              onClick={handleCreateNewCategory} 
+              disabled={saving}
+              variant="outline"
+              className="border-dashed border-2 hover:border-primary hover:bg-primary/5 py-3 px-6"
+            >
+              <Plus className="h-5 w-5 mr-2" />
+              Tambah Bagian
+            </Button>
+          </div>
         </div>
       )}
 
       {/* Statistics */}
-      <div className="mt-8 pt-6 border-t">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
-          <div>
-            <div className="text-2xl font-bold text-primary">{categories.length}</div>
-            <div className="text-sm text-muted-foreground">Kategori</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-primary">{aspects.length}</div>
-            <div className="text-sm text-muted-foreground">Total Aspek</div>
+      {displayCategories.length > 0 && (
+        <div className="bg-card rounded-lg border p-6">
+          <h3 className="text-lg font-medium mb-4">
+            Ringkasan Formulir
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="text-center p-4 bg-primary/5 rounded-lg">
+              <div className="text-3xl font-bold text-primary">{categories.length}</div>
+              <div className="text-sm text-muted-foreground font-medium">Bagian</div>
+            </div>
+            <div className="text-center p-4 bg-secondary rounded-lg">
+              <div className="text-3xl font-bold text-secondary-foreground">{aspects.length}</div>
+              <div className="text-sm text-muted-foreground font-medium">Total Pertanyaan</div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Create Category Dialog */}
       <Dialog open={showCreateCategoryDialog} onOpenChange={setShowCreateCategoryDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Buat Kategori Baru</DialogTitle>
+            <DialogTitle>Buat Bagian Baru</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <Input
-              placeholder="Masukkan nama kategori..."
+              placeholder="Nama bagian (contoh: Kompetensi Pedagogik)"
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               onKeyDown={(e) => {
@@ -372,7 +400,7 @@ export const EvaluationAspectsPage: React.FC = () => {
               onClick={confirmCreateCategory}
               disabled={!newCategoryName.trim()}
             >
-              Buat Kategori
+              Buat Bagian
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -382,9 +410,9 @@ export const EvaluationAspectsPage: React.FC = () => {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Aspek Evaluasi</AlertDialogTitle>
+            <AlertDialogTitle>Hapus Pertanyaan</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus aspek "{aspectToDelete?.aspect_name}"? 
+              Apakah Anda yakin ingin menghapus pertanyaan "{aspectToDelete?.aspect_name}"? 
               Tindakan ini tidak dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
