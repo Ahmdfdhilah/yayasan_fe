@@ -7,9 +7,7 @@ import { id } from 'date-fns/locale';
 import { 
   FileText, 
   Calendar,
-  User,
   BarChart3,
-  Send
 } from 'lucide-react';
 import { rppSubmissionService } from '@/services';
 

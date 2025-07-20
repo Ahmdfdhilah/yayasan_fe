@@ -11,7 +11,6 @@ import {
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Send } from 'lucide-react';
 import { rppSubmissionService } from '@/services';
 
 interface RPPSubmissionTableProps {

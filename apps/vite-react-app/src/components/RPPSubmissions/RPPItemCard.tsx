@@ -11,7 +11,8 @@ import {
 import { useToast } from '@workspace/ui/components/sonner';
 import { RPPSubmissionItemResponse, RPPSubmissionStatus } from '@/services/rpp-submissions/types';
 import { RPPFileUploadDialog } from './RPPFileUploadDialog';
-import { fileUtils } from '@/utils/fileUtils';
+import { mediaFileService } from '@/services/media-files/service';
+import { API_BASE_URL } from '@/config/api';
 
 interface RPPItemCardProps {
   item: RPPSubmissionItemResponse;
@@ -43,7 +44,12 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
     }
 
     try {
-      await fileUtils.viewFile(item.file_id);
+      const viewInfo = await mediaFileService.getFileViewInfo(item.file_id);
+      const view_url = `${API_BASE_URL}${viewInfo.view_url}`;
+
+      if (view_url) {
+        window.open(view_url, '_blank');
+      }
     } catch (error) {
       toast({
         title: 'Error',
@@ -64,7 +70,16 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
     }
 
     try {
-      await fileUtils.downloadFile(item.file_id, item.file_name || undefined);
+      const blob = await mediaFileService.downloadFile(item.file_id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = item.file_name || 'file';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
       toast({
         title: 'Berhasil',
         description: 'File berhasil didownload.',

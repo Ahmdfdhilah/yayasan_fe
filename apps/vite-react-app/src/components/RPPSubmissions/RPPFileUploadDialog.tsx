@@ -63,12 +63,6 @@ export const RPPFileUploadDialog: React.FC<RPPFileUploadDialogProps> = ({
       
       const file = selectedFiles[0];
       
-      // Validate file before upload
-      const validationError = mediaFileService.validateFile(file, 10 * 1024 * 1024); // 10MB limit
-      if (validationError) {
-        throw new Error(validationError);
-      }
-      
       // Upload file using media files service
       const uploadResult = await mediaFileService.uploadFile({
         file,

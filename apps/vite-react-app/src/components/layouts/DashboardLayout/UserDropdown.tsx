@@ -104,7 +104,6 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
           >
             <div className="relative">
               <Avatar className={cn("flex-shrink-0", collapsed ? "h-5 w-5" : "h-6 w-6")}>
-                {/* <AvatarImage src={fileUtils.getFullFileUrl(user?.avatar_file?.file_url || '')} alt={getUserDisplayName()} /> */}
                 <AvatarFallback className={cn(collapsed ? "text-[10px]" : "text-xs")}>
                   {getUserInitials()}
                 </AvatarFallback>
