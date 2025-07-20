@@ -71,7 +71,7 @@ export const TeacherEvaluationCards: React.FC<TeacherEvaluationCardsProps> = ({
   const getActionProps = (evaluation: TeacherEvaluation) => {
     const canEvaluate = userRole !== 'guru' && 
                        evaluation.status !== 'completed' && 
-                       onEvaluate;
+                       !!onEvaluate;
 
     return {
       onView: () => onView(evaluation),

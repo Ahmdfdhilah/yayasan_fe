@@ -71,7 +71,7 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
   const getActionProps = (evaluation: TeacherEvaluation) => {
     const canEvaluate = userRole !== 'guru' && 
                        evaluation.status !== 'completed' && 
-                       onEvaluate;
+                       !!onEvaluate;
 
     return {
       onView: () => onView(evaluation),
