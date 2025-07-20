@@ -48,7 +48,7 @@ const MyRPPSubmissionsPage: React.FC = () => {
   // URL Filters configuration
   const { updateURL, getCurrentFilters } = useURLFilters<MyRPPSubmissionsPageFilters>({
     defaults: {
-      period_id: 'latest',
+      period_id: 'all',
       status: 'all',
       page: 1,
       size: 10,
@@ -104,18 +104,7 @@ const MyRPPSubmissionsPage: React.FC = () => {
       };
 
       // Handle period filter
-      if (filters.period_id === 'latest') {
-        // Use latest period if available
-        if (periods.length > 0) {
-          const sortedPeriods = [...periods].sort((a, b) => {
-            if (a.academic_year !== b.academic_year) {
-              return b.academic_year.localeCompare(a.academic_year);
-            }
-            return a.semester === 'Ganjil' ? 1 : -1;
-          });
-          params.period_id = sortedPeriods[0].id;
-        }
-      } else if (filters.period_id !== 'all') {
+      if (filters.period_id !== 'all') {
         params.period_id = Number(filters.period_id);
       }
 
@@ -205,9 +194,7 @@ const MyRPPSubmissionsPage: React.FC = () => {
       activeFilters.push(statusLabels[filters.status as keyof typeof statusLabels]);
     }
 
-    if (filters.period_id === 'latest') {
-      activeFilters.push("Periode Terbaru");
-    } else if (filters.period_id !== 'all') {
+    if (filters.period_id !== 'all') {
       const period = periods.find(p => p.id === Number(filters.period_id));
       if (period) {
         activeFilters.push(`${period.academic_year} - ${period.semester}`);
@@ -278,11 +265,11 @@ const MyRPPSubmissionsPage: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Status</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="pending">Menunggu Review</SelectItem>
-              <SelectItem value="approved">Disetujui</SelectItem>
-              <SelectItem value="rejected">Ditolak</SelectItem>
-              <SelectItem value="revision_needed">Perlu Revisi</SelectItem>
+              <SelectItem value="DRAFT">Draft</SelectItem>
+              <SelectItem value="PENDING">Menunggu Review</SelectItem>
+              <SelectItem value="APPROVED">Disetujui</SelectItem>
+              <SelectItem value="REJECTED">Ditolak</SelectItem>
+              <SelectItem value="REVISION_NEEDED">Perlu Revisi</SelectItem>
             </SelectContent>
           </Select>
         </div>

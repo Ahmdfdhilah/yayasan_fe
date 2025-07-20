@@ -1,9 +1,16 @@
 import React from 'react';
 import { RPPSubmissionResponse } from '@/services/rpp-submissions/types';
-import { Button } from '@workspace/ui/components/button';
-import { Badge } from '@workspace/ui/components/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { Eye, Send, Calendar } from 'lucide-react';
+import { Card, CardContent } from '@workspace/ui/components/card';
+import ActionDropdown from '@/components/common/ActionDropdown';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+import { 
+  FileText, 
+  Calendar,
+  User,
+  BarChart3,
+  Send
+} from 'lucide-react';
 import { rppSubmissionService } from '@/services';
 
 interface RPPSubmissionCardsProps {
@@ -11,6 +18,8 @@ interface RPPSubmissionCardsProps {
   loading: boolean;
   onView: (submission: RPPSubmissionResponse) => void;
   onSubmit?: (submission: RPPSubmissionResponse) => void;
+  onEdit?: (submission: RPPSubmissionResponse) => void;
+  onDelete?: (submission: RPPSubmissionResponse) => void;
   userRole: 'guru' | 'admin' | 'kepala_sekolah';
 }
 
@@ -19,30 +28,22 @@ export const RPPSubmissionCards: React.FC<RPPSubmissionCardsProps> = ({
   loading,
   onView,
   onSubmit,
+  onEdit,
+  onDelete,
   userRole
 }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 gap-4">
-        {[...Array(3)].map((_, i) => (
-          <Card key={i}>
-            <CardContent className="p-4">
-              <div className="animate-pulse">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="text-center py-8 text-muted-foreground">
+        Memuat submission RPP...
       </div>
     );
   }
 
   if (submissions.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">Tidak ada RPP submissions yang ditemukan.</p>
+      <div className="text-center py-8 text-muted-foreground">
+        Tidak ada submission RPP ditemukan
       </div>
     );
   }
@@ -50,30 +51,57 @@ export const RPPSubmissionCards: React.FC<RPPSubmissionCardsProps> = ({
   return (
     <div className="grid grid-cols-1 gap-4">
       {submissions.map((submission) => (
-        <Card key={submission.id}>
-          <CardHeader className="pb-3">
-            <div className="flex items-start justify-between">
-              <CardTitle className="text-lg">{submission.period_name}</CardTitle>
-              <Badge 
-                variant="outline" 
-                className={`text-${rppSubmissionService.getStatusColor(submission.status)}-600`}
-              >
-                {rppSubmissionService.getStatusDisplayName(submission.status)}
-              </Badge>
+        <Card key={submission.id} className="hover:shadow-md transition-shadow">
+          <CardContent className="p-4">
+            {/* Header with Icon and Actions */}
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center justify-center w-10 h-10 bg-muted rounded-full">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-sm">{submission.period_name}</h3>
+                  {submission.teacher_name && (
+                    <div className="text-sm text-muted-foreground mt-1">
+                      {submission.teacher_name}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <ActionDropdown
+                onView={() => onView(submission)}
+                onEdit={onEdit ? () => onEdit(submission) : undefined}
+                onDelete={onDelete ? () => onDelete(submission) : undefined}
+                showEdit={userRole === 'guru' && submission.status === 'draft'}
+                showDelete={userRole === 'guru' && submission.status === 'draft'}
+                customActions={
+                  userRole === 'guru' && 
+                  onSubmit && 
+                  rppSubmissionService.isSubmissionReady(submission) && 
+                  submission.status === 'draft'
+                    ? [{
+                        label: 'Kirim',
+                        onClick: () => onSubmit(submission),
+                        icon: 'Send'
+                      }]
+                    : []
+                }
+              />
             </div>
-            {submission.teacher_name && (
-              <p className="text-sm text-muted-foreground">{submission.teacher_name}</p>
-            )}
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {/* Progress */}
-              <div>
+
+            {/* Status */}
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
+              <FileText className="w-4 h-4" />
+              <span>Status: {rppSubmissionService.getStatusDisplayName(submission.status)}</span>
+            </div>
+
+            {/* Progress */}
+            <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-2">
+              <BarChart3 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium">Progress</span>
-                  <span className="text-sm text-muted-foreground">
-                    {submission.completion_percentage}%
-                  </span>
+                  <span>Progress</span>
+                  <span>{submission.completion_percentage}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
@@ -82,40 +110,30 @@ export const RPPSubmissionCards: React.FC<RPPSubmissionCardsProps> = ({
                   ></div>
                 </div>
               </div>
+            </div>
 
-              {/* Submitted Date */}
-              {submission.submitted_at && (
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Submitted: {new Date(submission.submitted_at).toLocaleDateString()}
-                </div>
+            {/* Submitted Date */}
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
+              <Calendar className="w-4 h-4" />
+              <span>
+                {submission.submitted_at 
+                  ? `Dikirim: ${format(new Date(submission.submitted_at), 'dd MMM yyyy', { locale: id })}`
+                  : 'Belum dikirim'
+                }
+              </span>
+            </div>
+
+            {/* Created At */}
+            <div className="flex items-center space-x-2 text-xs text-muted-foreground pt-2 border-t">
+              <Calendar className="w-3 h-3" />
+              <span>
+                Dibuat: {format(new Date(submission.created_at), 'dd MMM yyyy', { locale: id })}
+              </span>
+              {submission.updated_at && (
+                <span className="ml-auto">
+                  Diperbarui: {format(new Date(submission.updated_at), 'dd MMM', { locale: id })}
+                </span>
               )}
-
-              {/* Actions */}
-              <div className="flex space-x-2 pt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onView(submission)}
-                  className="flex-1"
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  View
-                </Button>
-                {userRole === 'guru' && 
-                 onSubmit && 
-                 rppSubmissionService.isSubmissionReady(submission) && 
-                 submission.status === 'draft' && (
-                  <Button
-                    size="sm"
-                    onClick={() => onSubmit(submission)}
-                    className="flex-1"
-                  >
-                    <Send className="h-4 w-4 mr-1" />
-                    Submit
-                  </Button>
-                )}
-              </div>
             </div>
           </CardContent>
         </Card>

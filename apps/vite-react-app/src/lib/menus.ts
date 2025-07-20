@@ -8,7 +8,6 @@ import {
   Building,
   ClipboardCheck,
   Upload,
-  Download
 } from "lucide-react";
 
 // PKG System Role definitions
@@ -41,14 +40,8 @@ export const appMenuItems: SidebarItem[] = [
   {
     title: 'RPP Submissions',
     icon: FileText,
-    allowedRoles: ['guru', 'kepala_sekolah', 'admin'],
+    allowedRoles: ['kepala_sekolah', 'admin'],
     children: [
-      {
-        title: 'Submissions Saya',
-        href: '/my-rpp-submissions',
-        icon: Upload,
-        allowedRoles: ['guru'],
-      },
       {
         title: 'Review Submissions',
         href: '/rpp-submissions',
@@ -56,6 +49,12 @@ export const appMenuItems: SidebarItem[] = [
         allowedRoles: ['kepala_sekolah', 'admin'],
       },
     ],
+  },
+  {
+    title: 'RPP Saya',
+    href: '/my-rpp-submissions',
+    icon: Upload,
+    allowedRoles: ['guru'],
   },
 
   // Teacher Evaluations - Principals and Admin

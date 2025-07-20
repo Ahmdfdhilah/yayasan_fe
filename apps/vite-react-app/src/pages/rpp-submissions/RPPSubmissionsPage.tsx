@@ -277,11 +277,11 @@ const RPPSubmissionsPage: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Status</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="pending">Menunggu Review</SelectItem>
-              <SelectItem value="approved">Disetujui</SelectItem>
-              <SelectItem value="rejected">Ditolak</SelectItem>
-              <SelectItem value="revision_needed">Perlu Revisi</SelectItem>
+              <SelectItem value="DRAFT">Draft</SelectItem>
+              <SelectItem value="PENDING">Menunggu Review</SelectItem>
+              <SelectItem value="APPROVED">Disetujui</SelectItem>
+              <SelectItem value="REJECTED">Ditolak</SelectItem>
+              <SelectItem value="REVISION_NEEDED">Perlu Revisi</SelectItem>
             </SelectContent>
           </Select>
         </div>
