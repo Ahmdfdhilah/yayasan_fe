@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { useURLFilters } from '@/hooks/useURLFilters';
@@ -36,9 +36,14 @@ interface MyRPPSubmissionsPageFilters {
 
 const MyRPPSubmissionsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { isGuru } = useRole();
+  const { currentRole, isGuru } = useRole();
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  // Redirect non-guru users to appropriate page
+  if (currentRole === 'admin' || currentRole === 'kepala_sekolah') {
+    return <Navigate to="/rpp-submissions" replace />;
+  }
   
   // URL Filters configuration
   const { updateURL, getCurrentFilters } = useURLFilters<MyRPPSubmissionsPageFilters>({
@@ -65,15 +70,14 @@ const MyRPPSubmissionsPage: React.FC = () => {
   useEffect(() => {
     if (hasAccess) {
       loadPeriods();
-      loadMySubmissions();
     }
   }, [hasAccess]);
 
   useEffect(() => {
-    if (hasAccess && user?.id) {
+    if (hasAccess && user?.id && periods.length > 0) {
       loadMySubmissions();
     }
-  }, [filters, hasAccess, user?.id, periods]);
+  }, [filters.page, filters.size, filters.period_id, filters.status, hasAccess, user?.id, periods.length]);
 
   const loadPeriods = async () => {
     try {
@@ -249,41 +253,38 @@ const MyRPPSubmissionsPage: React.FC = () => {
       />
 
       <Filtering>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="period-filter">Periode</Label>
-            <Select value={filters.period_id} onValueChange={handlePeriodFilterChange}>
-              <SelectTrigger id="period-filter">
-                <SelectValue placeholder="Filter berdasarkan periode" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="latest">Periode Terbaru</SelectItem>
-                <SelectItem value="all">Semua Periode</SelectItem>
-                {periods.map((period) => (
-                  <SelectItem key={period.id} value={period.id.toString()}>
-                    {period.academic_year} - {period.semester}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="status-filter">Status</Label>
-            <Select value={filters.status} onValueChange={handleStatusFilterChange}>
-              <SelectTrigger id="status-filter">
-                <SelectValue placeholder="Filter berdasarkan status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Status</SelectItem>
-                <SelectItem value="draft">Draft</SelectItem>
-                <SelectItem value="pending">Menunggu Review</SelectItem>
-                <SelectItem value="approved">Disetujui</SelectItem>
-                <SelectItem value="rejected">Ditolak</SelectItem>
-                <SelectItem value="revision_needed">Perlu Revisi</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="period-filter">Periode</Label>
+          <Select value={filters.period_id} onValueChange={handlePeriodFilterChange}>
+            <SelectTrigger id="period-filter">
+              <SelectValue placeholder="Filter berdasarkan periode" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Periode</SelectItem>
+              {periods.map((period) => (
+                <SelectItem key={period.id} value={period.id.toString()}>
+                  {period.academic_year} - {period.semester}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="status-filter">Status</Label>
+          <Select value={filters.status} onValueChange={handleStatusFilterChange}>
+            <SelectTrigger id="status-filter">
+              <SelectValue placeholder="Filter berdasarkan status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Status</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="pending">Menunggu Review</SelectItem>
+              <SelectItem value="approved">Disetujui</SelectItem>
+              <SelectItem value="rejected">Ditolak</SelectItem>
+              <SelectItem value="revision_needed">Perlu Revisi</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </Filtering>
 

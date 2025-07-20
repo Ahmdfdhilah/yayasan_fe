@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { useURLFilters } from '@/hooks/useURLFilters';
@@ -16,12 +16,12 @@ import {
 } from '@workspace/ui/components/select';
 import { Label } from '@workspace/ui/components/label';
 import { Textarea } from '@workspace/ui/components/textarea';
-import { 
-  Eye, 
-  Upload, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
+import {
+  Eye,
+  Upload,
+  CheckCircle,
+  XCircle,
+  Clock,
   FileText,
   Download,
   AlertCircle,
@@ -29,17 +29,17 @@ import {
 } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
 import Filtering from '@/components/common/Filtering';
-import { 
-  RPPSubmissionResponse, 
+import {
+  RPPSubmissionResponse,
   RPPSubmissionItemResponse,
   RPPSubmissionStatus,
 } from '@/services/rpp-submissions/types';
 import { Period } from '@/services/periods/types';
 import { User } from '@/services/users/types';
-import { 
-  rppSubmissionService, 
-  periodService, 
-  userService 
+import {
+  rppSubmissionService,
+  periodService,
+  userService
 } from '@/services';
 
 interface DetailPageFilters {
@@ -48,11 +48,10 @@ interface DetailPageFilters {
 }
 
 const RPPSubmissionDetailPage: React.FC = () => {
-  const { teacherId, periodId } = useParams<{ 
-    teacherId?: string; 
-    periodId?: string; 
+  const { teacherId, periodId } = useParams<{
+    teacherId?: string;
+    periodId?: string;
   }>();
-  const navigate = useNavigate();
   const { isAdmin, isKepalaSekolah, isGuru } = useRole();
   const { user: currentUser } = useAuth();
   const { toast } = useToast();
@@ -130,7 +129,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
     try {
       let targetPeriodId: number;
       console.log(teacherId);
-      
+
       if (periodId) {
         // Direct period access (from my-submission route)
         targetPeriodId = Number(periodId);
@@ -170,7 +169,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
 
       // Load submission data
       let submissionData: RPPSubmissionResponse;
-console.log("hhhh");
+      console.log("hhhh");
 
       if (isOwnSubmission || periodId) {
         // Teacher viewing own submission or direct period access
@@ -185,7 +184,7 @@ console.log("hhhh");
           offset: 0
         });
         console.log(submissionsResponse);
-        
+
         if (submissionsResponse.items && submissionsResponse.items.length > 0) {
           submissionData = submissionsResponse.items[0];
         } else {
@@ -221,12 +220,12 @@ console.log("hhhh");
   //       rppType,
   //       { file_id: fileId }
   //     );
-      
+
   //     toast({
   //       title: 'Berhasil',
   //       description: `File ${rppSubmissionService.getRPPTypeDisplayName(rppType)} berhasil diupload.`,
   //     });
-      
+
   //     // Reload submission data
   //     await loadSubmissionDetail();
   //   } catch (error: any) {
@@ -290,7 +289,7 @@ console.log("hhhh");
         title: 'Berhasil',
         description: statusMessages[status] || 'Review berhasil disimpan.',
       });
-      
+
       await loadSubmissionDetail();
     } catch (error: any) {
       console.error('Error reviewing submission:', error);
@@ -324,9 +323,9 @@ console.log("hhhh");
   };
 
   const renderRPPItem = (item: RPPSubmissionItemResponse) => {
-    const canUpload = isOwnSubmission && 
-                     (submission?.status === RPPSubmissionStatus.DRAFT || 
-                      submission?.status === RPPSubmissionStatus.REVISION_NEEDED);
+    const canUpload = isOwnSubmission &&
+      (submission?.status === RPPSubmissionStatus.DRAFT ||
+        submission?.status === RPPSubmissionStatus.REVISION_NEEDED);
 
     return (
       <Card key={item.id}>
@@ -366,8 +365,8 @@ console.log("hhhh");
 
             {canUpload && (
               <div className="flex justify-end">
-                <Button 
-                  variant={item.is_uploaded ? "outline" : "default"} 
+                <Button
+                  variant={item.is_uploaded ? "outline" : "default"}
                   size="sm"
                   onClick={() => {
                     // This would open a file upload dialog
@@ -429,9 +428,9 @@ console.log("hhhh");
     );
   }
 
-  const canSubmitForApproval = isOwnSubmission && 
-                              submission.status === RPPSubmissionStatus.DRAFT && 
-                              rppSubmissionService.isSubmissionReady(submission);
+  const canSubmitForApproval = isOwnSubmission &&
+    submission.status === RPPSubmissionStatus.DRAFT &&
+    rppSubmissionService.isSubmissionReady(submission);
 
   return (
     <div className="space-y-6">
@@ -446,9 +445,6 @@ console.log("hhhh");
                 Submit untuk Approval
               </Button>
             )}
-            <Button variant="outline" onClick={() => navigate(-1)}>
-              Kembali
-            </Button>
           </div>
         }
       />
@@ -494,8 +490,8 @@ console.log("hhhh");
               <Label>Progress</Label>
               <div className="mt-1">
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full" 
+                  <div
+                    className="bg-blue-600 h-2 rounded-full"
                     style={{ width: `${submission.completion_percentage}%` }}
                   ></div>
                 </div>
@@ -504,7 +500,7 @@ console.log("hhhh");
                 </p>
               </div>
             </div>
-            
+
             {submission.submitted_at && (
               <div>
                 <Label>Tanggal Submit</Label>
@@ -513,7 +509,7 @@ console.log("hhhh");
                 </p>
               </div>
             )}
-            
+
             {submission.reviewed_at && (
               <div>
                 <Label>Tanggal Review</Label>
@@ -561,9 +557,9 @@ console.log("hhhh");
                   className="mt-1"
                 />
               </div>
-              
+
               <div className="flex space-x-2">
-                <Button 
+                <Button
                   onClick={() => handleReview(RPPSubmissionStatus.APPROVED)}
                   disabled={reviewing}
                   className="bg-green-600 hover:bg-green-700"
@@ -571,7 +567,7 @@ console.log("hhhh");
                   <CheckCircle className="h-4 w-4 mr-2" />
                   Setujui
                 </Button>
-                <Button 
+                <Button
                   onClick={() => handleReview(RPPSubmissionStatus.REVISION_NEEDED)}
                   disabled={reviewing}
                   variant="outline"
@@ -579,7 +575,7 @@ console.log("hhhh");
                   <AlertCircle className="h-4 w-4 mr-2" />
                   Minta Revisi
                 </Button>
-                <Button 
+                <Button
                   onClick={() => handleReview(RPPSubmissionStatus.REJECTED)}
                   disabled={reviewing}
                   variant="destructive"
