@@ -83,7 +83,7 @@ export const fileUtils = {
   },
 
   /**
-   * Get file icon based on extension
+   * Get file icon based on extension or media file response
    */
   getFileIcon(fileName: string): string {
     const extension = this.getFileExtension(fileName);
@@ -114,5 +114,19 @@ export const fileUtils = {
       default:
         return '📎';
     }
+  },
+
+  /**
+   * Format file size using media file service
+   */
+  formatFileSize(bytes: number): string {
+    return mediaFileService.formatFileSize(bytes);
+  },
+
+  /**
+   * Validate file before upload
+   */
+  validateFile(file: File, maxSizeBytes?: number): string | null {
+    return mediaFileService.validateFile(file, maxSizeBytes);
   }
 };

@@ -3,9 +3,9 @@ import { MessageResponse, PaginatedResponse } from "../base/types";
 
 // ===== ENUMS =====
 export enum RPPType {
-  REGULER = "reguler",
-  REMEDIAL = "remedial", 
-  PENGAYAAN = "pengayaan"
+  RENCANA_PROGRAM_HARIAN = "RENCANA_PROGRAM_HARIAN",
+  RENCANA_PROGRAM_MINGGUAN = "RENCANA_PROGRAM_MINGGUAN",
+  RENCANA_PROGRAM_SEMESTER = "RENCANA_PROGRAM_SEMESTER"
 }
 
 export enum RPPSubmissionStatus {

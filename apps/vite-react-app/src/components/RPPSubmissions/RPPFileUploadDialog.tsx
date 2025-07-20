@@ -11,9 +11,8 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Upload, FileText, Loader2 } from 'lucide-react';
 import { RPPType } from '@/services/rpp-submissions/types';
-import { rppSubmissionService } from '@/services';
+import { rppSubmissionService, mediaFileService } from '@/services';
 import FileUpload from '@/components/common/FileUpload';
-import { API_BASE_URL } from '@/config/api';
 
 interface RPPFileUploadDialogProps {
   open: boolean;
@@ -62,31 +61,27 @@ export const RPPFileUploadDialog: React.FC<RPPFileUploadDialogProps> = ({
     try {
       setUploading(true);
       
-      // First upload the file to get file ID
       const file = selectedFiles[0];
-      const formData = new FormData();
-      formData.append('file', file);
       
-      const uploadResponse = await fetch(`${API_BASE_URL}/files/upload`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: formData
-      });
-      
-      if (!uploadResponse.ok) {
-        throw new Error('Failed to upload file');
+      // Validate file before upload
+      const validationError = mediaFileService.validateFile(file, 10 * 1024 * 1024); // 10MB limit
+      if (validationError) {
+        throw new Error(validationError);
       }
       
-      const uploadResult = await uploadResponse.json();
-      const fileId = uploadResult.id || uploadResult.file_id;
+      // Upload file using media files service
+      const uploadResult = await mediaFileService.uploadFile({
+        file,
+        is_public: false // RPP files are private
+      });
+      
+      const fileId = uploadResult.file.id;
       
       if (!fileId) {
         throw new Error('File ID not returned from upload');
       }
       
-      // Then associate the file with the RPP submission
+      // Associate the file with the RPP submission
       await rppSubmissionService.uploadRPPFile(periodId, rppType, {
         file_id: fileId
       });

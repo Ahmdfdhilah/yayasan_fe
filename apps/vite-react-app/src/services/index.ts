@@ -11,6 +11,7 @@ export { periodService } from "./periods";
 export { evaluationAspectService } from "./evaluation-aspects";
 export { teacherEvaluationService } from "./teacher-evaluations";
 export { rppSubmissionService } from "./rpp-submissions";
+export { mediaFileService } from "./media-files";
 
 // Export types with explicit imports to avoid conflicts
 export type {
@@ -97,3 +98,13 @@ export type {
   RPPSubmissionItemUpdate,
   RPPSubmissionMessageResponse,
 } from "./rpp-submissions";
+
+export type {
+  MediaFileResponse,
+  MediaFileListResponse,
+  MediaFileFilterParams,
+  MediaFileMessageResponse,
+  MediaFileUpdate,
+  MediaFileUploadResponse,
+  MediaFileUploadData,
+} from "./media-files";

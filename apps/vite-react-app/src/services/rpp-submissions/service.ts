@@ -253,9 +253,9 @@ class RPPSubmissionService extends BaseService {
    */
   getRPPTypeDisplayName(rppType: RPPType): string {
     const displayNames = {
-      [RPPType.REGULER]: "RPP Reguler",
-      [RPPType.REMEDIAL]: "RPP Remedial", 
-      [RPPType.PENGAYAAN]: "RPP Pengayaan"
+      [RPPType.RENCANA_PROGRAM_HARIAN]: "Rencana Program Harian",
+      [RPPType.RENCANA_PROGRAM_MINGGUAN]: "Rencana Program Mingguan", 
+      [RPPType.RENCANA_PROGRAM_SEMESTER]: "Rencana Program Semester"
     };
     return displayNames[rppType] || rppType;
   }
