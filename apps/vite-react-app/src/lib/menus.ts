@@ -1,12 +1,11 @@
-import { 
-  BookOpen, 
-  FileText, 
-  Users, 
-  GraduationCap, 
-  Calendar, 
-  BarChart3, 
-  Building, 
-  Settings,
+import {
+  BookOpen,
+  FileText,
+  Users,
+  GraduationCap,
+  Calendar,
+  BarChart3,
+  Building,
   ClipboardCheck,
   Upload,
   Download
@@ -121,14 +120,6 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Manajemen User',
     href: '/users',
     icon: Users,
-    allowedRoles: ['admin'],
-  },
-
-  // System Settings - Admin only
-  {
-    title: 'Pengaturan',
-    href: '/settings',
-    icon: Settings,
     allowedRoles: ['admin'],
   },
 ];

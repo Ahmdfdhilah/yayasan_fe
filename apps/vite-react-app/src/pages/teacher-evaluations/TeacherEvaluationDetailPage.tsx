@@ -17,7 +17,7 @@ import {
   SelectValue
 } from '@workspace/ui/components/select';
 import { Label } from '@workspace/ui/components/label';
-import { ArrowLeft, Eye, Edit, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Eye, Edit, CheckCircle, Download } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { EvaluationCategorySection } from '@/components/TeacherEvaluations';
 import Filtering from '@/components/common/Filtering';
@@ -25,6 +25,7 @@ import { TeacherEvaluation } from '@/services/teacher-evaluations/types';
 import { EvaluationAspect } from '@/services/evaluation-aspects/types';
 import { Period } from '@/services/periods/types';
 import { teacherEvaluationService, evaluationAspectService, periodService } from '@/services';
+import { generateEvaluationPDF, EvaluationReportData } from '@/utils/pdfReportUtils';
 
 const evaluationFormSchema = z.object({
   aspects: z.record(z.string(), z.string().min(1, 'Rating harus dipilih')),
@@ -218,6 +219,65 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     }
   };
 
+  const generatePDFReport = () => {
+    if (!evaluations.length || !currentPeriod) {
+      toast({
+        title: 'Error',
+        description: 'Data evaluasi tidak lengkap untuk generate PDF.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      // Prepare data for PDF
+      const reportData: EvaluationReportData = {
+        teacherName: teacherInfo.teacher_name || 'N/A',
+        teacherNip: '', // Add NIP if available in data
+        evaluatorName: evaluations[0]?.evaluator_name || 'N/A',
+        periodAcademicYear: currentPeriod.academic_year,
+        periodSemester: currentPeriod.semester,
+        evaluationDate: evaluations[0]?.evaluation_date
+          ? new Date(evaluations[0].evaluation_date).toLocaleDateString('id-ID')
+          : new Date().toLocaleDateString('id-ID'),
+        organizationName: '', // Add organization name if available
+        evaluationResults: categories.map(category => ({
+          category,
+          aspects: aspects
+            .filter(aspect => aspect.category === category)
+            .map(aspect => {
+              const evaluation = evaluations.find(evaluation => evaluation.aspect_id === aspect.id);
+              return {
+                aspectName: aspect.aspect_name,
+                description: aspect.description,
+                grade: evaluation?.grade || 'N/A',
+                score: evaluation?.score || 0,
+              };
+            })
+        })),
+        averageScore: evaluations.length > 0
+          ? evaluations.reduce((sum, evaluation) => sum + evaluation.score, 0) / evaluations.length
+          : 0,
+        notes: evaluations[0]?.notes || '',
+      };
+
+      generateEvaluationPDF(reportData);
+
+      toast({
+        title: 'Berhasil',
+        description: 'PDF laporan evaluasi berhasil diunduh.',
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: 'Error',
+        description: 'Gagal generate PDF. Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -266,10 +326,14 @@ const TeacherEvaluationDetailPage: React.FC = () => {
         description={`Evaluasi kinerja ${teacherInfo.teacher_name || 'N/A'}`}
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={handleBack}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali
-            </Button>
+            {/* PDF Actions - only show when evaluations exist */}
+            {evaluations.length > 0 && (
+              <Button variant="outline" onClick={generatePDFReport}>
+                <Download className="h-4 w-4 mr-2" />
+                Unduh PDF
+              </Button>
+            )}
+
             {canEdit && evaluations.length > 0 && (
               <Button variant="outline" onClick={toggleMode}>
                 {mode === 'view' ? (
