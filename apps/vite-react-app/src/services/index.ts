@@ -80,15 +80,20 @@ export type {
 } from "./teacher-evaluations";
 
 export type {
-  RPPSubmission,
-  RPPSubmissionCreate,
-  RPPSubmissionUpdate,
-  RPPSubmissionReview,
-  RPPSubmissionResubmit,
+  RPPType,
+  RPPSubmissionStatus,
   RPPSubmissionResponse,
   RPPSubmissionListResponse,
+  RPPSubmissionItemResponse,
+  RPPSubmissionItemListResponse,
   RPPSubmissionFilterParams,
-  RPPStatus,
-  RPPStatusInfo,
-  RPPMessageResponse,
+  RPPSubmissionItemFilterParams,
+  RPPSubmissionStats,
+  RPPSubmissionDashboard,
+  GenerateRPPSubmissionsRequest,
+  GenerateRPPSubmissionsResponse,
+  RPPSubmissionSubmitRequest,
+  RPPSubmissionReviewRequest,
+  RPPSubmissionItemUpdate,
+  RPPSubmissionMessageResponse,
 } from "./rpp-submissions";
