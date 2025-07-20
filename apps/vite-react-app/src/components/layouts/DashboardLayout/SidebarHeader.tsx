@@ -2,11 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@workspace/ui/components/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@workspace/ui/lib/utils';
-import { useTheme } from '@/hooks/useTheme';
-import logoLightMode from '@/assets/logoLightMode.png';
-import logoDarkMode from '@/assets/logoDarkMode.png';
-import logoMiniLightMode from '@/assets/logoMiniLightMode.png';
-import logoMiniDarkMode from '@/assets/logoMiniDarkMode.png';
+import logo from '@/assets/logo.png';
 
 interface SidebarHeaderProps {
   collapsed: boolean;
@@ -14,15 +10,14 @@ interface SidebarHeaderProps {
 }
 
 export function SidebarHeader({ collapsed, onToggleCollapse }: SidebarHeaderProps) {
-  const { isDarkMode } = useTheme();
   
   return (
     <>
       <div className={cn("flex h-16 items-center flex-shrink-0", collapsed ? "px-3 justify-center" : "px-6 justify-between")}>
         <Link to="/admin" className={cn("flex items-center", collapsed ? "justify-center" : "space-x-2")}>
           <img 
-            src={collapsed ? (isDarkMode ? logoMiniDarkMode : logoMiniLightMode) : (isDarkMode ? logoDarkMode : logoLightMode)} 
-            className={cn("transition-all duration-300", collapsed ? "w-8 h-8" : "w-35 h-auto")} 
+            src={logo} 
+            className={cn("transition-all duration-300 object-contain", collapsed ? "w-8 h-8" : "w-12 h-12")} 
             alt="logo okoce" 
           />
         </Link>

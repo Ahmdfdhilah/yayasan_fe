@@ -13,10 +13,8 @@ import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@workspace/ui/components/form';
 import { Checkbox } from '@workspace/ui/components/checkbox';
 
-import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/components/Auth/AuthProvider';
-import logoLightMode from '@/assets/logoLightMode.png';
-import logoDarkMode from '@/assets/logoDarkMode.png';
+import logo from '@/assets/logo.png';
 import loginIcon from '@/assets/loginIcon.png';
 
 const loginSchema = z.object({
@@ -28,7 +26,6 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
-  const { isDarkMode } = useTheme();
   const { login, isAuthenticated, loading: authLoading, error, clearAuthError } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string>('');
@@ -128,7 +125,7 @@ export function LoginPage() {
             {/* Logo and Header */}
             <div className="text-center space-y-4">
               <div className="flex justify-center">
-                <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="" className="h-12 w-auto" />
+                <img src={logo} alt="" className="w-12 h-12 object-contain" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">Selamat Datang</h1>
@@ -289,7 +286,7 @@ export function LoginPage() {
           {/* Logo and Header */}
           <div className="text-center space-y-4">
             <div className="flex justify-center">
-              <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="" className="h-12 w-auto" />
+              <img src={logo} alt="" className="w-12 h-12 object-contain" />
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-white">Selamat Datang</h1>

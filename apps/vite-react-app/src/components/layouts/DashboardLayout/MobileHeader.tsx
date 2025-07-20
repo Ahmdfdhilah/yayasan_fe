@@ -8,7 +8,6 @@ interface MobileHeaderProps {
 
 export function MobileHeader({ onOpenSidebar }: MobileHeaderProps) {
 
-
   return (
     <>
       <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-3 shadow-sm md:hidden">

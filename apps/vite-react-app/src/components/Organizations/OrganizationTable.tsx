@@ -11,6 +11,7 @@ import {
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { Users } from 'lucide-react';
 
 interface OrganizationTableProps {
   organizations: Organization[];
@@ -66,8 +67,9 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
                 <TableCell>
                   {organization.head_name || 'Belum ada'}
                 </TableCell>
-                <TableCell>
-                  {organization.user_count}
+                <TableCell className='text-center flex'>
+                  <Users className='w-4' />
+                  <span>  {organization.user_count}</span>
                 </TableCell>
                 <TableCell>
                   {format(new Date(organization.created_at), 'dd MMM yyyy', { locale: id })}

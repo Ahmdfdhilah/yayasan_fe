@@ -14,9 +14,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@workspace/ui/components/form';
 
-import { useTheme } from '@/hooks/useTheme';
-import logoLightMode from '@/assets/logoLightMode.png';
-import logoDarkMode from '@/assets/logoDarkMode.png';
+import logo from '@/assets/logo.png';
 import loginIcon from '@/assets/loginIcon.png';
 
 const forgotPasswordSchema = z.object({
@@ -26,7 +24,6 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export function ForgotPasswordPage() {
-  const { isDarkMode } = useTheme();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const dispatch = useDispatch<AppDispatch>();
@@ -88,7 +85,8 @@ export function ForgotPasswordPage() {
             {/* Logo and Header */}
             <div className="text-center space-y-4">
               <div className="flex justify-center">
-                <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
+                <img src={logo} alt="YAYASAN BAITUL MUSLIM
+LAMPUNG TIMUR " className="w-12 h-12 object-contain" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">Lupa Password</h1>
@@ -180,7 +178,8 @@ export function ForgotPasswordPage() {
           {/* Logo and Header */}
           <div className="text-center space-y-4">
             <div className="flex justify-center">
-              <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
+              <img src={logo} alt="YAYASAN BAITUL MUSLIM
+LAMPUNG TIMUR " className="w-12 h-12 object-contain" />
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-white">Lupa Password</h1>

@@ -7,6 +7,7 @@ export * from "./base";
 export { authService } from "./auth";
 export { userService } from "./users";
 export { organizationService } from "./organizations";
+export { periodService } from "./periods";
 
 // Export types with explicit imports to avoid conflicts
 export type {
@@ -36,3 +37,13 @@ export type {
   OrganizationListResponse,
   OrganizationFilterParams,
 } from "./organizations";
+
+export type {
+  Period,
+  PeriodCreate,
+  PeriodUpdate,
+  PeriodResponse,
+  PeriodWithStats,
+  PeriodListResponse,
+  PeriodFilterParams,
+} from "./periods";

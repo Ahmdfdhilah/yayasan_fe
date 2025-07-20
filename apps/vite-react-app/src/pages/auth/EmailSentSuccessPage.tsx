@@ -9,13 +9,10 @@ import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 
-import { useTheme } from '@/hooks/useTheme';
-import logoLightMode from '@/assets/logoLightMode.png';
-import logoDarkMode from '@/assets/logoDarkMode.png';
+import logo from '@/assets/logo.png';
 import loginIcon from '@/assets/loginIcon.png';
 
 export function EmailSentSuccessPage() {
-  const { isDarkMode } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
@@ -69,7 +66,8 @@ export function EmailSentSuccessPage() {
             {/* Logo and Header */}
             <div className="text-center space-y-4">
               <div className="flex justify-center">
-                <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
+                <img src={logo} alt="YAYASAN BAITUL MUSLIM
+LAMPUNG TIMUR " className="w-12 h-12 object-contain" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">Email Terkirim!</h1>
@@ -162,7 +160,8 @@ export function EmailSentSuccessPage() {
           {/* Logo and Header */}
           <div className="text-center space-y-4">
             <div className="flex justify-center">
-              <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
+              <img src={logo} alt="YAYASAN BAITUL MUSLIM
+LAMPUNG TIMUR " className="w-12 h-12 object-contain" />
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-white">Email Terkirim!</h1>
