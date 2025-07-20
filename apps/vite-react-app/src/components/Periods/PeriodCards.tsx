@@ -1,16 +1,12 @@
 import React from 'react';
 import { Period } from '@/services/periods/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
-import { Badge } from '@workspace/ui/components/badge';
-import { Button } from '@workspace/ui/components/button';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { 
   Calendar, 
   BookOpen,
-  CheckCircle,
-  XCircle,
   FileText,
   Clock
 } from 'lucide-react';
@@ -21,9 +17,6 @@ interface PeriodCardsProps {
   onEdit: (period: Period) => void;
   onDelete: (period: Period) => void;
   onView: (period: Period) => void;
-  onActivate?: (period: Period) => void;
-  onDeactivate?: (period: Period) => void;
-  canManage?: boolean;
 }
 
 export const PeriodCards: React.FC<PeriodCardsProps> = ({
@@ -31,66 +24,14 @@ export const PeriodCards: React.FC<PeriodCardsProps> = ({
   loading = false,
   onEdit,
   onDelete,
-  onView,
-  onActivate,
-  onDeactivate,
-  canManage = false
+  onView
 }) => {
   
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), 'dd MMM yyyy', { locale: id });
   };
 
-  const getStatusBadge = (period: Period) => {
-    if (period.is_active) {
-      return (
-        <div className="flex items-center space-x-1">
-          <Badge variant="default" className="text-xs bg-green-100 text-green-800 hover:bg-green-100">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            Aktif
-          </Badge>
-          {canManage && onDeactivate && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onDeactivate(period)}
-              className="h-6 px-2 text-xs"
-            >
-              Nonaktifkan
-            </Button>
-          )}
-        </div>
-      );
-    } else {
-      return (
-        <div className="flex items-center space-x-1">
-          <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600 hover:bg-gray-100">
-            <XCircle className="w-3 h-3 mr-1" />
-            Tidak Aktif
-          </Badge>
-          {canManage && onActivate && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onActivate(period)}
-              className="h-6 px-2 text-xs"
-            >
-              Aktifkan
-            </Button>
-          )}
-        </div>
-      );
-    }
-  };
 
-  const getSemesterBadge = (semester: string) => {
-    const variant = semester === 'Ganjil' ? 'default' : 'secondary';
-    return (
-      <Badge variant={variant} className="text-xs">
-        {semester}
-      </Badge>
-    );
-  };
 
   const getActionProps = (period: Period) => {
     return {
@@ -131,10 +72,9 @@ export const PeriodCards: React.FC<PeriodCardsProps> = ({
                   <BookOpen className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-sm">{period.academic_year}</h3>
-                  <div className="flex items-center space-x-2 mt-1">
-                    {getSemesterBadge(period.semester)}
-                    {getStatusBadge(period)}
+                  <h3 className="font-medium text-sm">{period.academic_year} - {period.semester}</h3>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Status: {period.is_active ? 'Aktif' : 'Tidak Aktif'}
                   </div>
                 </div>
               </div>

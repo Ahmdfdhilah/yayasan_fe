@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@workspace/ui/components/select';
+import { Switch } from '@workspace/ui/components/switch';
 import { Period, PeriodCreate, PeriodUpdate } from '@/services/periods/types';
 
 const periodFormSchema = z.object({
@@ -36,6 +37,7 @@ const periodFormSchema = z.object({
   start_date: z.string().min(1, 'Tanggal mulai wajib diisi'),
   end_date: z.string().min(1, 'Tanggal selesai wajib diisi'),
   description: z.string().optional().or(z.literal('')),
+  is_active: z.boolean(),
 }).refine((data) => {
   const startDate = new Date(data.start_date);
   const endDate = new Date(data.end_date);
@@ -72,6 +74,7 @@ export const PeriodDialog: React.FC<PeriodDialogProps> = ({
       start_date: '',
       end_date: '',
       description: '',
+      is_active: false,
     },
   });
 
@@ -84,6 +87,7 @@ export const PeriodDialog: React.FC<PeriodDialogProps> = ({
           start_date: editingPeriod.start_date,
           end_date: editingPeriod.end_date,
           description: editingPeriod.description || '',
+          is_active: Boolean(editingPeriod.is_active),
         });
       } else {
         form.reset({
@@ -92,6 +96,7 @@ export const PeriodDialog: React.FC<PeriodDialogProps> = ({
           start_date: '',
           end_date: '',
           description: '',
+          is_active: false,
         });
       }
     }
@@ -107,6 +112,7 @@ export const PeriodDialog: React.FC<PeriodDialogProps> = ({
         start_date: data.start_date,
         end_date: data.end_date,
         description: data.description || undefined,
+        is_active: data.is_active,
       };
 
       onSave(submitData);
@@ -247,6 +253,27 @@ export const PeriodDialog: React.FC<PeriodDialogProps> = ({
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="is_active"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                  <div className="space-y-0.5">
+                    <FormLabel>Status Periode</FormLabel>
+                    <div className="text-sm text-muted-foreground">
+                      Aktifkan periode ini untuk digunakan dalam sistem
+                    </div>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
                 </FormItem>
               )}
             />

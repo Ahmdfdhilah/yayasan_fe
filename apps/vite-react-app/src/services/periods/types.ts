@@ -24,6 +24,7 @@ export interface PeriodCreate {
   start_date: string;
   end_date: string;
   description?: string;
+  is_active?: boolean;
 }
 
 export interface PeriodUpdate {

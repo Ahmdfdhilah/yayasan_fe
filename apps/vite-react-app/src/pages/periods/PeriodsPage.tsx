@@ -80,8 +80,8 @@ const PeriodsPage: React.FC = () => {
   const [periodToDelete, setPeriodToDelete] = useState<Period | null>(null);
 
   // Calculate access control
-  const hasAccess = isAdmin() || isPrincipal();
-  const canManage = isAdmin() || isPrincipal();
+  const hasAccess = isAdmin();
+  const canManage = isAdmin();
 
   // Fetch periods function
   const fetchPeriods = async () => {
@@ -146,43 +146,6 @@ const PeriodsPage: React.FC = () => {
     setPeriodToDelete(period);
   };
 
-  const handleActivate = async (period: Period) => {
-    try {
-      await periodService.activatePeriod(period.id);
-      fetchPeriods(); // Refresh the list
-      toast({
-        title: 'Periode berhasil diaktifkan',
-        description: `Periode ${period.academic_year} ${period.semester} telah diaktifkan.`,
-      });
-    } catch (error: any) {
-      console.error('Failed to activate period:', error);
-      const errorMessage = error?.message || 'Gagal mengaktifkan periode. Silakan coba lagi.';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive'
-      });
-    }
-  };
-
-  const handleDeactivate = async (period: Period) => {
-    try {
-      await periodService.deactivatePeriod(period.id);
-      fetchPeriods(); // Refresh the list
-      toast({
-        title: 'Periode berhasil dinonaktifkan',
-        description: `Periode ${period.academic_year} ${period.semester} telah dinonaktifkan.`,
-      });
-    } catch (error: any) {
-      console.error('Failed to deactivate period:', error);
-      const errorMessage = error?.message || 'Gagal menonaktifkan periode. Silakan coba lagi.';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive'
-      });
-    }
-  };
 
   const confirmDeletePeriod = async () => {
     if (periodToDelete) {
@@ -214,8 +177,22 @@ const PeriodsPage: React.FC = () => {
   const handleSave = async (periodData: any) => {
     try {
       if (editingPeriod) {
-        // Update existing period
-        await periodService.updatePeriod(editingPeriod.id, periodData);
+        // Check if status has changed and handle activate/deactivate separately
+        const statusChanged = editingPeriod.is_active !== periodData.is_active;
+        
+        // First update the period data (excluding status)
+        const { is_active, ...updateData } = periodData;
+        await periodService.updatePeriod(editingPeriod.id, updateData);
+        
+        // Then handle status change if needed
+        if (statusChanged) {
+          if (periodData.is_active) {
+            await periodService.activatePeriod(editingPeriod.id);
+          } else {
+            await periodService.deactivatePeriod(editingPeriod.id);
+          }
+        }
+        
         toast({
           title: 'Periode berhasil diperbarui',
           description: `Periode ${periodData.academic_year} ${periodData.semester} telah diperbarui.`,
@@ -406,9 +383,6 @@ const PeriodsPage: React.FC = () => {
                 onView={handleView}
                 onEdit={canManage ? handleEdit : () => {}}
                 onDelete={canManage ? handleDelete : () => {}}
-                onActivate={canManage ? handleActivate : undefined}
-                onDeactivate={canManage ? handleDeactivate : undefined}
-                canManage={canManage}
               />
             </div>
 
@@ -420,9 +394,6 @@ const PeriodsPage: React.FC = () => {
                 onView={handleView}
                 onEdit={canManage ? handleEdit : () => {}}
                 onDelete={canManage ? handleDelete : () => {}}
-                onActivate={canManage ? handleActivate : undefined}
-                onDeactivate={canManage ? handleDeactivate : undefined}
-                canManage={canManage}
               />
             </div>
 
