@@ -16,8 +16,8 @@ export interface BreadcrumbItem {
 }
 
 interface PageHeaderProps {
-  title: string;
-  description?: string;
+  title: React.ReactNode;
+  description?: React.ReactNode;
   breadcrumbs?: BreadcrumbItem[];
   actions?: React.ReactNode;
   className?: string;
@@ -57,7 +57,7 @@ export function PageHeader({
         <div className="min-w-0 flex-1 space-y-1">
           <h1 className="break-words text-xl font-bold tracking-tight sm:text-2xl lg:text-3xl">{title}</h1>
           {description && (
-            <p className="break-words text-sm text-muted-foreground sm:text-base">{description}</p>
+            <div className="break-words text-sm text-muted-foreground sm:text-base">{description}</div>
           )}
         </div>
         {actions && (

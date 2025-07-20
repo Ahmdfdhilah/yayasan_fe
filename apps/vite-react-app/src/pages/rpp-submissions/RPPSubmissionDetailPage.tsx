@@ -15,15 +15,11 @@ import {
   SelectValue
 } from '@workspace/ui/components/select';
 import { Label } from '@workspace/ui/components/label';
-import { Textarea } from '@workspace/ui/components/textarea';
 import {
-  Eye,
-  Upload,
   CheckCircle,
   XCircle,
   Clock,
   FileText,
-  Download,
   Send
 } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -33,6 +29,7 @@ import {
   RPPSubmissionItemResponse,
   RPPSubmissionStatus,
 } from '@/services/rpp-submissions/types';
+import { RPPItemCard, RPPReviewSection } from '@/components/RPPSubmissions';
 import { Period } from '@/services/periods/types';
 import { User } from '@/services/users/types';
 import {
@@ -70,12 +67,21 @@ const RPPSubmissionDetailPage: React.FC = () => {
   const [periods, setPeriods] = useState<Period[]>([]);
   const [currentPeriod, setCurrentPeriod] = useState<Period | null>(null);
   const [loading, setLoading] = useState(true);
-  const [reviewing, setReviewing] = useState(false);
-  const [reviewNotes, setReviewNotes] = useState('');
 
   // Determine if this is a teacher's own submission or viewing someone else's
   const isOwnSubmission = isGuru() && currentUser?.id?.toString() === teacherId;
-  const canReview = isKepalaSekolah() && submission?.status === RPPSubmissionStatus.PENDING;
+  
+  // Kepala sekolah can review submissions from teachers in their organization
+  const canReview = isKepalaSekolah() && 
+    submission?.status === RPPSubmissionStatus.PENDING &&
+    teacher?.profile?.organization_id === currentUser?.profile?.organization_id;
+  
+  // Admin can view all submissions but cannot review (read-only access)
+  const isAdminView = isAdmin();
+  
+  // Kepala sekolah can view submissions from teachers in their organization
+  const isKepalaSekolahView = isKepalaSekolah() && 
+    teacher?.profile?.organization_id === currentUser?.profile?.organization_id;
 
   useEffect(() => {
     loadInitialData();
@@ -194,7 +200,6 @@ const RPPSubmissionDetailPage: React.FC = () => {
       }
 
       setSubmission(submissionData);
-      setReviewNotes(submissionData.review_notes || '');
     } catch (error: any) {
       console.error('Error loading submission detail:', error);
       toast({
@@ -209,33 +214,9 @@ const RPPSubmissionDetailPage: React.FC = () => {
     updateURL({ period_id });
   };
 
-  // Note: handleFileUpload will be implemented when file upload component is ready
-  // const handleFileUpload = async (rppType: RPPType, fileId: number) => {
-  //   if (!submission) return;
-
-  //   try {
-  //     await rppSubmissionService.uploadRPPFile(
-  //       submission.period_id,
-  //       rppType,
-  //       { file_id: fileId }
-  //     );
-
-  //     toast({
-  //       title: 'Berhasil',
-  //       description: `File ${rppSubmissionService.getRPPTypeDisplayName(rppType)} berhasil diupload.`,
-  //     });
-
-  //     // Reload submission data
-  //     await loadSubmissionDetail();
-  //   } catch (error: any) {
-  //     console.error('Error uploading file:', error);
-  //     toast({
-  //       title: 'Error',
-  //       description: error.message || 'Gagal upload file.',
-  //       variant: 'destructive'
-  //     });
-  //   }
-  // };
+  const handleFileUploaded = async () => {
+    await loadSubmissionDetail();
+  };
 
   const handleSubmitForApproval = async () => {
     if (!submission) return;
@@ -266,39 +247,8 @@ const RPPSubmissionDetailPage: React.FC = () => {
     }
   };
 
-  const handleReview = async (status: RPPSubmissionStatus) => {
-    if (!submission) return;
-
-    try {
-      setReviewing(true);
-      await rppSubmissionService.reviewSubmission(submission.id, {
-        status,
-        review_notes: reviewNotes || undefined
-      });
-
-      const statusMessages: Record<RPPSubmissionStatus, string> = {
-        [RPPSubmissionStatus.DRAFT]: 'Status berhasil diubah ke draft.',
-        [RPPSubmissionStatus.PENDING]: 'Status berhasil diubah ke pending.',
-        [RPPSubmissionStatus.APPROVED]: 'RPP submission berhasil disetujui.',
-        [RPPSubmissionStatus.REJECTED]: 'RPP submission berhasil ditolak.',
-      };
-
-      toast({
-        title: 'Berhasil',
-        description: statusMessages[status] || 'Review berhasil disimpan.',
-      });
-
-      await loadSubmissionDetail();
-    } catch (error: any) {
-      console.error('Error reviewing submission:', error);
-      toast({
-        title: 'Error',
-        description: error.message || 'Gagal mereview RPP submission.',
-        variant: 'destructive'
-      });
-    } finally {
-      setReviewing(false);
-    }
+  const handleReviewComplete = async () => {
+    await loadSubmissionDetail();
   };
 
   const getStatusIcon = (status: RPPSubmissionStatus) => {
@@ -320,74 +270,21 @@ const RPPSubmissionDetailPage: React.FC = () => {
 
   const renderRPPItem = (item: RPPSubmissionItemResponse) => {
     const canUpload = isOwnSubmission &&
-      (submission?.status === RPPSubmissionStatus.DRAFT);
+      (submission?.status === RPPSubmissionStatus.DRAFT || submission?.status === RPPSubmissionStatus.REJECTED);
 
     return (
-      <Card key={item.id}>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">{item.rpp_type_display_name}</CardTitle>
-            <Badge variant={item.is_uploaded ? "default" : "secondary"}>
-              {item.is_uploaded ? "Uploaded" : "Belum Upload"}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {item.is_uploaded ? (
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <FileText className="h-4 w-4 text-green-600" />
-                  <span className="text-sm">{item.file_name}</span>
-                </div>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm">
-                    <Eye className="h-4 w-4 mr-1" />
-                    Lihat
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-1" />
-                    Download
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-4 border-2 border-dashed border-gray-300 rounded-lg">
-                <FileText className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                <p className="text-sm text-gray-500">Belum ada file yang diupload</p>
-              </div>
-            )}
-
-            {canUpload && (
-              <div className="flex justify-end">
-                <Button
-                  variant={item.is_uploaded ? "outline" : "default"}
-                  size="sm"
-                  onClick={() => {
-                    // This would open a file upload dialog
-                    // Implementation depends on your file upload component
-                    console.log('Upload file for', item.rpp_type);
-                  }}
-                >
-                  <Upload className="h-4 w-4 mr-1" />
-                  {item.is_uploaded ? "Ganti File" : "Upload File"}
-                </Button>
-              </div>
-            )}
-
-            {item.uploaded_at && (
-              <p className="text-xs text-gray-500">
-                Diupload: {new Date(item.uploaded_at).toLocaleString()}
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <RPPItemCard
+        key={item.id}
+        item={item}
+        canUpload={canUpload}
+        submissionStatus={submission!.status}
+        onFileUploaded={handleFileUploaded}
+      />
     );
   };
 
-  // Check access
-  const hasAccess = isAdmin() || isKepalaSekolah() || isOwnSubmission;
+  // Check access - more granular check
+  const hasAccess = isOwnSubmission || isAdminView || isKepalaSekolahView;
 
   if (!hasAccess) {
     return (
@@ -395,7 +292,10 @@ const RPPSubmissionDetailPage: React.FC = () => {
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
           <p className="text-muted-foreground">
-            Anda tidak memiliki akses untuk melihat halaman ini.
+            {isKepalaSekolah() 
+              ? "Anda hanya dapat melihat RPP submission dari guru di organisasi Anda."
+              : "Anda tidak memiliki akses untuk melihat halaman ini."
+            }
           </p>
         </div>
       </div>
@@ -424,14 +324,42 @@ const RPPSubmissionDetailPage: React.FC = () => {
   }
 
   const canSubmitForApproval = isOwnSubmission &&
-    submission.status === RPPSubmissionStatus.DRAFT &&
+    (submission.status === RPPSubmissionStatus.DRAFT || submission.status === RPPSubmissionStatus.REJECTED) &&
     rppSubmissionService.isSubmissionReady(submission);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={isOwnSubmission ? "RPP Submission Saya" : `RPP Submission - ${teacher?.profile?.name || teacher?.display_name || 'Unknown'}`}
-        description={`Detail RPP submission untuk periode ${currentPeriod?.academic_year} - ${currentPeriod?.semester}`}
+        title={
+          <div className="flex items-center space-x-3">
+            <span>
+              {isOwnSubmission 
+                ? "RPP Submission Saya" 
+                : `RPP Submission - ${teacher?.profile?.name || teacher?.display_name || 'Unknown'}`
+              }
+            </span>
+            {isAdminView && (
+              <Badge variant="outline" className="text-blue-600">
+                Admin View
+              </Badge>
+            )}
+            {isKepalaSekolahView && (
+              <Badge variant="outline" className="text-purple-600">
+                Kepala Sekolah
+              </Badge>
+            )}
+          </div>
+        }
+        description={
+          <div>
+            <p>{`Detail RPP submission untuk periode ${currentPeriod?.academic_year} - ${currentPeriod?.semester}`}</p>
+            {teacher?.profile?.organization_name && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Organisasi: {teacher.profile.organization_name}
+              </p>
+            )}
+          </div>
+        }
         actions={
           <div className="flex space-x-2">
             {canSubmitForApproval && (
@@ -536,44 +464,10 @@ const RPPSubmissionDetailPage: React.FC = () => {
 
       {/* Review Section (for kepala sekolah) */}
       {canReview && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Review Submission</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="review-notes">Catatan Review</Label>
-                <Textarea
-                  id="review-notes"
-                  value={reviewNotes}
-                  onChange={(e) => setReviewNotes(e.target.value)}
-                  placeholder="Berikan catatan untuk guru..."
-                  className="mt-1"
-                />
-              </div>
-
-              <div className="flex space-x-2">
-                <Button
-                  onClick={() => handleReview(RPPSubmissionStatus.APPROVED)}
-                  disabled={reviewing}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Setujui
-                </Button>
-                <Button
-                  onClick={() => handleReview(RPPSubmissionStatus.REJECTED)}
-                  disabled={reviewing}
-                  variant="destructive"
-                >
-                  <XCircle className="h-4 w-4 mr-2" />
-                  Tolak
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <RPPReviewSection
+          submission={submission}
+          onReviewComplete={handleReviewComplete}
+        />
       )}
     </div>
   );
