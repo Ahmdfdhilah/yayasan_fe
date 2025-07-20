@@ -26,6 +26,7 @@ import { EvaluationAspectsPage } from './pages/evaluation-aspects/EvaluationAspe
 import TeacherEvaluationsPage from './pages/teacher-evaluations/TeacherEvaluationsPage';
 import TeacherEvaluationDetailPage from './pages/teacher-evaluations/TeacherEvaluationDetailPage';
 import EvaluationReportsPage from './pages/evaluation-reports/EvaluationReportsPage';
+import { MyRPPSubmissionsPage, RPPSubmissionsPage, RPPSubmissionDetailPage } from './pages/rpp-submissions';
 
 // Simple redirect component for My Evaluations
 const MyEvaluationsRedirect = () => {
@@ -131,6 +132,28 @@ function App() {
                     <Route path="my-evaluations" element={
                       <RoleProtectedRoute allowedRoles={['guru']}>
                         <MyEvaluationsRedirect />
+                      </RoleProtectedRoute>
+                    } />
+                    
+                    {/* RPP Submissions Routes */}
+                    {/* My RPP Submissions - Guru only */}
+                    <Route path="my-rpp-submissions" element={
+                      <RoleProtectedRoute allowedRoles={['guru']}>
+                        <MyRPPSubmissionsPage />
+                      </RoleProtectedRoute>
+                    } />
+                    
+                    {/* RPP Submissions List - Admin and Kepala Sekolah */}
+                    <Route path="rpp-submissions" element={
+                      <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah']}>
+                        <RPPSubmissionsPage />
+                      </RoleProtectedRoute>
+                    } />
+                                      
+                    {/* RPP Submission Detail - Admin/Kepala Sekolah viewing teacher's submission */}
+                    <Route path="rpp-submissions/teacher/:teacherId" element={
+                      <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah']}>
+                        <RPPSubmissionDetailPage />
                       </RoleProtectedRoute>
                     } />
                   </Route>
