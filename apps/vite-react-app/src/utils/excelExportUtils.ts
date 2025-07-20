@@ -264,31 +264,163 @@ export const exportToExcel = async (config: ExcelExportConfig, toastFn: ToastFun
   }
 };
 
-// Specific utility for Matriks export
-export const exportMatriksToExcel = async (item: any, formatIndonesianDateRange: (start: string, end: string) => string, toastFn: ToastFunction): Promise<void> => {
-  const temuanRekomendasi = item.temuan_rekomendasi_summary?.data || [];
-  const tanggalEvaluasi = formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai);
-  
+// Specific utility for Evaluation Reports export
+export const exportEvaluationReportToExcel = async (
+  stats: any, 
+  period: any, 
+  toastFn: ToastFunction
+): Promise<void> => {
+  const today = new Date().toLocaleDateString('id-ID', { 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric' 
+  });
+
+  // Prepare category statistics data
+  const categoryData = stats.category_stats?.map((category: any, index: number) => ({
+    no: index + 1,
+    category: category.category,
+    total_evaluations: category.total_evaluations,
+    average_score: category.average_score.toFixed(2),
+    highest_score: category.highest_score,
+    lowest_score: category.lowest_score
+  })) || [];
+
+  // Prepare grade distribution data
+  const gradeData = [
+    { grade: 'A - Sangat Baik', count: stats.grade_distribution?.A || 0 },
+    { grade: 'B - Baik', count: stats.grade_distribution?.B || 0 },
+    { grade: 'C - Cukup', count: stats.grade_distribution?.C || 0 },
+    { grade: 'D - Perlu Perbaikan', count: stats.grade_distribution?.D || 0 }
+  ];
+
+  const completionPercentage = stats.total_teachers > 0 
+    ? Math.round((stats.completed_evaluations / stats.total_evaluations) * 100)
+    : 0;
+
+  const averageScore = stats.total_evaluations > 0 
+    ? (stats.total_score / stats.total_evaluations).toFixed(2)
+    : '0.00';
+
   const config: ExcelExportConfig = {
-    title: `Matriks Temuan Rekomendasi ${item.nama_perwadag} ${tanggalEvaluasi}`,
-    fileName: `Matriks_Temuan_Rekomendasi_${item.nama_perwadag.replace(/\s+/g, '_')}_${item.tahun_evaluasi}.xlsx`,
-    sheetName: 'Matriks Temuan Rekomendasi',
+    title: `Laporan Statistik Evaluasi Kinerja Guru`,
+    fileName: `Laporan_Evaluasi_${period.academic_year}_${period.semester}_${new Date().getFullYear()}.xlsx`,
+    sheetName: 'Laporan Statistik',
     columns: [
       { width: 5, header: 'No' },
-      { width: 50, header: 'Temuan', key: 'temuan' },
-      { width: 50, header: 'Rekomendasi', key: 'rekomendasi' }
+      { width: 30, header: 'Kategori', key: 'category' },
+      { width: 15, header: 'Total Evaluasi', key: 'total_evaluations' },
+      { width: 15, header: 'Rata-rata Skor', key: 'average_score' },
+      { width: 15, header: 'Skor Tertinggi', key: 'highest_score' },
+      { width: 15, header: 'Skor Terendah', key: 'lowest_score' }
     ],
     headerInfo: [
-      { label: 'Nama Perwadag', value: item.nama_perwadag },
-      { label: 'Inspektorat', value: item.inspektorat },
-      { label: 'Tanggal Evaluasi', value: tanggalEvaluasi },
-      { label: 'Tahun Evaluasi', value: item.tahun_evaluasi.toString() }
+      { label: 'Yayasan', value: 'Yayasan Baitul Muslim Lampung Timur' },
+      { label: 'Alamat', value: 'Jl. Ir. H. Djuanda No. 19 Labuhan Ratu Satu, Way Jepara, Lampung Timur' },
+      { label: 'Periode Evaluasi', value: `${period.academic_year} - ${period.semester}` },
+      { label: 'Tanggal Laporan', value: today },
+      { label: 'Total Guru', value: stats.total_teachers.toString() },
+      { label: 'Total Evaluasi', value: `${stats.completed_evaluations} dari ${stats.total_evaluations}` },
+      { label: 'Persentase Selesai', value: `${completionPercentage}%` },
+      { label: 'Rata-rata Keseluruhan', value: `${averageScore} / 4.0` }
     ],
-    data: temuanRekomendasi,
-    noDataMessage: 'Tidak ada temuan dan rekomendasi',
-    successMessage: `Data matriks ${item.nama_perwadag} berhasil diekspor ke Excel.`,
-    errorMessage: 'Gagal mengekspor data ke Excel. Silakan coba lagi.'
+    data: categoryData,
+    noDataMessage: 'Tidak ada data statistik kategori',
+    successMessage: `Laporan evaluasi periode ${period.academic_year} - ${period.semester} berhasil diekspor ke Excel.`,
+    errorMessage: 'Gagal mengekspor laporan ke Excel. Silakan coba lagi.'
   };
 
-  await exportToExcel(config, toastFn);
+  // Custom styles for evaluation report
+  const customStyles = {
+    title: {
+      font: { bold: true, size: 16, color: { argb: 'FF047857' } },
+      alignment: { horizontal: 'center', vertical: 'middle' },
+      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6FFFA' } },
+      height: 35
+    },
+    tableHeader: {
+      font: { bold: true, size: 12, color: { argb: 'FFFFFFFF' } },
+      alignment: { horizontal: 'center', vertical: 'middle' },
+      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF047857' } },
+      border: {
+        top: { style: 'thin' },
+        bottom: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' }
+      },
+      height: 30
+    }
+  };
+
+  await exportToExcel(config, toastFn, customStyles);
+
+  // Create second sheet for grade distribution
+  try {
+    const ExcelJS = await import('exceljs');
+    const workbook = new ExcelJS.Workbook();
+    const statsSheet = workbook.addWorksheet('Statistik Kategori');
+    const gradeSheet = workbook.addWorksheet('Distribusi Nilai');
+
+    // Stats sheet (same as above but we'll recreate)
+    await exportToExcel(config, toastFn, customStyles);
+
+    // Grade distribution sheet
+    gradeSheet.columns = [
+      { width: 25, header: 'Nilai' },
+      { width: 15, header: 'Jumlah' },
+      { width: 15, header: 'Persentase' }
+    ];
+
+    let currentRow = 1;
+
+    // Add title
+    const titleRange = `A${currentRow}:C${currentRow}`;
+    gradeSheet.mergeCells(titleRange);
+    const titleCell = gradeSheet.getCell(`A${currentRow}`);
+    titleCell.value = 'Distribusi Nilai Evaluasi';
+    titleCell.font = { bold: true, size: 16, color: { argb: 'FF047857' } };
+    titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+    titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6FFFA' } };
+    gradeSheet.getRow(currentRow).height = 35;
+
+    currentRow += 3;
+
+    // Add headers
+    const headerRow = gradeSheet.addRow(['Nilai', 'Jumlah', 'Persentase']);
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true, size: 12, color: { argb: 'FFFFFFFF' } };
+      cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF047857' } };
+      cell.border = {
+        top: { style: 'thin' },
+        bottom: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+    });
+
+    // Add grade data
+    const totalGrades = gradeData.reduce((sum, grade) => sum + grade.count, 0);
+    gradeData.forEach((grade) => {
+      const percentage = totalGrades > 0 ? ((grade.count / totalGrades) * 100).toFixed(1) : '0.0';
+      const dataRow = gradeSheet.addRow([grade.grade, grade.count, `${percentage}%`]);
+      
+      dataRow.eachCell((cell, colNumber) => {
+        cell.font = { size: 11 };
+        cell.alignment = { 
+          horizontal: colNumber === 1 ? 'left' : 'center', 
+          vertical: 'middle' 
+        };
+        cell.border = {
+          top: { style: 'thin' },
+          bottom: { style: 'thin' },
+          left: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+      });
+    });
+
+  } catch (error) {
+    console.error('Error creating grade distribution sheet:', error);
+  }
 };

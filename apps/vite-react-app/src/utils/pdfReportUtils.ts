@@ -52,13 +52,16 @@ export class TeacherEvaluationPDFGenerator {
     this.doc.setFontSize(16);
     this.doc.setFont('helvetica', 'bold');
     
-    // Logo placeholder - bisa ditambahkan logo nanti
     const centerX = this.pageWidth / 2;
     
-    this.doc.text('PEMERINTAH DAERAH', centerX, this.currentY, { align: 'center' });
+    // Logo space - 20mm from left
+    // TODO: Add logo image here when assets are ready
+    // this.doc.addImage(logoBase64, 'PNG', 20, this.currentY - 5, 15, 15);
+    
+    this.doc.text('YAYASAN BAITUL MUSLIM', centerX, this.currentY, { align: 'center' });
     this.currentY += 6;
     
-    this.doc.text('DINAS PENDIDIKAN', centerX, this.currentY, { align: 'center' });
+    this.doc.text('LAMPUNG TIMUR', centerX, this.currentY, { align: 'center' });
     this.currentY += 6;
     
     if (data.organizationName) {
@@ -69,9 +72,9 @@ export class TeacherEvaluationPDFGenerator {
     // Alamat
     this.doc.setFontSize(10);
     this.doc.setFont('helvetica', 'normal');
-    this.doc.text('Jl. Pendidikan No. 123, Kota Pendidikan 12345', centerX, this.currentY, { align: 'center' });
+    this.doc.text('Jl. Ir. H. Djuanda No. 19 Labuhan Ratu Satu', centerX, this.currentY, { align: 'center' });
     this.currentY += 4;
-    this.doc.text('Telp. (021) 12345678 | Email: info@disdik.go.id', centerX, this.currentY, { align: 'center' });
+    this.doc.text('Way Jepara, Lampung Timur | Website: baitul-muslim.sch.id', centerX, this.currentY, { align: 'center' });
     this.currentY += 8;
     
     // Garis bawah kop

@@ -113,7 +113,18 @@ export interface TeacherEvaluationSummary {
 }
 
 // Period evaluation statistics
+export interface CategoryStats {
+  category: string;
+  total_evaluations: number;
+  average_score: number;
+  highest_score: number;
+  lowest_score: number;
+}
+
 export interface PeriodEvaluationStats {
+  total_evaluations: number;
+  total_score: number;
+  category_stats: CategoryStats[];
   period_id: number;
   period_name: string;
   total_teachers: number;

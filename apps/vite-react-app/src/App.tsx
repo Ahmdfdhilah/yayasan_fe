@@ -25,6 +25,7 @@ import PeriodsPage from './pages/periods/PeriodsPage';
 import { EvaluationAspectsPage } from './pages/evaluation-aspects/EvaluationAspectsPage';
 import TeacherEvaluationsPage from './pages/teacher-evaluations/TeacherEvaluationsPage';
 import TeacherEvaluationDetailPage from './pages/teacher-evaluations/TeacherEvaluationDetailPage';
+import EvaluationReportsPage from './pages/evaluation-reports/EvaluationReportsPage';
 
 // Simple redirect component for My Evaluations
 const MyEvaluationsRedirect = () => {
@@ -102,6 +103,13 @@ function App() {
                     <Route path="evaluation-aspects" element={
                       <RoleProtectedRoute allowedRoles={['admin']}>
                         <EvaluationAspectsPage />
+                      </RoleProtectedRoute>
+                    } />
+                    
+                    {/* Evaluation Reports - Admin only */}
+                    <Route path="evaluations/reports" element={
+                      <RoleProtectedRoute allowedRoles={['admin']}>
+                        <EvaluationReportsPage />
                       </RoleProtectedRoute>
                     } />
                     

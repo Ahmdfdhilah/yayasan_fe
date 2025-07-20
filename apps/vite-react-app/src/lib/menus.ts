@@ -86,7 +86,7 @@ export const appMenuItems: SidebarItem[] = [
         title: 'Laporan Evaluasi',
         href: '/evaluations/reports',
         icon: BarChart3,
-        allowedRoles: ['kepala_sekolah', 'admin'],
+        allowedRoles: ['admin'],
       },
     ],
   },
