@@ -1,5 +1,5 @@
 // src/App.jsx
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { TooltipProvider } from '@workspace/ui/components/tooltip';
 // Import your layouts/components
@@ -7,7 +7,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './redux/store';
 import { Toaster } from "@workspace/ui/components/sonner";
-import { AuthProvider } from './components/Auth/AuthProvider';
+import { AuthProvider, useAuth } from './components/Auth/AuthProvider';
 import { DashboardLayout } from './components/layouts/DashboardLayout';
 import { LoginPage } from './pages/auth/LoginPage';
 import { DefaultLayout } from './components/layouts';
@@ -24,8 +24,13 @@ import { RoleProtectedRoute } from './components/Auth/RoleProtectedRoute';
 import PeriodsPage from './pages/periods/PeriodsPage';
 import { EvaluationAspectsPage } from './pages/evaluation-aspects/EvaluationAspectsPage';
 import TeacherEvaluationsPage from './pages/teacher-evaluations/TeacherEvaluationsPage';
-import MyEvaluationsPage from './pages/teacher-evaluations/MyEvaluationsPage';
 import TeacherEvaluationDetailPage from './pages/teacher-evaluations/TeacherEvaluationDetailPage';
+
+// Simple redirect component for My Evaluations
+const MyEvaluationsRedirect = () => {
+  const { user } = useAuth();
+  return user?.id ? <Navigate to={`/teacher-evaluations/${user.id}`} replace /> : null;
+};
 
 function App() {
   return (
@@ -114,10 +119,10 @@ function App() {
                       </RoleProtectedRoute>
                     } />
                     
-                    {/* My Evaluations - Guru only */}
+                    {/* My Evaluations - Guru only - Redirect to detail page */}
                     <Route path="my-evaluations" element={
                       <RoleProtectedRoute allowedRoles={['guru']}>
-                        <MyEvaluationsPage />
+                        <MyEvaluationsRedirect />
                       </RoleProtectedRoute>
                     } />
                   </Route>

@@ -42,7 +42,7 @@ const MyEvaluationsPage: React.FC = () => {
   // URL Filters configuration
   const { updateURL, getCurrentFilters } = useURLFilters<MyEvaluationPageFilters>({
     defaults: {
-      period_id: 'all',
+      period_id: 'latest',
       status: 'all',
       page: 1,
       size: 10,
@@ -93,11 +93,9 @@ const MyEvaluationsPage: React.FC = () => {
       setLoading(true);
       
       // Determine which period to use
-      let periodId: number;
+      let periodId: number | undefined;
       
-      if (filters.period_id !== 'all') {
-        periodId = Number(filters.period_id);
-      } else {
+      if (filters.period_id === 'latest') {
         // Use latest period if available
         if (periods.length > 0) {
           // Sort periods by academic year and semester to get the latest
@@ -107,6 +105,24 @@ const MyEvaluationsPage: React.FC = () => {
             }
             // Assume 'Ganjil' comes before 'Genap' in a year
             if (a.semester === b.semester) return 0;
+            return a.semester === 'Ganjil' ? 1 : -1;
+          });
+          periodId = sortedPeriods[0].id;
+        } else {
+          setEvaluations([]);
+          setTotalItems(0);
+          return;
+        }
+      } else if (filters.period_id !== 'all') {
+        periodId = Number(filters.period_id);
+      } else {
+        // Show all evaluations across all periods
+        // For now, we'll use the latest period as the API might not support all periods
+        if (periods.length > 0) {
+          const sortedPeriods = [...periods].sort((a, b) => {
+            if (a.academic_year !== b.academic_year) {
+              return b.academic_year.localeCompare(a.academic_year);
+            }
             return a.semester === 'Ganjil' ? 1 : -1;
           });
           periodId = sortedPeriods[0].id;
@@ -125,7 +141,7 @@ const MyEvaluationsPage: React.FC = () => {
       // Use getTeacherEvaluationsInPeriod with current user's ID
       const response = await teacherEvaluationService.getTeacherEvaluationsInPeriod(
         user.id,
-        periodId,
+        periodId!,
         params
       );
       
@@ -156,9 +172,9 @@ const MyEvaluationsPage: React.FC = () => {
     updateURL({ size, page: 1 });
   };
 
-  const handleView = (evaluation: TeacherEvaluation) => {
-    // Navigate to detail page using teacher ID
-    navigate(`/teacher-evaluations/${evaluation.teacher_id}`);
+  const handleView = () => {
+    // Navigate to detail page using current user's ID (always my evaluations)
+    navigate(`/teacher-evaluations/${user?.id}`);
   };
 
   // Generate composite title
@@ -177,7 +193,9 @@ const MyEvaluationsPage: React.FC = () => {
     //   activeFilters.push(statusLabels[filters.status as keyof typeof statusLabels]);
     // }
 
-    if (filters.period_id !== 'all') {
+    if (filters.period_id === 'latest') {
+      activeFilters.push("Periode Terbaru");
+    } else if (filters.period_id !== 'all') {
       const period = periods.find(p => p.id === Number(filters.period_id));
       if (period) {
         activeFilters.push(`${period.academic_year} - ${period.semester}`);
@@ -230,6 +248,7 @@ const MyEvaluationsPage: React.FC = () => {
               <SelectValue placeholder="Filter berdasarkan periode" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="latest">Periode Terbaru</SelectItem>
               <SelectItem value="all">Semua Periode</SelectItem>
               {periods.map((period) => (
                 <SelectItem key={period.id} value={period.id.toString()}>
@@ -239,23 +258,6 @@ const MyEvaluationsPage: React.FC = () => {
             </SelectContent>
           </Select>
         </div>
-
-        {/* Status filter temporarily removed - may not be available in new API */}
-        {/* <div className="space-y-2">
-          <Label htmlFor="status-filter">Status</Label>
-          <Select value={filters.status} onValueChange={handleStatusFilterChange}>
-            <SelectTrigger id="status-filter">
-              <SelectValue placeholder="Filter berdasarkan status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Status</SelectItem>
-              <SelectItem value="pending">Menunggu</SelectItem>
-              <SelectItem value="in_progress">Berlangsung</SelectItem>
-              <SelectItem value="completed">Selesai</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-            </SelectContent>
-          </Select>
-        </div> */}
       </Filtering>
 
       <Card>
