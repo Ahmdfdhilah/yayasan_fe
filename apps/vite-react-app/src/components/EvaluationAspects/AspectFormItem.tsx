@@ -39,7 +39,7 @@ interface AspectFormItemProps {
   onEdit: () => void;
   onCancel: () => void;
   onSave: (data: EvaluationAspectCreate | EvaluationAspectUpdate) => void;
-  onDelete?: (aspectId: number) => void;
+  onDelete?: (aspect: EvaluationAspect) => void;
   loading?: boolean;
   defaultCategory?: string;
 }
@@ -93,8 +93,8 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
   };
 
   const handleDelete = () => {
-    if (aspect && onDelete && window.confirm('Apakah Anda yakin ingin menghapus aspek evaluasi ini?')) {
-      onDelete(aspect.id);
+    if (aspect && onDelete) {
+      onDelete(aspect);
     }
   };
 

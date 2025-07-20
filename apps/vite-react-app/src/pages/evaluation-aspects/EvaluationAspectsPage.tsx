@@ -2,6 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { useToast } from '@workspace/ui/components/sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@workspace/ui/components/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@workspace/ui/components/alert-dialog';
 import { PageHeader } from '@/components/common/PageHeader';
 import { CategorySection } from '@/components/EvaluationAspects';
 import { evaluationAspectService } from '@/services';
@@ -24,6 +41,12 @@ export const EvaluationAspectsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingAspectId, setEditingAspectId] = useState<number | null>(null);
   const [newAspectCategory, setNewAspectCategory] = useState<string | null>(null);
+  
+  // Dialog states
+  const [showCreateCategoryDialog, setShowCreateCategoryDialog] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [aspectToDelete, setAspectToDelete] = useState<EvaluationAspect | null>(null);
 
   useEffect(() => {
     if (!isAdmin()) {
@@ -132,13 +155,20 @@ export const EvaluationAspectsPage: React.FC = () => {
     }
   };
 
-  const handleDeleteAspect = async (aspectId: number) => {
+  const handleDeleteAspect = (aspect: EvaluationAspect) => {
+    setAspectToDelete(aspect);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteAspect = async () => {
+    if (!aspectToDelete) return;
+    
     try {
       setSaving(true);
 
-      await evaluationAspectService.deleteEvaluationAspect(aspectId);
+      await evaluationAspectService.deleteEvaluationAspect(aspectToDelete.id);
 
-      setAspects(prev => prev.filter(aspect => aspect.id !== aspectId));
+      setAspects(prev => prev.filter(aspect => aspect.id !== aspectToDelete.id));
 
       toast({
         title: 'Berhasil',
@@ -153,16 +183,28 @@ export const EvaluationAspectsPage: React.FC = () => {
       });
     } finally {
       setSaving(false);
+      setShowDeleteDialog(false);
+      setAspectToDelete(null);
     }
   };
 
   const handleCreateNewCategory = () => {
-    const categoryName = prompt('Masukkan nama kategori baru:');
-    if (categoryName && categoryName.trim()) {
-      const trimmedName = categoryName.trim();
+    setNewCategoryName('');
+    setShowCreateCategoryDialog(true);
+  };
+
+  const confirmCreateCategory = () => {
+    if (newCategoryName && newCategoryName.trim()) {
+      const trimmedName = newCategoryName.trim();
       if (!categories.includes(trimmedName)) {
         setCategories(prev => [...prev, trimmedName].sort());
         handleAddAspect(trimmedName);
+        setShowCreateCategoryDialog(false);
+        setNewCategoryName('');
+        toast({
+          title: 'Berhasil',
+          description: 'Kategori baru berhasil dibuat.',
+        });
       } else {
         toast({
           title: 'Kategori Sudah Ada',
@@ -270,7 +312,7 @@ export const EvaluationAspectsPage: React.FC = () => {
               onAddAspect={handleAddAspect}
               onEditAspect={handleEditAspect}
               onSaveAspect={handleSaveAspect}
-              onDeleteAspect={handleDeleteAspect}
+              onDeleteAspect={(aspect) => handleDeleteAspect(aspect)}
               editingAspectId={editingAspectId}
               newAspectCategory={newAspectCategory}
               onCancelEdit={handleCancelEdit}
@@ -293,6 +335,75 @@ export const EvaluationAspectsPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Create Category Dialog */}
+      <Dialog open={showCreateCategoryDialog} onOpenChange={setShowCreateCategoryDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Buat Kategori Baru</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              placeholder="Masukkan nama kategori..."
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  confirmCreateCategory();
+                }
+              }}
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowCreateCategoryDialog(false);
+                setNewCategoryName('');
+              }}
+            >
+              Batal
+            </Button>
+            <Button 
+              onClick={confirmCreateCategory}
+              disabled={!newCategoryName.trim()}
+            >
+              Buat Kategori
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Aspek Evaluasi</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus aspek "{aspectToDelete?.aspect_name}"? 
+              Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              onClick={() => {
+                setShowDeleteDialog(false);
+                setAspectToDelete(null);
+              }}
+            >
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDeleteAspect}
+              disabled={saving}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {saving ? 'Menghapus...' : 'Hapus'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

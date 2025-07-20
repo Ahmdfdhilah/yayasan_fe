@@ -13,7 +13,7 @@ interface CategorySectionProps {
   onAddAspect: (categoryName: string) => void;
   onEditAspect: (aspect: EvaluationAspect) => void;
   onSaveAspect: (aspectId: number | null, data: EvaluationAspectCreate | EvaluationAspectUpdate) => void;
-  onDeleteAspect: (aspectId: number) => void;
+  onDeleteAspect: (aspect: EvaluationAspect) => void;
   editingAspectId: number | null;
   newAspectCategory: string | null;
   onCancelEdit: () => void;
