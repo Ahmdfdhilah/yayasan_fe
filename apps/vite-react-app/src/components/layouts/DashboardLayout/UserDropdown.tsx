@@ -40,28 +40,29 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
 
   // Get user initials for avatar fallback
   const getUserInitials = () => {
-    if (!user?.nama) return 'U';
-    const nameParts = user.nama.split(' ');
+    const name = user?.profile?.name || user?.display_name || user?.full_name;
+    if (!name) return 'U';
+    const nameParts = name.split(' ');
     if (nameParts.length >= 2) {
       return `${nameParts[0].charAt(0)}${nameParts[1].charAt(0)}`.toUpperCase();
     }
-    return user.nama.charAt(0).toUpperCase();
+    return name.charAt(0).toUpperCase();
   };
 
   // Get user display name
   const getUserDisplayName = () => {
-    return user?.nama || 'User';
+    return user?.profile?.name || user?.display_name || user?.full_name || 'User';
   };
 
   // Get user role display
   const getUserRole = () => {
     switch (currentRole) {
-      case 'ADMIN':
+      case 'admin':
         return 'Administrator';
-      case 'INSPEKTORAT':
-        return 'Inspektorat';
-      case 'PERWADAG':
-        return 'Perwadag';
+      case 'guru':
+        return 'Guru';
+      case 'kepala_sekolah':
+        return 'Kepala Sekolah';
       default:
         return currentRole;
     }
@@ -109,7 +110,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
                 </AvatarFallback>
               </Avatar>
               {/* Active user indicator */}
-              {user.is_active && (
+              {user.status === 'active' && (
                 <div className={cn(
                   "absolute bg-green-500 rounded-full border border-background",
                   collapsed ? "-top-0.5 -right-0.5 h-2 w-2" : "-top-1 -right-1 h-3 w-3"
@@ -140,7 +141,6 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
               <span className="font-medium">{getUserDisplayName()}</span>
               {user.email && <span className="text-xs text-muted-foreground">{user.email}</span>}
               <span className="text-xs text-muted-foreground">{getUserRole()}</span>
-              {user.inspektorat && <span className="text-xs text-muted-foreground">{user.inspektorat}</span>}
             </div>
           </DropdownMenuLabel>
 
@@ -167,7 +167,6 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
               onCheckedChange={toggleTheme}
               aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
               className="ml-2"
-              size="sm"
             />
           </DropdownMenuItem>
 
