@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
+import { useAuth } from '@/components/Auth/AuthProvider';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { 
   TeacherEvaluation, 
-  TeacherEvaluationFilterParams
 } from '@/services/teacher-evaluations/types';
 import { Period } from '@/services/periods/types';
 import { teacherEvaluationService, periodService } from '@/services';
@@ -33,7 +34,9 @@ interface MyEvaluationPageFilters {
 }
 
 const MyEvaluationsPage: React.FC = () => {
+  const navigate = useNavigate();
   const { isGuru } = useRole();
+  const { user } = useAuth();
   const { toast } = useToast();
   
   // URL Filters configuration
@@ -66,10 +69,10 @@ const MyEvaluationsPage: React.FC = () => {
   }, [hasAccess]);
 
   useEffect(() => {
-    if (hasAccess) {
+    if (hasAccess && user?.id) {
       loadMyEvaluations();
     }
-  }, [filters, hasAccess]);
+  }, [filters, hasAccess, user?.id, periods]);
 
   const loadPeriods = async () => {
     try {
@@ -81,26 +84,50 @@ const MyEvaluationsPage: React.FC = () => {
   };
 
   const loadMyEvaluations = async () => {
+    if (!user?.id) {
+      console.error('User ID not available');
+      return;
+    }
+
     try {
       setLoading(true);
       
-      const params: TeacherEvaluationFilterParams = {
+      // Determine which period to use
+      let periodId: number;
+      
+      if (filters.period_id !== 'all') {
+        periodId = Number(filters.period_id);
+      } else {
+        // Use latest period if available
+        if (periods.length > 0) {
+          // Sort periods by academic year and semester to get the latest
+          const sortedPeriods = [...periods].sort((a, b) => {
+            if (a.academic_year !== b.academic_year) {
+              return b.academic_year.localeCompare(a.academic_year);
+            }
+            // Assume 'Ganjil' comes before 'Genap' in a year
+            if (a.semester === b.semester) return 0;
+            return a.semester === 'Ganjil' ? 1 : -1;
+          });
+          periodId = sortedPeriods[0].id;
+        } else {
+          setEvaluations([]);
+          setTotalItems(0);
+          return;
+        }
+      }
+      
+      const params = {
         page: filters.page,
         size: filters.size,
       };
 
-      // Add period filter
-      if (filters.period_id !== 'all') {
-        params.period_id = Number(filters.period_id);
-      }
-
-      // Add status filter - Note: Status filtering may not be available in new API
-      // if (filters.status !== 'all') {
-      //   params.status = filters.status;
-      // }
-
-      // Note: Using getAllEvaluations for now, may need specific endpoint for current user
-      const response = await teacherEvaluationService.getAllEvaluations(params);
+      // Use getTeacherEvaluationsInPeriod with current user's ID
+      const response = await teacherEvaluationService.getTeacherEvaluationsInPeriod(
+        user.id,
+        periodId,
+        params
+      );
       
       setEvaluations(response.items || []);
       setTotalItems(response.total || 0);
@@ -120,10 +147,6 @@ const MyEvaluationsPage: React.FC = () => {
     updateURL({ period_id, page: 1 });
   };
 
-  const handleStatusFilterChange = (status: string) => {
-    updateURL({ status, page: 1 });
-  };
-
   const handlePageChange = (page: number) => {
     updateURL({ page });
   };
@@ -134,8 +157,8 @@ const MyEvaluationsPage: React.FC = () => {
   };
 
   const handleView = (evaluation: TeacherEvaluation) => {
-    // Navigate to detail page
-    window.location.href = `/teacher-evaluations/${evaluation.id}`;
+    // Navigate to detail page using teacher ID
+    navigate(`/teacher-evaluations/${evaluation.teacher_id}`);
   };
 
   // Generate composite title
@@ -180,6 +203,14 @@ const MyEvaluationsPage: React.FC = () => {
             Halaman ini hanya untuk guru.
           </p>
         </div>
+      </div>
+    );
+  }
+
+  if (!user?.id) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }

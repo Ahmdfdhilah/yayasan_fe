@@ -108,7 +108,7 @@ function App() {
                     } />
                     
                     {/* Teacher Evaluation Detail - Admin, Kepala Sekolah, and Guru */}
-                    <Route path="teacher-evaluations/:id" element={
+                    <Route path="teacher-evaluations/:teacherId" element={
                       <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
                         <TeacherEvaluationDetailPage />
                       </RoleProtectedRoute>

@@ -4,17 +4,27 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRole } from '@/hooks/useRole';
+import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { Badge } from '@workspace/ui/components/badge';
 import { Form } from '@workspace/ui/components/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@workspace/ui/components/select';
+import { Label } from '@workspace/ui/components/label';
 import { ArrowLeft, Eye, Edit, CheckCircle } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
-import { EvaluationCategorySection } from '@/components/TeacherEvaluations/EvaluationCategorySection';
+import { EvaluationCategorySection } from '@/components/TeacherEvaluations';
+import Filtering from '@/components/common/Filtering';
 import { TeacherEvaluation } from '@/services/teacher-evaluations/types';
 import { EvaluationAspect } from '@/services/evaluation-aspects/types';
-import { teacherEvaluationService, evaluationAspectService } from '@/services';
+import { Period } from '@/services/periods/types';
+import { teacherEvaluationService, evaluationAspectService, periodService } from '@/services';
 
 const evaluationFormSchema = z.object({
   aspects: z.record(z.string(), z.string().min(1, 'Rating harus dipilih')),
@@ -23,14 +33,32 @@ const evaluationFormSchema = z.object({
 
 type EvaluationFormData = z.infer<typeof evaluationFormSchema>;
 
+interface DetailPageFilters {
+  period_id: string;
+  [key: string]: string | number;
+}
+
 const TeacherEvaluationDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { teacherId } = useParams<{ teacherId: string }>();
   const navigate = useNavigate();
   const { isAdmin, isKepalaSekolah } = useRole();
   const { toast } = useToast();
 
-  const [evaluation, setEvaluation] = useState<TeacherEvaluation | null>(null);
+  // URL Filters configuration
+  const { updateURL, getCurrentFilters } = useURLFilters<DetailPageFilters>({
+    defaults: {
+      period_id: 'latest',
+    },
+    cleanDefaults: true,
+  });
+
+  // Get current filters from URL
+  const filters = getCurrentFilters();
+
+  const [evaluations, setEvaluations] = useState<TeacherEvaluation[]>([]);
   const [aspects, setAspects] = useState<EvaluationAspect[]>([]);
+  const [periods, setPeriods] = useState<Period[]>([]);
+  const [currentPeriod, setCurrentPeriod] = useState<Period | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [mode, setMode] = useState<'view' | 'edit'>('view');
@@ -44,29 +72,81 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   });
 
   useEffect(() => {
-    if (id) {
-      loadEvaluationDetail();
+    if (teacherId) {
+      loadPeriods();
       loadEvaluationAspects();
     }
-  }, [id]);
+  }, [teacherId]);
+
+  useEffect(() => {
+    if (teacherId && periods.length > 0) {
+      loadEvaluationDetail();
+    }
+  }, [teacherId, filters.period_id, periods]);
+
+  const loadPeriods = async () => {
+    try {
+      const response = await periodService.getPeriods();
+      setPeriods(response.items || []);
+    } catch (error) {
+      console.error('Error loading periods:', error);
+    }
+  };
 
   const loadEvaluationDetail = async () => {
     try {
       setLoading(true);
-      const response = await teacherEvaluationService.getTeacherEvaluation(Number(id));
-      setEvaluation(response);
-      
+
+      if (periods.length === 0) {
+        throw new Error('No periods available');
+      }
+
+      // Determine which period to use
+      let selectedPeriod: Period;
+
+      if (filters.period_id === 'latest') {
+        // Sort periods to get the latest
+        const sortedPeriods = [...periods].sort((a, b) => {
+          if (a.academic_year !== b.academic_year) {
+            return b.academic_year.localeCompare(a.academic_year);
+          }
+          return a.semester === 'Ganjil' ? 1 : -1;
+        });
+        selectedPeriod = sortedPeriods[0];
+      } else {
+        const foundPeriod = periods.find(p => p.id === Number(filters.period_id));
+        if (!foundPeriod) {
+          throw new Error('Selected period not found');
+        }
+        selectedPeriod = foundPeriod;
+      }
+
+      setCurrentPeriod(selectedPeriod);
+
+      // Get teacher evaluations for the selected period
+      const response = await teacherEvaluationService.getTeacherEvaluationsInPeriod(
+        Number(teacherId),
+        selectedPeriod.id
+      );
+
+      // Handle both array response and object with items property
+      const evaluationsData = Array.isArray(response) ? response : (response.items || []);
+
+      setEvaluations(evaluationsData);
+
       // Set form values from evaluation data
       const evaluationData: Record<string, string> = {};
-      // Initialize with existing evaluation data if available
+      evaluationsData.forEach(evaluation => {
+        evaluationData[evaluation.aspect_id.toString()] = evaluation.grade;
+      });
+
       form.reset({
         aspects: evaluationData,
-        notes: response.notes || '',
+        notes: evaluationsData[0]?.notes || '',
       });
-      
-      // Determine initial mode based on user role (status may not be available)
-      const canEdit = (isAdmin() || isKepalaSekolah());
-      setMode(canEdit ? 'edit' : 'view');
+
+      // Always start in view mode
+      setMode('view');
     } catch (error) {
       console.error('Error loading evaluation detail:', error);
       toast({
@@ -81,9 +161,8 @@ const TeacherEvaluationDetailPage: React.FC = () => {
 
   const loadEvaluationAspects = async () => {
     try {
-      const response = await evaluationAspectService.getEvaluationAspects({ 
-        size: 1000,
-        is_active: true 
+      const response = await evaluationAspectService.getEvaluationAspects({
+        is_active: true
       });
       setAspects(response.items || []);
     } catch (error) {
@@ -92,25 +171,29 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   };
 
   const onSubmit = async (data: EvaluationFormData) => {
-    if (!evaluation) return;
+    if (!teacherId || !currentPeriod) return;
 
     try {
       setSaving(true);
-      
-      // Update evaluation with new grade and notes
-      await teacherEvaluationService.updateTeacherEvaluation(evaluation.id, {
-        grade: Object.values(data.aspects)[0] as 'A' | 'B' | 'C' | 'D', // Use first aspect grade for now
-        notes: data.notes,
-      });
+
+      // Prepare bulk update data
+      const bulkUpdateData = {
+        evaluations: evaluations.map(evaluation => ({
+          evaluation_id: evaluation.id,
+          grade: data.aspects[evaluation.aspect_id.toString()] as 'A' | 'B' | 'C' | 'D',
+          notes: data.notes,
+        })).filter(update => update.grade) // Only include evaluations with grades
+      };
+
+      await teacherEvaluationService.bulkUpdateGrades(bulkUpdateData);
 
       toast({
         title: 'Berhasil',
         description: 'Evaluasi berhasil disimpan.',
       });
 
-      // Refresh evaluation data
+      // Refresh evaluation data and switch back to view mode
       await loadEvaluationDetail();
-      setMode('view');
     } catch (error: any) {
       console.error('Error saving evaluation:', error);
       toast({
@@ -124,12 +207,12 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   };
 
   const handleBack = () => {
-    navigate(-1);
+    navigate('/teacher-evaluations');
   };
 
   const toggleMode = () => {
-    const canEdit = (isAdmin() || isKepalaSekolah()) && evaluation;
-    
+    const canEdit = (isAdmin() || isKepalaSekolah()) && evaluations.length > 0;
+
     if (canEdit) {
       setMode(mode === 'view' ? 'edit' : 'view');
     }
@@ -143,13 +226,13 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     );
   }
 
-  if (!evaluation) {
+  if (!loading && evaluations.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-2">Evaluasi Tidak Ditemukan</h2>
           <p className="text-muted-foreground mb-4">
-            Evaluasi yang Anda cari tidak dapat ditemukan.
+            Tidak ada evaluasi untuk guru ini pada periode terkini.
           </p>
           <Button onClick={handleBack}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -160,33 +243,34 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     );
   }
 
+  const handlePeriodFilterChange = (period_id: string) => {
+    updateURL({ period_id });
+  };
+
   const categories = [...new Set(aspects.map(aspect => aspect.category))];
   const canEdit = (isAdmin() || isKepalaSekolah());
 
-  const getGradeBadge = (grade: string) => {
-    const gradeConfig = {
-      A: { label: 'A - Excellent', variant: 'default' as const },
-      B: { label: 'B - Good', variant: 'secondary' as const },
-      C: { label: 'C - Satisfactory', variant: 'outline' as const },
-      D: { label: 'D - Needs Improvement', variant: 'destructive' as const },
-    };
-    
-    const config = gradeConfig[grade as keyof typeof gradeConfig] || gradeConfig.A;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
-  };
+  // Create evaluation data mapping for display
+  const evaluationData: Record<string, string> = {};
+  evaluations.forEach(evaluation => {
+    evaluationData[evaluation.aspect_id.toString()] = evaluation.grade;
+  });
+
+  // Get teacher info from first evaluation or use teacherId
+  const teacherInfo = evaluations[0] || { teacher_name: `Teacher ${teacherId}`, teacher_id: Number(teacherId) };
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Detail Evaluasi Guru"
-        description={`Evaluasi kinerja ${evaluation.teacher_name || 'N/A'}`}
+        description={`Evaluasi kinerja ${teacherInfo.teacher_name || 'N/A'}`}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleBack}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Kembali
             </Button>
-            {canEdit && (
+            {canEdit && evaluations.length > 0 && (
               <Button variant="outline" onClick={toggleMode}>
                 {mode === 'view' ? (
                   <>
@@ -205,6 +289,25 @@ const TeacherEvaluationDetailPage: React.FC = () => {
         }
       />
 
+      <Filtering>
+        <div className="space-y-2">
+          <Label htmlFor="period-filter">Periode</Label>
+          <Select value={filters.period_id} onValueChange={handlePeriodFilterChange}>
+            <SelectTrigger id="period-filter">
+              <SelectValue placeholder="Pilih periode" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="latest">Periode Terbaru</SelectItem>
+              {periods.map((period) => (
+                <SelectItem key={period.id} value={period.id.toString()}>
+                  {period.academic_year} - {period.semester}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </Filtering>
+
       {/* Evaluation Info Card */}
       <Card>
         <CardHeader>
@@ -214,38 +317,38 @@ const TeacherEvaluationDetailPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">Guru</h4>
-              <p className="text-sm">{evaluation.teacher_name || 'N/A'}</p>
+              <p className="text-sm">{teacherInfo.teacher_name || 'N/A'}</p>
             </div>
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">Evaluator</h4>
-              <p className="text-sm">{evaluation.evaluator_name || '-'}</p>
+              <p className="text-sm">{evaluations[0]?.evaluator_name || '-'}</p>
             </div>
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">Periode</h4>
-              <p className="text-sm">{evaluation.period_name || 'N/A'}</p>
+              <p className="text-sm">
+                {currentPeriod ? `${currentPeriod.academic_year} - ${currentPeriod.semester}` : 'N/A'}
+              </p>
             </div>
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Aspek</h4>
-              <p className="text-sm">{evaluation.aspect_name || 'N/A'}</p>
+              <h4 className="font-medium text-sm text-muted-foreground mb-1">Total Aspek</h4>
+              <p className="text-sm">{evaluations.length} aspek</p>
             </div>
-            {evaluation.grade && (
+            {evaluations.length > 0 && (
               <div>
-                <h4 className="font-medium text-sm text-muted-foreground mb-1">Grade</h4>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">Rata-rata Skor</h4>
                 <div className="flex items-center gap-2">
-                  <Badge variant="default" className="text-lg px-3 py-1">
-                    {evaluation.grade}
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    ({evaluation.score || 0} poin)
+                  <span className="text-lg font-medium">
+                    {(evaluations.reduce((sum, evaluation) => sum + evaluation.score, 0) / evaluations.length).toFixed(1)}
                   </span>
+                  <span className="text-sm text-muted-foreground">/ 4.0</span>
                 </div>
               </div>
             )}
-            {evaluation.evaluation_date && (
+            {evaluations[0]?.evaluation_date && (
               <div>
                 <h4 className="font-medium text-sm text-muted-foreground mb-1">Tanggal Evaluasi</h4>
                 <p className="text-sm">
-                  {new Date(evaluation.evaluation_date).toLocaleDateString('id-ID')}
+                  {new Date(evaluations[0].evaluation_date).toLocaleDateString('id-ID')}
                 </p>
               </div>
             )}
@@ -264,12 +367,12 @@ const TeacherEvaluationDetailPage: React.FC = () => {
               control={mode === 'edit' ? form.control : undefined}
               sectionNumber={index + 1}
               disabled={mode === 'view'}
-              evaluationData={{}}
+              evaluationData={evaluationData}
             />
           ))}
 
           {/* Notes Section */}
-          {(evaluation.notes || mode === 'edit') && (
+          {(evaluations[0]?.notes || mode === 'edit') && (
             <Card>
               <CardHeader>
                 <CardTitle>Catatan Evaluasi</CardTitle>
@@ -283,7 +386,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
                   />
                 ) : (
                   <p className="text-sm whitespace-pre-wrap">
-                    {evaluation.notes || 'Tidak ada catatan'}
+                    {evaluations[0]?.notes || 'Tidak ada catatan'}
                   </p>
                 )}
               </CardContent>
@@ -302,7 +405,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
                 ) : (
                   <>
                     <CheckCircle className="h-4 w-4 mr-2" />
-                    Selesaikan Evaluasi
+                    Simpan Nilai Evaluasi
                   </>
                 )}
               </Button>

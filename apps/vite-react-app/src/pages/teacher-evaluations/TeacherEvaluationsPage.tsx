@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
@@ -40,6 +40,7 @@ interface TeacherPageFilters {
 const TeacherEvaluationsPage: React.FC = () => {
   const { currentRole, isAdmin, isKepalaSekolah } = useRole();
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   // Redirect guru to my-evaluations
   if (currentRole === 'guru') {
@@ -132,13 +133,13 @@ const TeacherEvaluationsPage: React.FC = () => {
   const totalPages = Math.ceil(totalItems / filters.size);
 
   const handleViewTeacherEvaluations = (teacher: User) => {
-    // Navigate to teacher's evaluations list
-    window.location.href = `/teacher-evaluations/teacher/${teacher.id}`;
+    // Navigate to teacher's evaluations detail page
+    navigate(`/teacher-evaluations/${teacher.id}`);
   };
 
   const handleCreateEvaluation = (teacher: User) => {
-    // Navigate to create evaluation page
-    window.location.href = `/teacher-evaluations/create?teacher_id=${teacher.id}`;
+    // Navigate to create evaluation page (same as view for now, will be edit mode)
+    navigate(`/teacher-evaluations/${teacher.id}`);
   };
 
   const handleAssignTeachers = () => {

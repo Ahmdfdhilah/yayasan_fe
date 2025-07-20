@@ -11,7 +11,6 @@ import {
   Calendar,
   GraduationCap,
   Star,
-  Clock
 } from 'lucide-react';
 
 interface TeacherEvaluationCardsProps {
