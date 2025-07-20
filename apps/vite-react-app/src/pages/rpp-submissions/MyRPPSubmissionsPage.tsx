@@ -4,7 +4,7 @@ import { useRole } from '@/hooks/useRole';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
-import { 
+import {
   RPPSubmissionResponse,
   RPPSubmissionStatus,
 } from '@/services/rpp-submissions/types';
@@ -39,12 +39,12 @@ const MyRPPSubmissionsPage: React.FC = () => {
   const { currentRole, isGuru } = useRole();
   const { user } = useAuth();
   const { toast } = useToast();
-  
+
   // Redirect non-guru users to appropriate page
   if (currentRole === 'admin' || currentRole === 'kepala_sekolah') {
     return <Navigate to="/rpp-submissions" replace />;
   }
-  
+
   // URL Filters configuration
   const { updateURL, getCurrentFilters } = useURLFilters<MyRPPSubmissionsPageFilters>({
     defaults: {
@@ -58,7 +58,7 @@ const MyRPPSubmissionsPage: React.FC = () => {
 
   // Get current filters from URL
   const filters = getCurrentFilters();
-  
+
   const [submissions, setSubmissions] = useState<RPPSubmissionResponse[]>([]);
   const [periods, setPeriods] = useState<Period[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,7 +96,7 @@ const MyRPPSubmissionsPage: React.FC = () => {
 
     try {
       setLoading(true);
-      
+
       // Build parameters
       let params: any = {
         limit: filters.size,
@@ -114,7 +114,7 @@ const MyRPPSubmissionsPage: React.FC = () => {
       }
 
       const response = await rppSubmissionService.getMySubmissions(params);
-      
+
       setSubmissions(response.items || []);
       setTotalItems(response.total || 0);
     } catch (error: any) {
@@ -182,14 +182,13 @@ const MyRPPSubmissionsPage: React.FC = () => {
   const getCompositeTitle = () => {
     let title = "RPP Submissions Saya";
     const activeFilters = [];
-    
+
     if (filters.status !== 'all') {
       const statusLabels = {
         draft: 'Draft',
         pending: 'Menunggu Review',
         approved: 'Disetujui',
         rejected: 'Ditolak',
-        revision_needed: 'Perlu Revisi'
       };
       activeFilters.push(statusLabels[filters.status as keyof typeof statusLabels]);
     }
@@ -200,11 +199,11 @@ const MyRPPSubmissionsPage: React.FC = () => {
         activeFilters.push(`${period.academic_year} - ${period.semester}`);
       }
     }
-    
+
     if (activeFilters.length > 0) {
       title += " - " + activeFilters.join(" - ");
     }
-    
+
     return title;
   };
 
@@ -269,7 +268,6 @@ const MyRPPSubmissionsPage: React.FC = () => {
               <SelectItem value="PENDING">Menunggu Review</SelectItem>
               <SelectItem value="APPROVED">Disetujui</SelectItem>
               <SelectItem value="REJECTED">Ditolak</SelectItem>
-              <SelectItem value="REVISION_NEEDED">Perlu Revisi</SelectItem>
             </SelectContent>
           </Select>
         </div>

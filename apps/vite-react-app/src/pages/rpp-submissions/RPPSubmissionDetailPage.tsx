@@ -24,7 +24,6 @@ import {
   Clock,
   FileText,
   Download,
-  AlertCircle,
   Send
 } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -282,7 +281,6 @@ const RPPSubmissionDetailPage: React.FC = () => {
         [RPPSubmissionStatus.PENDING]: 'Status berhasil diubah ke pending.',
         [RPPSubmissionStatus.APPROVED]: 'RPP submission berhasil disetujui.',
         [RPPSubmissionStatus.REJECTED]: 'RPP submission berhasil ditolak.',
-        [RPPSubmissionStatus.REVISION_NEEDED]: 'RPP submission berhasil diminta revisi.'
       };
 
       toast({
@@ -311,8 +309,6 @@ const RPPSubmissionDetailPage: React.FC = () => {
         return <XCircle className="h-4 w-4" />;
       case RPPSubmissionStatus.PENDING:
         return <Clock className="h-4 w-4" />;
-      case RPPSubmissionStatus.REVISION_NEEDED:
-        return <AlertCircle className="h-4 w-4" />;
       default:
         return <FileText className="h-4 w-4" />;
     }
@@ -324,8 +320,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
 
   const renderRPPItem = (item: RPPSubmissionItemResponse) => {
     const canUpload = isOwnSubmission &&
-      (submission?.status === RPPSubmissionStatus.DRAFT ||
-        submission?.status === RPPSubmissionStatus.REVISION_NEEDED);
+      (submission?.status === RPPSubmissionStatus.DRAFT);
 
     return (
       <Card key={item.id}>
@@ -566,14 +561,6 @@ const RPPSubmissionDetailPage: React.FC = () => {
                 >
                   <CheckCircle className="h-4 w-4 mr-2" />
                   Setujui
-                </Button>
-                <Button
-                  onClick={() => handleReview(RPPSubmissionStatus.REVISION_NEEDED)}
-                  disabled={reviewing}
-                  variant="outline"
-                >
-                  <AlertCircle className="h-4 w-4 mr-2" />
-                  Minta Revisi
                 </Button>
                 <Button
                   onClick={() => handleReview(RPPSubmissionStatus.REJECTED)}

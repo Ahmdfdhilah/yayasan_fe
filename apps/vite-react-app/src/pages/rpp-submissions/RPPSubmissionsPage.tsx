@@ -11,8 +11,6 @@ import {
 import { Organization } from '@/services/organizations/types';
 import { Period } from '@/services/periods/types';
 import { rppSubmissionService, organizationService, periodService } from '@/services';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import {
   Select,
@@ -49,9 +47,6 @@ const RPPSubmissionsPage: React.FC = () => {
   if (currentRole === 'guru') {
     return <Navigate to="/my-rpp-submissions" replace />;
   }
-
-  // Get current user info for organization filtering
-  const currentUser = useSelector((state: RootState) => state.auth.user);
 
   // URL Filters configuration
   const { updateURL, getCurrentFilters } = useURLFilters<RPPSubmissionsPageFilters>({
@@ -202,7 +197,6 @@ const RPPSubmissionsPage: React.FC = () => {
         pending: 'Menunggu Review',
         approved: 'Disetujui',
         rejected: 'Ditolak',
-        revision_needed: 'Perlu Revisi'
       };
       activeFilters.push(statusLabels[filters.status as keyof typeof statusLabels]);
     }
@@ -281,7 +275,6 @@ const RPPSubmissionsPage: React.FC = () => {
               <SelectItem value="PENDING">Menunggu Review</SelectItem>
               <SelectItem value="APPROVED">Disetujui</SelectItem>
               <SelectItem value="REJECTED">Ditolak</SelectItem>
-              <SelectItem value="REVISION_NEEDED">Perlu Revisi</SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -268,8 +268,7 @@ class RPPSubmissionService extends BaseService {
       [RPPSubmissionStatus.DRAFT]: "Draft",
       [RPPSubmissionStatus.PENDING]: "Menunggu Review",
       [RPPSubmissionStatus.APPROVED]: "Disetujui",
-      [RPPSubmissionStatus.REJECTED]: "Ditolak",
-      [RPPSubmissionStatus.REVISION_NEEDED]: "Perlu Revisi"
+      [RPPSubmissionStatus.REJECTED]: "Ditolak"
     };
     return displayNames[status] || status;
   }
@@ -282,8 +281,7 @@ class RPPSubmissionService extends BaseService {
       [RPPSubmissionStatus.DRAFT]: "gray",
       [RPPSubmissionStatus.PENDING]: "yellow",
       [RPPSubmissionStatus.APPROVED]: "green",
-      [RPPSubmissionStatus.REJECTED]: "red",
-      [RPPSubmissionStatus.REVISION_NEEDED]: "orange"
+      [RPPSubmissionStatus.REJECTED]: "red"
     };
     return colors[status] || "gray";
   }
@@ -308,8 +306,7 @@ class RPPSubmissionService extends BaseService {
             draft: 0,
             pending: 0,
             approved: 0,
-            rejected: 0,
-            revision_needed: 0
+            rejected: 0
           }
         };
       }
@@ -354,8 +351,7 @@ class RPPSubmissionService extends BaseService {
             draft: 0,
             pending: 0,
             approved: 0,
-            rejected: 0,
-            revision_needed: 0
+            rejected: 0
           }
         };
       }

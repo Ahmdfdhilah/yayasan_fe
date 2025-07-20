@@ -13,7 +13,6 @@ export enum RPPSubmissionStatus {
   PENDING = "pending", 
   APPROVED = "approved",
   REJECTED = "rejected",
-  REVISION_NEEDED = "revision_needed"
 }
 
 // ===== RPP SUBMISSION ITEM TYPES =====
@@ -129,7 +128,6 @@ export interface RPPSubmissionStats {
   pending_count: number;
   approved_count: number;
   rejected_count: number;
-  revision_needed_count: number;
   completion_rate: number;
 }
 

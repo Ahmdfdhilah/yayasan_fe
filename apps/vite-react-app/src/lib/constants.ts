@@ -37,7 +37,6 @@ export const RPP_STATUS = {
   PENDING: 'pending',
   APPROVED: 'approved',
   REJECTED: 'rejected',
-  REVISION_NEEDED: 'revision_needed'
 } as const;
 
 export type RPPStatus = typeof RPP_STATUS[keyof typeof RPP_STATUS];
@@ -47,7 +46,6 @@ export const RPP_STATUS_LABELS = {
   [RPP_STATUS.PENDING]: 'Menunggu Review',
   [RPP_STATUS.APPROVED]: 'Disetujui',
   [RPP_STATUS.REJECTED]: 'Ditolak',
-  [RPP_STATUS.REVISION_NEEDED]: 'Perlu Revisi'
 } as const;
 
 // Evaluation Grade Constants
