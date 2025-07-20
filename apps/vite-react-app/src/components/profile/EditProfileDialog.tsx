@@ -24,9 +24,10 @@ import {
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 
 const editProfileSchema = z.object({
-  nama: z.string().min(1, 'Nama wajib diisi').min(2, 'Nama minimal 2 karakter'),
-  jabatan: z.string().min(1, 'Jabatan wajib diisi'),
-  email: z.string().email('Format email tidak valid').optional().or(z.literal('')),
+  name: z.string().min(1, 'Nama wajib diisi').min(2, 'Nama minimal 2 karakter'),
+  phone: z.string().optional().or(z.literal('')),
+  address: z.string().optional().or(z.literal('')),
+  position: z.string().optional().or(z.literal('')),
 });
 
 type EditProfileData = z.infer<typeof editProfileSchema>;
@@ -49,33 +50,40 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
   const form = useForm<EditProfileData>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
-      nama: user.nama,
-      jabatan: user.jabatan,
-      email: user.email || '',
+      name: user.profile?.name || user.display_name || '',
+      phone: user.profile?.phone || '',
+      address: user.profile?.address || '',
+      position: user.profile?.position || '',
     },
   });
 
   useEffect(() => {
     if (open && user) {
       form.reset({
-        nama: user.nama,
-        jabatan: user.jabatan,
-        email: user.email || '',
+        name: user.profile?.name || user.display_name || '',
+        phone: user.profile?.phone || '',
+        address: user.profile?.address || '',
+        position: user.profile?.position || '',
       });
     }
   }, [open, user, form]);
 
   const onSubmit = (data: EditProfileData) => {
     const updateData: UserUpdate = {
-      nama: data.nama,
-      jabatan: data.jabatan,
-      email: data.email || undefined,
+      profile: {
+        ...user.profile, // Preserve other existing profile fields
+        name: data.name,
+        phone: data.phone || undefined,
+        address: data.address || undefined,
+        position: data.position || undefined,
+      },
     };
     onSave(updateData);
   };
 
   const getInitials = () => {
-    const nameParts = user.nama.split(' ');
+    const name = user.profile?.name || user.display_name || 'N';
+    const nameParts = name.split(' ');
     if (nameParts.length >= 2) {
       return nameParts[0][0] + nameParts[1][0];
     }
@@ -102,10 +110,10 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
               </div>
 
               {/* Form Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col gap-6">
                 <FormField
                   control={form.control}
-                  name="nama"
+                  name="name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nama Lengkap</FormLabel>
@@ -121,16 +129,15 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
                   )}
                 />
 
-
                 <FormField
                   control={form.control}
-                  name="jabatan"
+                  name="position"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Jabatan</FormLabel>
+                      <FormLabel>Posisi/Jabatan</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Masukkan jabatan"
+                          placeholder="Masukkan posisi atau jabatan"
                           disabled={loading}
                           {...field}
                         />
@@ -142,14 +149,31 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
 
                 <FormField
                   control={form.control}
-                  name="email"
+                  name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email (Opsional)</FormLabel>
+                      <FormLabel>Nomor Telepon</FormLabel>
                       <FormControl>
                         <Input
-                          type="email"
-                          placeholder="Masukkan email"
+                          placeholder="Masukkan nomor telepon"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>Alamat</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Masukkan alamat lengkap"
                           disabled={loading}
                           {...field}
                         />
@@ -161,30 +185,43 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
               </div>
 
               {/* Read-only fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1  gap-6">
                 <div className="space-y-2">
-                  <Label>Username</Label>
+                  <Label>Email</Label>
                   <div className="p-3 bg-muted rounded-md text-sm">
-                    {user.username}
+                    {user.email}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Role</Label>
+                  <Label>User ID</Label>
                   <div className="p-3 bg-muted rounded-md text-sm">
-                    {user.role_display}
+                    {user.id}
                   </div>
                 </div>
 
-                {user.inspektorat && (
+                <div className="space-y-2">
+                  <Label>Roles</Label>
+                  <div className="p-3 bg-muted rounded-md text-sm">
+                    {user.roles?.join(', ') || 'Tidak ada role'}
+                  </div>
+                </div>
+
+                {user.organization_id && (
                   <div className="space-y-2">
-                    <Label>Inspektorat</Label>
+                    <Label>Organisasi ID</Label>
                     <div className="p-3 bg-muted rounded-md text-sm">
-                      {user.inspektorat}
+                      {user.organization_id}
                     </div>
                   </div>
                 )}
 
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <div className="p-3 bg-muted rounded-md text-sm">
+                    {user.status}
+                  </div>
+                </div>
               </div>
             </form>
           </Form>

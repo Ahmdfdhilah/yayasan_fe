@@ -8,10 +8,11 @@ import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import { PageHeader } from '@/components/common/PageHeader';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
-// import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
+import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { UserUpdate } from '@/services/users/types';
+import { USER_STATUS, ROLE_LABELS } from '@/lib/constants';
 import {
   Mail,
   Building,
@@ -21,6 +22,7 @@ import {
   CheckCircle,
   XCircle,
   IdCard,
+  Lock,
 } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
@@ -29,7 +31,7 @@ const ProfilePage: React.FC = () => {
   const isLoading = useAppSelector(selectAuthLoading);
   const { toast } = useToast();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  // const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
   if (!user) {
     return (
@@ -43,32 +45,49 @@ const ProfilePage: React.FC = () => {
   }
 
   const getFullName = () => {
-    return user.nama;
+    return user.profile?.name || user.display_name || user.full_name || 'N/A';
   };
 
   const getStatusIcon = () => {
-    if (!user.is_active) {
+    if (user.status !== USER_STATUS.ACTIVE) {
       return <XCircle className="w-4 h-4 text-red-500" />;
     }
     return <CheckCircle className="w-4 h-4 text-green-500" />;
   };
 
   const getStatusText = () => {
-    if (!user.is_active) return 'Tidak Aktif';
-    return 'Aktif';
+    switch (user.status) {
+      case USER_STATUS.ACTIVE:
+        return 'Aktif';
+      case USER_STATUS.INACTIVE:
+        return 'Tidak Aktif';
+      case USER_STATUS.SUSPENDED:
+        return 'Ditangguhkan';
+      default:
+        return user.status;
+    }
   };
 
   const getStatusBadgeVariant = () => {
-    if (!user.is_active) return 'destructive';
-    return 'default';
+    switch (user.status) {
+      case USER_STATUS.ACTIVE:
+        return 'default';
+      case USER_STATUS.INACTIVE:
+        return 'secondary';
+      case USER_STATUS.SUSPENDED:
+        return 'destructive';
+      default:
+        return 'secondary';
+    }
   };
 
-  const getRoleDisplayName = () => {
-    return user.role_display || user.role;
+  const getRoleDisplayNames = () => {
+    return user.roles?.map(role => ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role) || ['N/A'];
   };
 
   const getInitials = () => {
-    const nameParts = user.nama.split(' ');
+    const name = getFullName();
+    const nameParts = name.split(' ');
     if (nameParts.length >= 2) {
       return nameParts[0][0] + nameParts[1][0];
     }
@@ -87,9 +106,9 @@ const ProfilePage: React.FC = () => {
     setIsEditDialogOpen(true);
   };
 
-  // const handleChangePassword = () => {
-  //   setIsPasswordDialogOpen(true);
-  // };
+  const handleChangePassword = () => {
+    setIsPasswordDialogOpen(true);
+  };
 
   const handleProfileUpdate = async (data: UserUpdate) => {
     try {
@@ -109,23 +128,14 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  // const handlePasswordChange = async (data: UserChangePassword) => {
-  //   try {
-  //     await dispatch(changePasswordAsync(data)).unwrap();
-  //     toast({
-  //       title: 'Password berhasil diubah',
-  //       description: 'Password Anda telah berhasil diubah.',
-  //       variant: 'default'
-  //     });
-  //     setIsPasswordDialogOpen(false);
-  //   } catch (error) {
-  //     toast({
-  //       title: 'Gagal mengubah password',
-  //       description: 'Terjadi kesalahan saat mengubah password.',
-  //       variant: 'destructive'
-  //     });
-  //   }
-  // };
+  const handlePasswordChangeSuccess = () => {
+    toast({
+      title: 'Password berhasil diubah',
+      description: 'Password Anda telah berhasil diubah.',
+      variant: 'default'
+    });
+    setIsPasswordDialogOpen(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -138,10 +148,10 @@ const ProfilePage: React.FC = () => {
               <Edit className="w-4 h-4 mr-2" />
               Edit Profil
             </Button>
-            {/* <Button onClick={handleChangePassword}>
+            <Button onClick={handleChangePassword}>
               <Lock className="w-4 h-4 mr-2" />
               Ganti Password
-            </Button> */}
+            </Button>
           </div>
         }
       />
@@ -172,19 +182,34 @@ const ProfilePage: React.FC = () => {
                 <span className="text-sm">{user.email || 'Tidak ada email'}</span>
               </div>
 
-              <div className="flex items-center gap-2">
-                <IdCard className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">{user.username}</span>
-              </div>
+              {user.profile?.phone && (
+                <div className="flex items-center gap-2">
+                  <IdCard className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm">{user.profile.phone}</span>
+                </div>
+              )}
+
+              {user.profile?.position && (
+                <div className="flex items-center gap-2">
+                  <UserIcon className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm">{user.profile.position}</span>
+                </div>
+              )}
 
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">{getRoleDisplayName()}</span>
+                <div className="flex flex-wrap gap-1">
+                  {getRoleDisplayNames().map((role, index) => (
+                    <Badge key={index} variant="outline" className="text-xs">
+                      {role}
+                    </Badge>
+                  ))}
+                </div>
               </div>
-              {user.inspektorat && (
+              {user.organization_id && (
                 <div className="flex items-center gap-2">
                   <Building className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm">{user.inspektorat}</span>
+                  <span className="text-sm">Organisasi ID: {user.organization_id}</span>
                 </div>
               )}
             </div>
@@ -212,19 +237,39 @@ const ProfilePage: React.FC = () => {
                     <p className="text-sm text-muted-foreground">{getFullName()}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Username</label>
-                    <p className="text-sm text-muted-foreground">{user.username}</p>
+                    <label className="text-sm font-medium">User ID</label>
+                    <p className="text-sm text-muted-foreground">{user.id}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Email</label>
                     <p className="text-sm text-muted-foreground">{user.email || 'Tidak ada email'}</p>
                   </div>
+                  {user.profile?.phone && (
+                    <div>
+                      <label className="text-sm font-medium">Nomor Telepon</label>
+                      <p className="text-sm text-muted-foreground">{user.profile.phone}</p>
+                    </div>
+                  )}
+                  {user.profile?.position && (
+                    <div>
+                      <label className="text-sm font-medium">Posisi/Jabatan</label>
+                      <p className="text-sm text-muted-foreground">{user.profile.position}</p>
+                    </div>
+                  )}
+                  {user.profile?.address && (
+                    <div>
+                      <label className="text-sm font-medium">Alamat</label>
+                      <p className="text-sm text-muted-foreground">{user.profile.address}</p>
+                    </div>
+                  )}
+                  {user.organization_id && (
+                    <div>
+                      <label className="text-sm font-medium">Organisasi ID</label>
+                      <p className="text-sm text-muted-foreground">{user.organization_id}</p>
+                    </div>
+                  )}
                   <div>
-                    <label className="text-sm font-medium">Jabatan</label>
-                    <p className="text-sm text-muted-foreground">{user.jabatan}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Tanggal Bergabung</label>
+                    <label className="text-sm font-medium">Tanggal Akun dibuat</label>
                     <p className="text-sm text-muted-foreground">
                       {formatDate(user.created_at)}
                     </p>
@@ -241,35 +286,28 @@ const ProfilePage: React.FC = () => {
                   <div>
                     <label className="text-sm font-medium">Peran</label>
                     <div className="flex flex-wrap gap-1 mt-1">
-                      <Badge variant="secondary" className="text-xs">
-                        {getRoleDisplayName()}
-                      </Badge>
+                      {getRoleDisplayNames().map((role, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {role}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
-                  {user.inspektorat && (
-                    <div>
-                      <label className="text-sm font-medium">Inspektorat</label>
-                      <p className="text-sm text-muted-foreground">{user.inspektorat}</p>
-                    </div>
-                  )}
                   <div>
-                    <label className="text-sm font-medium">Status Email</label>
+                    <label className="text-sm font-medium">Status Akun</label>
                     <div className="flex items-center gap-2">
-                      {user.has_email ? (
-                        <CheckCircle className="w-4 h-4 text-green-500" />
-                      ) : (
-                        <XCircle className="w-4 h-4 text-red-500" />
-                      )}
+                      {getStatusIcon()}
                       <span className="text-sm text-muted-foreground">
-                        {user.has_email ? 'Memiliki email' : 'Tidak memiliki email'}
+                        {getStatusText()}
                       </span>
                     </div>
                   </div>
-                  {user.last_login && (
+
+                  {user.last_login_at && (
                     <div>
                       <label className="text-sm font-medium">Login Terakhir</label>
                       <p className="text-sm text-muted-foreground">
-                        {formatDateTime(user.last_login)}
+                        {formatDateTime(user.last_login_at)}
                       </p>
                     </div>
                   )}
@@ -297,39 +335,21 @@ const ProfilePage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  {user.has_email ? (
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                  ) : (
-                    <XCircle className="w-4 h-4 text-red-500" />
-                  )}
-                  <span className="text-sm font-medium">Status Email</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {user.has_email ? 'Email tersedia' : 'Email tidak tersedia'}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  {user.is_active ? (
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                  ) : (
-                    <XCircle className="w-4 h-4 text-red-500" />
-                  )}
+                  {getStatusIcon()}
                   <span className="text-sm font-medium">Status Akun</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {user.is_active ? 'Akun aktif' : 'Akun tidak aktif'}
+                  {getStatusText()}
                 </p>
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span className="text-sm font-medium">Password Status</span>
+                  <Shield className="w-4 h-4 text-blue-500" />
+                  <span className="text-sm font-medium">Keamanan</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Password aman
+                  {user.roles && user.roles.length > 0 ? 'Roles aktif' : 'Tidak ada role'}
                 </p>
               </div>
             </div>
@@ -346,12 +366,12 @@ const ProfilePage: React.FC = () => {
         loading={isLoading}
       />
 
-      {/* <ChangePasswordDialog
+      <ChangePasswordDialog
         open={isPasswordDialogOpen}
         onOpenChange={setIsPasswordDialogOpen}
-        onSave={handlePasswordChange}
+        onSave={handlePasswordChangeSuccess}
         loading={isLoading}
-      /> */}
+      />
     </div>
   );
 };

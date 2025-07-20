@@ -4,7 +4,8 @@ import { useRole } from '@/hooks/useRole';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
-import { Calendar, Users, FileText, GraduationCap, Building, Settings } from 'lucide-react';
+import { Calendar, Users, FileText, GraduationCap, Building, Settings, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function DashboardPage() {
   const { user, logout } = useAuth();
@@ -38,9 +39,17 @@ export function DashboardPage() {
             Selamat datang di Sistem Penilaian Kinerja Guru
           </p>
         </div>
-        <Button variant="outline" onClick={handleLogout}>
-          Logout
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link to="/profile">
+              <User className="h-4 w-4 mr-2" />
+              Profile
+            </Link>
+          </Button>
+          <Button variant="outline" onClick={handleLogout}>
+            Logout
+          </Button>
+        </div>
       </div>
 
       {/* User Info Card */}
