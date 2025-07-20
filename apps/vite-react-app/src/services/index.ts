@@ -8,6 +8,7 @@ export { authService } from "./auth";
 export { userService } from "./users";
 export { organizationService } from "./organizations";
 export { periodService } from "./periods";
+export { evaluationAspectService } from "./evaluation-aspects";
 
 // Export types with explicit imports to avoid conflicts
 export type {
@@ -47,3 +48,13 @@ export type {
   PeriodListResponse,
   PeriodFilterParams,
 } from "./periods";
+
+export type {
+  EvaluationAspect,
+  EvaluationAspectCreate,
+  EvaluationAspectUpdate,
+  EvaluationAspectResponse,
+  EvaluationAspectSummary,
+  EvaluationAspectListResponse,
+  EvaluationAspectFilterParams,
+} from "./evaluation-aspects";

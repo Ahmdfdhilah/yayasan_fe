@@ -571,7 +571,7 @@ Delete evaluation aspect (Admin only).
 **Base Path**: `/teacher-evaluations`
 
 ### POST /teacher-evaluations
-Create teacher evaluation (Admin/Manager only).
+Create teacher evaluation (Admin only).
 
 **Request Body**: `TeacherEvaluationCreate`
 ```typescript

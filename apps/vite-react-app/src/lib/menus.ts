@@ -79,7 +79,7 @@ export const appMenuItems: SidebarItem[] = [
       },
       {
         title: 'Aspek Evaluasi',
-        href: '/evaluations/aspects',
+        href: '/evaluation-aspects',
         icon: BookOpen,
         allowedRoles: ['admin'],
       },
@@ -92,12 +92,12 @@ export const appMenuItems: SidebarItem[] = [
     ],
   },
 
-  // Period Management - Admin and Principals
+  // Period Management - Admin only
   {
     title: 'Periode',
     href: '/periods',
     icon: Calendar,
-    allowedRoles: ['admin', 'kepala_sekolah'],
+    allowedRoles: ['admin'],
   },
 
   // Organization Management - Admin only

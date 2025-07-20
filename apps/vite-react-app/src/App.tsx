@@ -22,6 +22,7 @@ import { PublicRoute, AuthGuard } from './components/Auth/AuthGuard';
 import { RoleBasedHome } from './components/Auth/RoleBasedHome';
 import { RoleProtectedRoute } from './components/Auth/RoleProtectedRoute';
 import PeriodsPage from './pages/periods/PeriodsPage';
+import { EvaluationAspectsPage } from './pages/evaluation-aspects/EvaluationAspectsPage';
 
 function App() {
   return (
@@ -87,6 +88,12 @@ function App() {
                     <Route path="periods" element={
                       <RoleProtectedRoute allowedRoles={['admin']}>
                         <PeriodsPage />
+                      </RoleProtectedRoute>
+                    } />
+                    
+                    <Route path="evaluation-aspects" element={
+                      <RoleProtectedRoute allowedRoles={['admin']}>
+                        <EvaluationAspectsPage />
                       </RoleProtectedRoute>
                     } />
                   </Route>
