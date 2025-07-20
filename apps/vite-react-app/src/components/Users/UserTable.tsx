@@ -1,6 +1,6 @@
 import React from 'react';
 import { User } from '@/services/users/types';
-import { ROLE_LABELS } from '@/lib/constants';
+import { UserStatus } from '@/services/auth/types';
 import {
   Table,
   TableBody,
@@ -12,6 +12,8 @@ import {
 import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import ActionDropdown  from '@/components/common/ActionDropdown';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 interface UserTableProps {
   users: User[];
@@ -28,20 +30,17 @@ export const UserTable: React.FC<UserTableProps> = ({
   onDelete,
   onView
 }) => {
-  const getStatusBadge = (isActive: boolean) => {
+  const getStatusBadge = (status: UserStatus) => {
     return (
-      <Badge variant={isActive ? 'default' : 'destructive'}>
-        {isActive ? 'Aktif' : 'Tidak Aktif'}
+      <Badge variant={status === UserStatus.ACTIVE ? 'default' : 'destructive'}>
+        {status === UserStatus.ACTIVE ? 'Aktif' : 'Tidak Aktif'}
       </Badge>
     );
   };
 
-  const getRoleBadge = (role: string) => {
-    return (
-      <Badge variant="secondary" className="text-xs">
-        {ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role}
-      </Badge>
-    );
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
 
@@ -51,24 +50,25 @@ export const UserTable: React.FC<UserTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>User</TableHead>
-            <TableHead>Jabatan</TableHead>
+            <TableHead>Position</TableHead>
             <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Inspektorat</TableHead>
+            <TableHead>Roles</TableHead>
+            <TableHead>Phone</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Last Login</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                 Loading users...
               </TableCell>
             </TableRow>
           ) : users.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                 Tidak ada user ditemukan
               </TableCell>
             </TableRow>
@@ -79,31 +79,36 @@ export const UserTable: React.FC<UserTableProps> = ({
                   <div className="flex items-center space-x-3">
                     <Avatar className="w-8 h-8">
                       <AvatarFallback className="text-xs">
-                        {user.nama.split(' ').map(n => n[0]).join('').toUpperCase()}
+                        {getInitials(user.profile?.name || user.display_name || 'N')}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium">{user.nama}</p>
-                      <p className="text-sm text-muted-foreground">@{user.username}</p>
+                      <p className="font-medium">{user.profile?.name || user.display_name}</p>
+                      <p className="text-sm text-muted-foreground">ID: {user.id}</p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">{user.jabatan}</span>
+                  <span className="text-sm">{user.profile?.position || '-'}</span>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">{user.email || '-'}</span>
+                  <span className="text-sm">{user.email}</span>
                 </TableCell>
                 <TableCell>
-                  {getRoleBadge(user.role)}
+                 {user.roles}
                 </TableCell>
                 <TableCell>
                   <span className="text-sm">
-                    {user.inspektorat || '-'}
+                    {user.profile?.phone || '-'}
                   </span>
                 </TableCell>
                 <TableCell>
-                  {getStatusBadge(user.is_active)}
+                  {getStatusBadge(user.status)}
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm text-muted-foreground">
+                    {user.last_login_at ? format(new Date(user.last_login_at), 'dd MMM yyyy', { locale: id }) : '-'}
+                  </span>
                 </TableCell>
                 <TableCell className="text-right">
                   <ActionDropdown

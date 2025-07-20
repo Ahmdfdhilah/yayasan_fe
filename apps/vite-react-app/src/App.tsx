@@ -16,9 +16,10 @@ import { EmailSentSuccessPage } from './pages/auth/EmailSentSuccessPage';
 import { ResetPasswordPage } from './pages/auth/ResetPasswordPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import { DashboardPage } from './pages/DashboardPage';
+import UsersPage from './pages/users/UsersPage';
 import { PublicRoute, AuthGuard } from './components/Auth/AuthGuard';
 import { RoleBasedHome } from './components/Auth/RoleBasedHome';
-
+import { RoleProtectedRoute } from './components/Auth/RoleProtectedRoute';
 
 function App() {
   return (
@@ -68,6 +69,13 @@ function App() {
                   
                     {/* Profile - All authenticated users */}
                     <Route path="profile" element={<ProfilePage />} />
+                    
+                    {/* Admin only routes */}
+                    <Route path="users" element={
+                      <RoleProtectedRoute allowedRoles={['admin']}>
+                        <UsersPage />
+                      </RoleProtectedRoute>
+                    } />
                   </Route>
                 </Routes>
               </AuthProvider>

@@ -8,16 +8,8 @@ import {
   changePasswordAsync,
   getCurrentUserAsync,
   clearAuth,
-  clearError,
-  selectIsAuthenticated,
-  selectUser,
-  selectAuthLoading,
-  selectAuthError,
-  selectAccessToken,
-  selectRefreshToken,
-  selectTokenExpiry
+  clearError
 } from '@/redux/features/authSlice';
-import { useToast } from '@workspace/ui/components/sonner';
 import type { User } from '@/services/users/types';
 
 interface LoginData {
@@ -57,25 +49,13 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const dispatch = useAppDispatch();
-  const { toast } = useToast();
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
-  const user = useAppSelector(selectUser);
-  const loading = useAppSelector(selectAuthLoading);
-  const error = useAppSelector(selectAuthError);
-  const accessToken = useAppSelector(selectAccessToken);
-  const refreshToken = useAppSelector(selectRefreshToken);
-  const tokenExpiry = useAppSelector(selectTokenExpiry);
-
-  // Show error toast when error is set
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: error,
-        variant: "destructive"
-      });
-    }
-  }, [error, toast]);
+  const isAuthenticated = useAppSelector((state) => state.auth?.isAuthenticated ?? false);
+  const user = useAppSelector((state) => state.auth?.user ?? null);
+  const loading = useAppSelector((state) => state.auth?.isLoading ?? false);
+  const error = useAppSelector((state) => state.auth?.error ?? null);
+  const accessToken = useAppSelector((state) => state.auth?.accessToken ?? null);
+  const refreshToken = useAppSelector((state) => state.auth?.refreshToken ?? null);
+  const tokenExpiry = useAppSelector((state) => state.auth?.tokenExpiry ?? null);
 
   const login = async (loginData: LoginData): Promise<void> => {
     try {

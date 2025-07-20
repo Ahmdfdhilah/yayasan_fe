@@ -322,39 +322,6 @@ const ProfilePage: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Security Information */}
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5" />
-              Informasi Keamanan
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  {getStatusIcon()}
-                  <span className="text-sm font-medium">Status Akun</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {getStatusText()}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm font-medium">Keamanan</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {user.roles && user.roles.length > 0 ? 'Roles aktif' : 'Tidak ada role'}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Dialogs */}

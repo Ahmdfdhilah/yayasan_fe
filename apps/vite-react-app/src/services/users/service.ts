@@ -3,6 +3,7 @@ import { BaseService } from "../base";
 import {
   UserCreate,
   UserUpdate,
+  AdminUserUpdate,
   UserChangePassword,
   UserResponse,
   UserListResponse,
@@ -55,7 +56,12 @@ class UserService extends BaseService {
     organizationId?: number
   ): Promise<UserResponse> {
     const params = organizationId ? `?organization_id=${organizationId}` : '';
-    return this.post(`/${params}`, userData);
+    // For admin create, always set status to ACTIVE
+    const createData = {
+      ...userData,
+      status: 'active' as const,
+    };
+    return this.post(`/${params}`, createData);
   }
 
   async getUserById(
@@ -66,7 +72,7 @@ class UserService extends BaseService {
 
   async updateUser(
     userId: number,
-    userData: UserUpdate
+    userData: AdminUserUpdate
   ): Promise<UserResponse> {
     return this.put(`/${userId}`, userData);
   }

@@ -37,7 +37,14 @@ export interface UserUpdate {
   profile?: {
     [key: string]: any;
   };
+}
+
+export interface AdminUserUpdate {
+  profile?: {
+    [key: string]: any;
+  };
   organization_id?: number;
+  email?: string;
   status?: UserStatus;
 }
 

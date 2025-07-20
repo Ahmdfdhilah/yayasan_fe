@@ -3,6 +3,7 @@ import { useRole } from '@/hooks/useRole';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { User, UserFilterParams } from '@/services/users/types';
+import { UserRole, UserStatus } from '@/services/auth/types';
 import { userService } from '@/services/users';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent } from '@workspace/ui/components/card';
@@ -33,6 +34,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@workspace/ui/components/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@workspace/ui/components/dialog';
 
 interface UserPageFilters {
   search: string;
@@ -82,8 +89,8 @@ const UsersPage: React.FC = () => {
         page: filters.page,
         size: filters.size,
         search: filters.search || undefined,
-        role: filters.role !== 'all' ? filters.role as 'ADMIN' | 'INSPEKTORAT' | 'PERWADAG' : undefined,
-        is_active: filters.status !== 'all' ? filters.status === 'active' : undefined,
+        role: filters.role !== 'all' ? filters.role as UserRole : undefined,
+        status: filters.status !== 'all' ? filters.status as UserStatus : undefined,
       };
 
       const response = await userService.getUsers(params);
@@ -128,7 +135,7 @@ const UsersPage: React.FC = () => {
         fetchUsers(); // Refresh the list
         toast({
           title: 'User berhasil dihapus',
-          description: `User ${userToDelete.nama} telah dihapus dari sistem.`,
+          description: `User ${userToDelete.profile?.name || userToDelete.display_name} telah dihapus dari sistem.`,
           variant: 'default'
         });
       } catch (error) {
@@ -149,7 +156,7 @@ const UsersPage: React.FC = () => {
         await userService.updateUser(editingUser.id, userData);
         toast({
           title: 'User berhasil diperbarui',
-          description: `Data user ${userData.nama} telah diperbarui.`,
+          description: `Data user ${userData.profile?.name || 'pengguna'} telah diperbarui.`,
           variant: 'default'
         });
       } else {
@@ -157,7 +164,7 @@ const UsersPage: React.FC = () => {
         await userService.createUser(userData);
         toast({
           title: 'User berhasil dibuat',
-          description: `User ${userData.nama} telah ditambahkan ke sistem.`,
+          description: `User ${userData.profile?.name || 'pengguna'} telah ditambahkan ke sistem.`,
           variant: 'default'
         });
       }
@@ -190,11 +197,11 @@ const UsersPage: React.FC = () => {
     updateURL({ page });
   };
 
-  // Role options
+  // Role options based on PKG system
   const roleOptions = [
-    { value: 'ADMIN', label: 'Admin' },
-    { value: 'INSPEKTORAT', label: 'Inspektorat' },
-    { value: 'PERWADAG', label: 'Perwadag' },
+    { value: UserRole.ADMIN, label: 'Admin' },
+    { value: UserRole.GURU, label: 'Guru' },
+    { value: UserRole.KEPALA_SEKOLAH, label: 'Kepala Sekolah' },
   ];
 
   // Generate composite title
@@ -208,7 +215,7 @@ const UsersPage: React.FC = () => {
     }
     
     if (filters.status !== 'all') {
-      activeFilters.push(filters.status === 'active' ? 'Aktif' : 'Tidak Aktif');
+      activeFilters.push(filters.status === UserStatus.ACTIVE ? 'Aktif' : 'Tidak Aktif');
     }
     
     if (activeFilters.length > 0) {
@@ -271,8 +278,8 @@ const UsersPage: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Status</SelectItem>
-              <SelectItem value="active">Aktif</SelectItem>
-              <SelectItem value="inactive">Tidak Aktif</SelectItem>
+              <SelectItem value={UserStatus.ACTIVE}>Aktif</SelectItem>
+              <SelectItem value={UserStatus.INACTIVE}>Tidak Aktif</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -338,11 +345,65 @@ const UsersPage: React.FC = () => {
       />
 
       {/* User View Dialog */}
-      <UserViewDialog
-        open={isViewDialogOpen}
-        onOpenChange={setIsViewDialogOpen}
-        user={viewingUser}
-      />
+      {viewingUser && (
+        <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Detail User</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Nama</Label>
+                <div className="p-2 bg-muted rounded text-sm">
+                  {viewingUser.profile?.name || viewingUser.display_name}
+                </div>
+              </div>
+              <div>
+                <Label>Email</Label>
+                <div className="p-2 bg-muted rounded text-sm">
+                  {viewingUser.email}
+                </div>
+              </div>
+              <div>
+                <Label>Status</Label>
+                <div className="p-2 bg-muted rounded text-sm">
+                  {viewingUser.status}
+                </div>
+              </div>
+              <div>
+                <Label>Roles</Label>
+                <div className="p-2 bg-muted rounded text-sm">
+                  {viewingUser.roles?.join(', ') || 'Tidak ada role'}
+                </div>
+              </div>
+              {viewingUser.profile?.phone && (
+                <div>
+                  <Label>Telepon</Label>
+                  <div className="p-2 bg-muted rounded text-sm">
+                    {viewingUser.profile.phone}
+                  </div>
+                </div>
+              )}
+              {viewingUser.profile?.position && (
+                <div>
+                  <Label>Posisi</Label>
+                  <div className="p-2 bg-muted rounded text-sm">
+                    {viewingUser.profile.position}
+                  </div>
+                </div>
+              )}
+              {viewingUser.profile?.address && (
+                <div className="md:col-span-2">
+                  <Label>Alamat</Label>
+                  <div className="p-2 bg-muted rounded text-sm">
+                    {viewingUser.profile.address}
+                  </div>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!userToDelete} onOpenChange={() => setUserToDelete(null)}>
@@ -351,7 +412,7 @@ const UsersPage: React.FC = () => {
             <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
             <AlertDialogDescription>
               Tindakan ini tidak dapat dibatalkan. User{' '}
-              <span className="font-semibold">{userToDelete?.nama}</span> akan dihapus
+              <span className="font-semibold">{userToDelete?.profile?.name || userToDelete?.display_name}</span> akan dihapus
               secara permanen dari sistem.
             </AlertDialogDescription>
           </AlertDialogHeader>

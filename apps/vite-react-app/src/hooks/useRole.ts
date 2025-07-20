@@ -4,7 +4,7 @@ import { selectUser } from '@/redux/features/authSlice';
 import { USER_ROLES } from '@/lib/constants';
 
 export const useRole = () => {
-  const user = useAppSelector(selectUser);
+  const user = useAppSelector((state) => state.auth?.user ?? null);
   // PKG system uses roles array, get primary role or default to GURU
   const currentRole = user?.roles?.[0] || USER_ROLES.GURU;
   const allRoles = user?.roles || [];

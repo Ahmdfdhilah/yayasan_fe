@@ -294,7 +294,7 @@ Get user by ID (Admin/Manager only).
 ### PUT /users/{user_id}
 Update user (Admin only).
 
-**Request Body**: `UserUpdate`
+**Request Body**: `AdminUserUpdate`
 
 **Response**: `UserResponse`
 

@@ -1,17 +1,18 @@
 import React from 'react';
 import { User } from '@/services/users/types';
-import { ROLE_LABELS } from '@/lib/constants';
+import { UserStatus } from '@/services/auth/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
-import ActionDropdown  from '@/components/common/ActionDropdown';
+import ActionDropdown from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { 
-  Mail, 
-  Calendar, 
-  CreditCard,
-  Building
+import {
+  Mail,
+  Calendar,
+  User as UserIcon,
+  Phone,
+  MapPin
 } from 'lucide-react';
 
 interface UserCardsProps {
@@ -29,20 +30,17 @@ export const UserCards: React.FC<UserCardsProps> = ({
   onDelete,
   onView
 }) => {
-  const getStatusBadge = (isActive: boolean) => {
+  const getStatusBadge = (status: UserStatus) => {
     return (
-      <Badge variant={isActive ? 'default' : 'destructive'} className="text-xs">
-        {isActive ? 'Aktif' : 'Tidak Aktif'}
+      <Badge variant={status === UserStatus.ACTIVE ? 'default' : 'destructive'} className="text-xs">
+        {status === UserStatus.ACTIVE ? 'Aktif' : 'Tidak Aktif'}
       </Badge>
     );
   };
 
-  const getRoleBadge = (role: string) => {
-    return (
-      <Badge variant="secondary" className="text-xs">
-        {ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role}
-      </Badge>
-    );
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
 
@@ -72,13 +70,13 @@ export const UserCards: React.FC<UserCardsProps> = ({
               <div className="flex items-center space-x-3">
                 <Avatar className="w-10 h-10">
                   <AvatarFallback className="text-sm">
-                    {user.nama.split(' ').map(n => n[0]).join('').toUpperCase()}
+                    {getInitials(user.profile?.name || user.display_name || 'N')}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className="font-medium text-sm">{user.nama}</h3>
+                  <h3 className="font-medium text-sm">{user.profile?.name || user.display_name}</h3>
                   <div className="flex items-center space-x-2 mt-1">
-                    {getStatusBadge(user.is_active)}
+                    {getStatusBadge(user.status)}
                   </div>
                 </div>
               </div>
@@ -89,38 +87,42 @@ export const UserCards: React.FC<UserCardsProps> = ({
               />
             </div>
 
-            {/* Username */}
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
-              <CreditCard className="w-4 h-4" />
-              <span>@{user.username}</span>
-            </div>
-
-            {/* Jabatan */}
-            <div className="mb-2">
-              <p className="text-sm font-medium">{user.jabatan}</p>
-            </div>
-
             {/* Email */}
-            {user.email && (
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
+              <Mail className="w-4 h-4" />
+              <span className="truncate">{user.email}</span>
+            </div>
+
+            {/* Position */}
+            {user.profile?.position && (
               <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
-                <Mail className="w-4 h-4" />
-                <span className="truncate">{user.email}</span>
+                <UserIcon className="w-4 h-4" />
+                <span>{user.profile.position}</span>
               </div>
             )}
 
+            {/* Phone */}
+            {user.profile?.phone && (
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
+                <Phone className="w-4 h-4" />
+                <span>{user.profile.phone}</span>
+              </div>
+            )}
 
-            {/* Inspektorat */}
-            {user.inspektorat && (
+            {/* Address */}
+            {user.profile?.address && (
               <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-2">
-                <Building className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span className="line-clamp-2">Inspektorat: {user.inspektorat}</span>
+                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span className="line-clamp-2">{user.profile.address}</span>
               </div>
             )}
 
-            {/* Role */}
+            {/* Roles */}
             <div className="mb-3">
-              <p className="text-xs text-muted-foreground mb-1">Role:</p>
-              {getRoleBadge(user.role)}
+              <p className="text-xs text-muted-foreground mb-1">Roles:</p>
+              <div className="flex flex-wrap gap-1">
+                {user.roles}
+              </div>
             </div>
 
             {/* Created At */}
@@ -129,6 +131,11 @@ export const UserCards: React.FC<UserCardsProps> = ({
               <span>
                 Dibuat: {format(new Date(user.created_at), 'dd MMM yyyy', { locale: id })}
               </span>
+              {user.last_login_at && (
+                <span className="ml-auto">
+                  Login: {format(new Date(user.last_login_at), 'dd MMM', { locale: id })}
+                </span>
+              )}
             </div>
           </CardContent>
         </Card>
