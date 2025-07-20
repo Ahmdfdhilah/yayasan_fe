@@ -20,7 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@workspace/ui/components/select';
-import { Card, CardContent, CardHeader } from '@workspace/ui/components/card';
 import { Trash2, Edit, Check, X } from 'lucide-react';
 import { EvaluationAspect, EvaluationAspectCreate, EvaluationAspectUpdate } from '@/services/evaluation-aspects/types';
 
@@ -103,7 +102,7 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
   if (!isEditing && !isNewAspect) {
     return (
       <div className="group bg-card border rounded-lg p-6 hover:shadow-md transition-shadow">
-        <div className="flex items-start gap-4">
+        <div className="flex flex-col lg:flex-row items-start gap-4">
           {/* Question Number */}
           <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
             <span className="text-sm font-medium text-primary">

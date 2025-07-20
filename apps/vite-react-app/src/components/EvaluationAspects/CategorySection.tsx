@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@workspace/ui/components/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@workspace/ui/components/collapsible';
-import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
 import { EvaluationAspect, EvaluationAspectCreate, EvaluationAspectUpdate } from '@/services/evaluation-aspects/types';
 import { AspectFormItem } from './AspectFormItem';
+import { Plus } from 'lucide-react';
 
 interface CategorySectionProps {
   category: string;
@@ -41,30 +39,33 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   return (
     <div className="bg-card rounded-lg border overflow-hidden">
       {/* Section Header - Google Forms style */}
-      <div className="border-l-4 border-primary bg-muted/50 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-primary font-medium">
+      <div className="border-l-4 border-primary bg-muted/50 px-4 sm:px-6 py-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+              <span className="text-sm text-primary font-medium whitespace-nowrap">
                 Bagian {sectionNumber}
               </span>
               <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
-              <span className="text-muted-foreground text-sm">
+              <span className="text-muted-foreground text-sm whitespace-nowrap">
                 {categoryAspects.length} pertanyaan
               </span>
             </div>
-            <h2 className="text-xl font-medium mt-1">
+            <h2 className="text-lg sm:text-xl font-medium mt-1 break-words">
               {category}
             </h2>
           </div>
-          <Button
-            onClick={() => onAddAspect(category)}
-            disabled={loading || isAddingToThisCategory}
-            variant="outline"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Tambah Pertanyaan
-          </Button>
+          <div className="flex-shrink-0">
+            <Button
+              onClick={() => onAddAspect(category)}
+              disabled={loading || isAddingToThisCategory}
+              variant="outline"
+              size="sm"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah Pertanyaan
+            </Button>
+          </div>
         </div>
       </div>
 

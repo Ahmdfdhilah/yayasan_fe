@@ -41,7 +41,7 @@ export const EvaluationAspectsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingAspectId, setEditingAspectId] = useState<number | null>(null);
   const [newAspectCategory, setNewAspectCategory] = useState<string | null>(null);
-  
+
   // Dialog states
   const [showCreateCategoryDialog, setShowCreateCategoryDialog] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
@@ -164,7 +164,7 @@ export const EvaluationAspectsPage: React.FC = () => {
 
   const confirmDeleteAspect = async () => {
     if (!aspectToDelete) return;
-    
+
     try {
       setSaving(true);
 
@@ -332,11 +332,11 @@ export const EvaluationAspectsPage: React.FC = () => {
               sectionNumber={index + 1}
             />
           ))}
-          
+
           {/* Add Section Button */}
           <div className="flex justify-center mt-8">
-            <Button 
-              onClick={handleCreateNewCategory} 
+            <Button
+              onClick={handleCreateNewCategory}
               disabled={saving}
               variant="outline"
               className="border-dashed border-2 hover:border-primary hover:bg-primary/5 py-3 px-6"
@@ -344,25 +344,6 @@ export const EvaluationAspectsPage: React.FC = () => {
               <Plus className="h-5 w-5 mr-2" />
               Tambah Bagian
             </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Statistics */}
-      {displayCategories.length > 0 && (
-        <div className="bg-card rounded-lg border p-6">
-          <h3 className="text-lg font-medium mb-4">
-            Ringkasan Formulir
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="text-center p-4 bg-primary/5 rounded-lg">
-              <div className="text-3xl font-bold text-primary">{categories.length}</div>
-              <div className="text-sm text-muted-foreground font-medium">Bagian</div>
-            </div>
-            <div className="text-center p-4 bg-secondary rounded-lg">
-              <div className="text-3xl font-bold text-secondary-foreground">{aspects.length}</div>
-              <div className="text-sm text-muted-foreground font-medium">Total Pertanyaan</div>
-            </div>
           </div>
         </div>
       )}
@@ -387,8 +368,8 @@ export const EvaluationAspectsPage: React.FC = () => {
             />
           </div>
           <DialogFooter>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 setShowCreateCategoryDialog(false);
                 setNewCategoryName('');
@@ -396,7 +377,7 @@ export const EvaluationAspectsPage: React.FC = () => {
             >
               Batal
             </Button>
-            <Button 
+            <Button
               onClick={confirmCreateCategory}
               disabled={!newCategoryName.trim()}
             >
@@ -412,12 +393,12 @@ export const EvaluationAspectsPage: React.FC = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus Pertanyaan</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus pertanyaan "{aspectToDelete?.aspect_name}"? 
+              Apakah Anda yakin ingin menghapus pertanyaan "{aspectToDelete?.aspect_name}"?
               Tindakan ini tidak dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel 
+            <AlertDialogCancel
               onClick={() => {
                 setShowDeleteDialog(false);
                 setAspectToDelete(null);
@@ -425,7 +406,7 @@ export const EvaluationAspectsPage: React.FC = () => {
             >
               Batal
             </AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={confirmDeleteAspect}
               disabled={saving}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
