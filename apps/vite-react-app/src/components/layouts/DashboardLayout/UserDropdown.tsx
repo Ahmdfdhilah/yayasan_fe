@@ -15,11 +15,15 @@ import {
   LogOut,
   User,
   Loader2,
+  Moon,
+  Sun,
 } from 'lucide-react';
 import { cn } from '@workspace/ui/lib/utils';
 import { useState } from 'react';
 import { useRole } from '@/hooks/useRole';
 import { useAuth } from '@/components/Auth/AuthProvider';
+import { useTheme } from '@/hooks/useTheme';
+import { Switch } from '@workspace/ui/components/switch';
 
 interface UserDropdownProps {
   collapsed?: boolean;
@@ -29,6 +33,7 @@ interface UserDropdownProps {
 export function UserDropdown({ collapsed = false, className }: UserDropdownProps) {
   const { user, logout, loading } = useAuth();
   const { currentRole } = useRole();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const navigate = useNavigate();
@@ -147,6 +152,26 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
               <span>Profile</span>
             </Link>
           </DropdownMenuItem>
+
+          <DropdownMenuItem className="flex items-center justify-between" onClick={(e) => e.preventDefault()}>
+            <div className="flex items-center">
+              {isDarkMode ? (
+                <Moon className="mr-2 h-4 w-4" />
+              ) : (
+                <Sun className="mr-2 h-4 w-4" />
+              )}
+              <span>{isDarkMode ? 'Dark Mode' : 'Light Mode'}</span>
+            </div>
+            <Switch
+              checked={isDarkMode}
+              onCheckedChange={toggleTheme}
+              aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              className="ml-2"
+              size="sm"
+            />
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
 
           <DropdownMenuItem
             onClick={handleLogout}

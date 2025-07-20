@@ -1,4 +1,3 @@
-import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { UserDropdown } from './UserDropdown';
 import { cn } from '@workspace/ui/lib/utils';
 
@@ -11,13 +10,7 @@ export function SidebarFooter({ collapsed }: SidebarFooterProps) {
 
   return (
     <>
-      <div className={cn("flex-shrink-0 mt-auto", collapsed ? "p-2 space-y-2" : "p-4 pt-3 space-y-3")}>
-        <div className={cn("flex", collapsed ? "justify-center" : "items-center justify-between")}>
-          <div className={cn("flex", collapsed ? "justify-center" : "justify-start")}>
-            <ThemeToggle collapsed={collapsed} />
-          </div>
-        </div>
-
+      <div className={cn("flex-shrink-0 mt-auto", collapsed ? "p-2" : "p-4 pt-3")}>
         <UserDropdown collapsed={collapsed} />
       </div>
     </>
