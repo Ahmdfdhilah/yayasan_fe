@@ -64,9 +64,8 @@ const TeacherEvaluationDetailPage: React.FC = () => {
         notes: response.notes || '',
       });
       
-      // Determine initial mode based on status and user role
-      const canEdit = (isAdmin() || isKepalaSekolah()) && 
-                     (response.status === 'pending' || response.status === 'in_progress');
+      // Determine initial mode based on user role (status may not be available)
+      const canEdit = (isAdmin() || isKepalaSekolah());
       setMode(canEdit ? 'edit' : 'view');
     } catch (error) {
       console.error('Error loading evaluation detail:', error);
@@ -98,18 +97,10 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     try {
       setSaving(true);
       
-      // Convert aspects object to EvaluationData array format
-      const evaluationDataArray = Object.entries(data.aspects).map(([aspectId, rating]) => ({
-        teacher_evaluation_id: evaluation.id,
-        aspect_id: parseInt(aspectId),
-        rating: rating as 'A' | 'B' | 'C' | 'D',
-        score: { A: 4, B: 3, C: 2, D: 1 }[rating as 'A' | 'B' | 'C' | 'D'],
-      }));
-
+      // Update evaluation with new grade and notes
       await teacherEvaluationService.updateTeacherEvaluation(evaluation.id, {
-        evaluation_data: evaluationDataArray,
+        grade: Object.values(data.aspects)[0] as 'A' | 'B' | 'C' | 'D', // Use first aspect grade for now
         notes: data.notes,
-        status: 'completed',
       });
 
       toast({
@@ -137,9 +128,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   };
 
   const toggleMode = () => {
-    const canEdit = (isAdmin() || isKepalaSekolah()) && 
-                   evaluation &&
-                   (evaluation.status === 'pending' || evaluation.status === 'in_progress');
+    const canEdit = (isAdmin() || isKepalaSekolah()) && evaluation;
     
     if (canEdit) {
       setMode(mode === 'view' ? 'edit' : 'view');
@@ -172,18 +161,17 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   }
 
   const categories = [...new Set(aspects.map(aspect => aspect.category))];
-  const canEdit = (isAdmin() || isKepalaSekolah()) && 
-                 (evaluation.status === 'pending' || evaluation.status === 'in_progress');
+  const canEdit = (isAdmin() || isKepalaSekolah());
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      pending: { label: 'Menunggu', variant: 'secondary' as const },
-      in_progress: { label: 'Berlangsung', variant: 'default' as const },
-      completed: { label: 'Selesai', variant: 'default' as const },
-      draft: { label: 'Draft', variant: 'outline' as const },
+  const getGradeBadge = (grade: string) => {
+    const gradeConfig = {
+      A: { label: 'A - Excellent', variant: 'default' as const },
+      B: { label: 'B - Good', variant: 'secondary' as const },
+      C: { label: 'C - Satisfactory', variant: 'outline' as const },
+      D: { label: 'D - Needs Improvement', variant: 'destructive' as const },
     };
     
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+    const config = gradeConfig[grade as keyof typeof gradeConfig] || gradeConfig.A;
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
@@ -191,7 +179,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Detail Evaluasi Guru"
-        description={`Evaluasi kinerja ${evaluation.teacher?.full_name || 'N/A'}`}
+        description={`Evaluasi kinerja ${evaluation.teacher_name || 'N/A'}`}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleBack}>
@@ -226,38 +214,38 @@ const TeacherEvaluationDetailPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">Guru</h4>
-              <p className="text-sm">{evaluation.teacher?.full_name || 'N/A'}</p>
+              <p className="text-sm">{evaluation.teacher_name || 'N/A'}</p>
             </div>
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">Evaluator</h4>
-              <p className="text-sm">{evaluation.evaluator?.full_name || '-'}</p>
+              <p className="text-sm">{evaluation.evaluator_name || '-'}</p>
             </div>
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">Periode</h4>
-              <p className="text-sm">{evaluation.period ? `${evaluation.period.academic_year} - ${evaluation.period.semester}` : 'N/A'}</p>
+              <p className="text-sm">{evaluation.period_name || 'N/A'}</p>
             </div>
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Status</h4>
-              <div>{getStatusBadge(evaluation.status)}</div>
+              <h4 className="font-medium text-sm text-muted-foreground mb-1">Aspek</h4>
+              <p className="text-sm">{evaluation.aspect_name || 'N/A'}</p>
             </div>
-            {evaluation.final_grade && (
+            {evaluation.grade && (
               <div>
-                <h4 className="font-medium text-sm text-muted-foreground mb-1">Nilai Akhir</h4>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">Grade</h4>
                 <div className="flex items-center gap-2">
                   <Badge variant="default" className="text-lg px-3 py-1">
-                    {evaluation.final_grade}
+                    {evaluation.grade}
                   </Badge>
                   <span className="text-sm text-muted-foreground">
-                    ({evaluation.total_score || 0} poin)
+                    ({evaluation.score || 0} poin)
                   </span>
                 </div>
               </div>
             )}
-            {evaluation.submitted_at && (
+            {evaluation.evaluation_date && (
               <div>
-                <h4 className="font-medium text-sm text-muted-foreground mb-1">Selesai</h4>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">Tanggal Evaluasi</h4>
                 <p className="text-sm">
-                  {new Date(evaluation.submitted_at).toLocaleDateString('id-ID')}
+                  {new Date(evaluation.evaluation_date).toLocaleDateString('id-ID')}
                 </p>
               </div>
             )}

@@ -4,8 +4,7 @@ import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { 
   TeacherEvaluation, 
-  MyEvaluationsFilterParams,
-  TeacherEvaluationStatus 
+  TeacherEvaluationFilterParams
 } from '@/services/teacher-evaluations/types';
 import { Period } from '@/services/periods/types';
 import { teacherEvaluationService, periodService } from '@/services';
@@ -85,7 +84,7 @@ const MyEvaluationsPage: React.FC = () => {
     try {
       setLoading(true);
       
-      const params: MyEvaluationsFilterParams = {
+      const params: TeacherEvaluationFilterParams = {
         page: filters.page,
         size: filters.size,
       };
@@ -95,12 +94,13 @@ const MyEvaluationsPage: React.FC = () => {
         params.period_id = Number(filters.period_id);
       }
 
-      // Add status filter
-      if (filters.status !== 'all') {
-        params.status = filters.status as TeacherEvaluationStatus;
-      }
+      // Add status filter - Note: Status filtering may not be available in new API
+      // if (filters.status !== 'all') {
+      //   params.status = filters.status;
+      // }
 
-      const response = await teacherEvaluationService.getMyEvaluations(params);
+      // Note: Using getAllEvaluations for now, may need specific endpoint for current user
+      const response = await teacherEvaluationService.getAllEvaluations(params);
       
       setEvaluations(response.items || []);
       setTotalItems(response.total || 0);
@@ -143,15 +143,16 @@ const MyEvaluationsPage: React.FC = () => {
     let title = "Evaluasi Saya";
     const activeFilters = [];
     
-    if (filters.status !== 'all') {
-      const statusLabels = {
-        pending: 'Menunggu',
-        in_progress: 'Berlangsung', 
-        completed: 'Selesai',
-        draft: 'Draft'
-      };
-      activeFilters.push(statusLabels[filters.status as keyof typeof statusLabels]);
-    }
+    // Status filter removed for now as it may not be available in new API
+    // if (filters.status !== 'all') {
+    //   const statusLabels = {
+    //     pending: 'Menunggu',
+    //     in_progress: 'Berlangsung', 
+    //     completed: 'Selesai',
+    //     draft: 'Draft'
+    //   };
+    //   activeFilters.push(statusLabels[filters.status as keyof typeof statusLabels]);
+    // }
 
     if (filters.period_id !== 'all') {
       const period = periods.find(p => p.id === Number(filters.period_id));
@@ -208,7 +209,8 @@ const MyEvaluationsPage: React.FC = () => {
           </Select>
         </div>
 
-        <div className="space-y-2">
+        {/* Status filter temporarily removed - may not be available in new API */}
+        {/* <div className="space-y-2">
           <Label htmlFor="status-filter">Status</Label>
           <Select value={filters.status} onValueChange={handleStatusFilterChange}>
             <SelectTrigger id="status-filter">
@@ -222,7 +224,7 @@ const MyEvaluationsPage: React.FC = () => {
               <SelectItem value="draft">Draft</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </div> */}
       </Filtering>
 
       <Card>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TeacherEvaluation, TeacherEvaluationStatus } from '@/services/teacher-evaluations/types';
+import { TeacherEvaluation } from '@/services/teacher-evaluations/types';
 import { UserRole } from '@/lib/constants';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
@@ -34,18 +34,18 @@ export const TeacherEvaluationCards: React.FC<TeacherEvaluationCardsProps> = ({
     return format(new Date(dateString), 'dd MMM yyyy', { locale: id });
   };
 
-  const getStatusBadge = (status: TeacherEvaluationStatus) => {
-    const statusConfig = {
-      pending: { label: 'Menunggu', variant: 'secondary' as const },
-      in_progress: { label: 'Berlangsung', variant: 'default' as const },
-      completed: { label: 'Selesai', variant: 'outline' as const },
-      draft: { label: 'Draft', variant: 'secondary' as const }
-    };
-
-    const config = statusConfig[status] || statusConfig.pending;
+  const getStatusBadge = (grade?: string) => {
+    if (!grade) {
+      return (
+        <Badge variant="secondary">
+          Belum Dinilai
+        </Badge>
+      );
+    }
+    
     return (
-      <Badge variant={config.variant}>
-        {config.label}
+      <Badge variant="outline">
+        Selesai
       </Badge>
     );
   };
@@ -69,9 +69,7 @@ export const TeacherEvaluationCards: React.FC<TeacherEvaluationCardsProps> = ({
   };
 
   const getActionProps = (evaluation: TeacherEvaluation) => {
-    const canEvaluate = userRole !== 'guru' && 
-                       evaluation.status !== 'completed' && 
-                       !!onEvaluate;
+    const canEvaluate = userRole !== 'guru' && !!onEvaluate;
 
     return {
       onView: () => onView(evaluation),
@@ -118,12 +116,12 @@ export const TeacherEvaluationCards: React.FC<TeacherEvaluationCardsProps> = ({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                  <span className="font-medium truncate">{evaluation.teacher.display_name}</span>
+                  <span className="font-medium truncate">{evaluation.teacher_name || 'N/A'}</span>
                 </div>
-                <p className="text-sm text-muted-foreground truncate">{evaluation.teacher.email}</p>
+                <p className="text-sm text-muted-foreground truncate">{evaluation.teacher_email || ''}</p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                {getStatusBadge(evaluation.status)}
+                {getStatusBadge(evaluation.grade)}
                 <ActionDropdown {...getActionProps(evaluation)} />
               </div>
             </div>
@@ -132,21 +130,21 @@ export const TeacherEvaluationCards: React.FC<TeacherEvaluationCardsProps> = ({
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">
-                  {evaluation.period.academic_year} - {evaluation.period.semester}
+                  {evaluation.period_name || 'N/A'}
                 </span>
               </div>
               
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4" />
+                <GraduationCap className="h-4 w-4" />
                 <span>
-                  {formatDate(evaluation.period.start_date)} - {formatDate(evaluation.period.end_date)}
+                  Aspek: {evaluation.aspect_name || 'N/A'}
                 </span>
               </div>
 
               {userRole === 'admin' && (
                 <div className="flex items-center gap-2 text-sm">
-                  <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                  <span>Evaluator: {evaluation.evaluator.display_name}</span>
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span>Evaluator: {evaluation.evaluator_name || 'N/A'}</span>
                 </div>
               )}
 
@@ -155,24 +153,24 @@ export const TeacherEvaluationCards: React.FC<TeacherEvaluationCardsProps> = ({
                   <div className="flex items-center gap-2">
                     <Star className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm">
-                      {evaluation.total_score ? (
-                        <span className="font-medium">{evaluation.total_score.toFixed(1)}</span>
+                      {evaluation.score ? (
+                        <span className="font-medium">{evaluation.score}</span>
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
                     </span>
                   </div>
                   
-                  {evaluation.final_grade && (
+                  {evaluation.grade && (
                     <div className="flex items-center gap-2">
-                      {getGradeBadge(evaluation.final_grade)}
+                      {getGradeBadge(evaluation.grade)}
                     </div>
                   )}
                 </div>
 
-                {evaluation.submitted_at && (
+                {evaluation.evaluation_date && (
                   <div className="text-xs text-muted-foreground">
-                    Submit: {formatDate(evaluation.submitted_at)}
+                    Evaluasi: {formatDate(evaluation.evaluation_date)}
                   </div>
                 )}
               </div>

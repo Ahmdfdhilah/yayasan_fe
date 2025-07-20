@@ -3,14 +3,12 @@ import { Navigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
-import { UserRole } from '@/lib/constants';
-import { 
-  TeacherEvaluation, 
-  TeacherEvaluationFilterParams,
-  TeacherEvaluationStatus 
-} from '@/services/teacher-evaluations/types';
-import { Period } from '@/services/periods/types';
-import { teacherEvaluationService, periodService } from '@/services';
+import { UserRole } from '@/services/auth/types';
+import { User, UserFilterParams } from '@/services/users/types';
+import { Organization } from '@/services/organizations/types';
+import { userService, organizationService } from '@/services';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import {
@@ -22,8 +20,8 @@ import {
 } from '@workspace/ui/components/select';
 import { Label } from '@workspace/ui/components/label';
 import { Plus } from 'lucide-react';
-import { TeacherEvaluationTable } from '@/components/TeacherEvaluations/TeacherEvaluationTable';
-import { TeacherEvaluationCards } from '@/components/TeacherEvaluations/TeacherEvaluationCards';
+import { UserTable } from '@/components/Users/UserTable';
+import { UserCards } from '@/components/Users/UserCards';
 import AssignTeachersDialog from '@/components/TeacherEvaluations/AssignTeachersDialog';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
@@ -31,11 +29,9 @@ import SearchContainer from '@/components/common/SearchContainer';
 import Filtering from '@/components/common/Filtering';
 import Pagination from '@/components/common/Pagination';
 
-interface TeacherEvaluationPageFilters {
-  q: string;
-  period_id: string;
-  status: string;
-  grade: string;
+interface TeacherPageFilters {
+  search: string;
+  organization_id: string;
   page: number;
   size: number;
   [key: string]: string | number;
@@ -50,13 +46,14 @@ const TeacherEvaluationsPage: React.FC = () => {
     return <Navigate to="/my-evaluations" replace />;
   }
 
+  // Get current user info for organization filtering
+  const currentUser = useSelector((state: RootState) => state.auth.user);
+
   // URL Filters configuration
-  const { updateURL, getCurrentFilters } = useURLFilters<TeacherEvaluationPageFilters>({
+  const { updateURL, getCurrentFilters } = useURLFilters<TeacherPageFilters>({
     defaults: {
-      q: '',
-      period_id: 'all',
-      status: 'all',
-      grade: 'all',
+      search: '',
+      organization_id: 'all',
       page: 1,
       size: 10,
     },
@@ -66,8 +63,8 @@ const TeacherEvaluationsPage: React.FC = () => {
   // Get current filters from URL
   const filters = getCurrentFilters();
   
-  const [evaluations, setEvaluations] = useState<TeacherEvaluation[]>([]);
-  const [periods, setPeriods] = useState<Period[]>([]);
+  const [teachers, setTeachers] = useState<User[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
@@ -75,66 +72,35 @@ const TeacherEvaluationsPage: React.FC = () => {
   // Check access
   const hasAccess = isAdmin() || isKepalaSekolah();
 
-  useEffect(() => {
-    if (hasAccess) {
-      loadPeriods();
-      loadEvaluations();
-    }
-  }, [hasAccess]);
-
-  useEffect(() => {
-    if (hasAccess) {
-      loadEvaluations();
-    }
-  }, [filters, hasAccess]);
-
-  const loadPeriods = async () => {
+  // Fetch teachers function
+  const fetchTeachers = async () => {
+    setLoading(true);
     try {
-      const response = await periodService.getPeriods({ is_active: true });
-      setPeriods(response.items || []);
-    } catch (error) {
-      console.error('Error loading periods:', error);
-    }
-  };
-
-  const loadEvaluations = async () => {
-    try {
-      setLoading(true);
-      
-      const params: TeacherEvaluationFilterParams = {
+      const params: UserFilterParams = {
         page: filters.page,
         size: filters.size,
+        role: UserRole.GURU, 
+        search: filters.search || undefined,
       };
 
-      // Add search query
-      if (filters.q) {
-        params.search = filters.q;
+      // No period filtering needed for this page
+
+      // Auto-filter by organization for kepala sekolah, or allow admin to choose
+      if (isKepalaSekolah() && currentUser?.organization_id) {
+        params.organization_id = currentUser.organization_id;
+      } else if (isAdmin() && filters.organization_id !== 'all') {
+        params.organization_id = Number(filters.organization_id);
       }
 
-      // Add period filter
-      if (filters.period_id !== 'all') {
-        params.period_id = Number(filters.period_id);
-      }
-
-      // Add status filter
-      if (filters.status !== 'all') {
-        params.status = filters.status as TeacherEvaluationStatus;
-      }
-
-      // Add grade filter
-      if (filters.grade !== 'all') {
-        params.grade = filters.grade as 'A' | 'B' | 'C' | 'D';
-      }
-
-      const response = await teacherEvaluationService.getTeacherEvaluations(params);
-      
-      setEvaluations(response.items || []);
+      const response = await userService.getUsers(params);
+      setTeachers(response.items || []);
       setTotalItems(response.total || 0);
     } catch (error: any) {
-      console.error('Error loading teacher evaluations:', error);
+      console.error('Error loading teachers:', error);
+      const errorMessage = error?.message || 'Gagal memuat data guru. Silakan coba lagi.';
       toast({
         title: 'Error',
-        description: 'Gagal memuat data evaluasi guru. Silakan coba lagi.',
+        description: errorMessage,
         variant: 'destructive'
       });
     } finally {
@@ -142,39 +108,37 @@ const TeacherEvaluationsPage: React.FC = () => {
     }
   };
 
-  const handleSearchChange = (search: string) => {
-    updateURL({ q: search, page: 1 });
+  // Load organizations (only for admin)
+  const loadOrganizations = async () => {
+    if (isAdmin()) {
+      try {
+        const response = await organizationService.getOrganizations();
+        setOrganizations(response.items || []);
+      } catch (error) {
+        console.error('Error loading organizations:', error);
+      }
+    }
   };
 
-  const handlePeriodFilterChange = (period_id: string) => {
-    updateURL({ period_id, page: 1 });
+  // Effect to fetch data when filters change
+  useEffect(() => {
+    if (hasAccess) {
+      loadOrganizations();
+      fetchTeachers();
+    }
+  }, [filters.page, filters.size, filters.search, filters.organization_id, hasAccess]);
+
+  // Pagination
+  const totalPages = Math.ceil(totalItems / filters.size);
+
+  const handleViewTeacherEvaluations = (teacher: User) => {
+    // Navigate to teacher's evaluations list
+    window.location.href = `/teacher-evaluations/teacher/${teacher.id}`;
   };
 
-  const handleStatusFilterChange = (status: string) => {
-    updateURL({ status, page: 1 });
-  };
-
-  const handleGradeFilterChange = (grade: string) => {
-    updateURL({ grade, page: 1 });
-  };
-
-  const handlePageChange = (page: number) => {
-    updateURL({ page });
-  };
-
-  const handleItemsPerPageChange = (value: string) => {
-    const size = parseInt(value, 10);
-    updateURL({ size, page: 1 });
-  };
-
-  const handleView = (evaluation: TeacherEvaluation) => {
-    // Navigate to detail page
-    window.location.href = `/teacher-evaluations/${evaluation.id}`;
-  };
-
-  const handleEvaluate = (evaluation: TeacherEvaluation) => {
-    // Navigate to evaluation page
-    window.location.href = `/teacher-evaluations/${evaluation.id}`;
+  const handleCreateEvaluation = (teacher: User) => {
+    // Navigate to create evaluation page
+    window.location.href = `/teacher-evaluations/create?teacher_id=${teacher.id}`;
   };
 
   const handleAssignTeachers = () => {
@@ -182,33 +146,38 @@ const TeacherEvaluationsPage: React.FC = () => {
   };
 
   const handleAssignSuccess = () => {
-    loadEvaluations(); // Refresh the evaluations list
+    fetchTeachers(); // Refresh the teachers list
+  };
+
+  const handleItemsPerPageChange = (value: string) => {
+    updateURL({ size: parseInt(value), page: 1 });
+  };
+
+  // Filter handlers
+  const handleSearchChange = (search: string) => {
+    updateURL({ search, page: 1 });
+  };
+
+  const handleOrganizationChange = (organization_id: string) => {
+    updateURL({ organization_id, page: 1 });
+  };
+
+  const handlePageChange = (page: number) => {
+    updateURL({ page });
   };
 
   // Generate composite title
   const getCompositeTitle = () => {
-    let title = "Evaluasi Guru";
+    let title = "Daftar Guru";
     const activeFilters = [];
     
-    if (filters.status !== 'all') {
-      const statusLabels = {
-        pending: 'Menunggu',
-        in_progress: 'Berlangsung', 
-        completed: 'Selesai',
-        draft: 'Draft'
-      };
-      activeFilters.push(statusLabels[filters.status as keyof typeof statusLabels]);
-    }
-    
-    if (filters.grade !== 'all') {
-      activeFilters.push(`Grade ${filters.grade}`);
-    }
-
-    if (filters.period_id !== 'all') {
-      const period = periods.find(p => p.id === Number(filters.period_id));
-      if (period) {
-        activeFilters.push(`${period.academic_year} - ${period.semester}`);
+    if (isAdmin() && filters.organization_id !== 'all') {
+      const org = organizations.find(o => o.id === Number(filters.organization_id));
+      if (org) {
+        activeFilters.push(org.name);
       }
+    } else if (isKepalaSekolah()) {
+      activeFilters.push("Organisasi Saya");
     }
     
     if (activeFilters.length > 0) {
@@ -217,8 +186,6 @@ const TeacherEvaluationsPage: React.FC = () => {
     
     return title;
   };
-
-  const totalPages = Math.ceil(totalItems / filters.size);
 
   // Check access after hooks
   if (!hasAccess) {
@@ -237,8 +204,8 @@ const TeacherEvaluationsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Evaluasi Guru"
-        description="Kelola evaluasi kinerja guru dan lihat hasil penilaian"
+        title="Daftar Guru"
+        description="Kelola evaluasi kinerja guru - pilih guru untuk membuat evaluasi atau melihat riwayat evaluasi"
         actions={
           isAdmin() && (
             <Button onClick={handleAssignTeachers}>
@@ -249,90 +216,61 @@ const TeacherEvaluationsPage: React.FC = () => {
         }
       />
 
-      <Filtering>
-        <div className="space-y-2">
-          <Label htmlFor="period-filter">Periode</Label>
-          <Select value={filters.period_id} onValueChange={handlePeriodFilterChange}>
-            <SelectTrigger id="period-filter">
-              <SelectValue placeholder="Filter berdasarkan periode" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Periode</SelectItem>
-              {periods.map((period) => (
-                <SelectItem key={period.id} value={period.id.toString()}>
-                  {period.academic_year} - {period.semester}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="status-filter">Status</Label>
-          <Select value={filters.status} onValueChange={handleStatusFilterChange}>
-            <SelectTrigger id="status-filter">
-              <SelectValue placeholder="Filter berdasarkan status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Status</SelectItem>
-              <SelectItem value="pending">Menunggu</SelectItem>
-              <SelectItem value="in_progress">Berlangsung</SelectItem>
-              <SelectItem value="completed">Selesai</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="grade-filter">Grade</Label>
-          <Select value={filters.grade} onValueChange={handleGradeFilterChange}>
-            <SelectTrigger id="grade-filter">
-              <SelectValue placeholder="Filter berdasarkan grade" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Grade</SelectItem>
-              <SelectItem value="A">A - Sangat Baik</SelectItem>
-              <SelectItem value="B">B - Baik</SelectItem>
-              <SelectItem value="C">C - Cukup</SelectItem>
-              <SelectItem value="D">D - Perlu Perbaikan</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </Filtering>
+      {/* Only show filtering if admin (for organization filter) */}
+      {isAdmin() && (
+        <Filtering>
+          <div className="space-y-2">
+            <Label htmlFor="organization-filter">Organisasi</Label>
+            <Select value={filters.organization_id} onValueChange={handleOrganizationChange}>
+              <SelectTrigger id="organization-filter">
+                <SelectValue placeholder="Filter berdasarkan organisasi" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Organisasi</SelectItem>
+                {organizations.map((org) => (
+                  <SelectItem key={org.id} value={org.id.toString()}>
+                    {org.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </Filtering>
+      )}
 
       <Card>
         <CardContent>
           <div className="space-y-4">
             <ListHeaderComposite
               title={getCompositeTitle()}
-              subtitle="Kelola evaluasi kinerja guru dan lihat hasil penilaian"
+              subtitle="Kelola evaluasi kinerja guru - pilih guru untuk membuat evaluasi atau melihat riwayat evaluasi"
             />
 
             <SearchContainer
-              searchQuery={filters.q}
+              searchQuery={filters.search}
               onSearchChange={handleSearchChange}
-              placeholder="Cari berdasarkan nama guru atau evaluator..."
+              placeholder="Cari berdasarkan nama guru atau email..."
             />
 
             {/* Desktop Table */}
             <div className="hidden lg:block">
-              <TeacherEvaluationTable
-                evaluations={evaluations}
+              <UserTable
+                users={teachers}
                 loading={loading}
-                onView={handleView}
-                onEvaluate={handleEvaluate}
-                userRole={currentRole as UserRole}
+                onView={handleViewTeacherEvaluations}
+                onEdit={handleCreateEvaluation}
+                onDelete={() => {}}
               />
             </div>
 
             {/* Mobile Cards */}
             <div className="lg:hidden">
-              <TeacherEvaluationCards
-                evaluations={evaluations}
+              <UserCards
+                users={teachers}
                 loading={loading}
-                onView={handleView}
-                onEvaluate={handleEvaluate}
-                userRole={currentRole as UserRole}
+                onView={handleViewTeacherEvaluations}
+                onEdit={handleCreateEvaluation}
+                onDelete={() => {}}
               />
             </div>
 
