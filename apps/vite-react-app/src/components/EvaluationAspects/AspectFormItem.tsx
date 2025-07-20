@@ -124,7 +124,7 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
                   </p>
                 )}
                 <div className="inline-flex items-center px-2 py-1 bg-muted rounded text-xs text-muted-foreground">
-                  Tipe: Text
+                  Tipe: Pilihan Ganda (A-D)
                 </div>
               </div>
               
@@ -151,11 +151,24 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
               </div>
             </div>
             
-            {/* Preview Answer Area */}
-            <div className="mt-4 p-3 bg-muted/50 border rounded-md">
-              <p className="text-sm text-muted-foreground italic">
-                Jawaban akan ditampilkan di sini...
-              </p>
+            {/* Preview Answer Area - Evaluation Options */}
+            <div className="mt-4 space-y-2">
+              <div className="flex items-center space-x-2 p-2 border rounded-md hover:bg-muted/30">
+                <div className="w-4 h-4 border-2 border-primary rounded-full"></div>
+                <span className="text-sm">A - Sangat Baik (4)</span>
+              </div>
+              <div className="flex items-center space-x-2 p-2 border rounded-md hover:bg-muted/30">
+                <div className="w-4 h-4 border-2 border-border rounded-full"></div>
+                <span className="text-sm">B - Baik (3)</span>
+              </div>
+              <div className="flex items-center space-x-2 p-2 border rounded-md hover:bg-muted/30">
+                <div className="w-4 h-4 border-2 border-border rounded-full"></div>
+                <span className="text-sm">C - Cukup (2)</span>
+              </div>
+              <div className="flex items-center space-x-2 p-2 border rounded-md hover:bg-muted/30">
+                <div className="w-4 h-4 border-2 border-border rounded-full"></div>
+                <span className="text-sm">D - Perlu Perbaikan (1)</span>
+              </div>
             </div>
           </div>
         </div>
@@ -217,12 +230,25 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
               {/* Answer Type Preview */}
               <div className="space-y-3">
                 <div className="text-sm text-muted-foreground">
-                  Tipe jawaban
+                  Tipe jawaban: Skala Penilaian
                 </div>
-                <div className="p-3 bg-muted/50 border rounded-md">
-                  <p className="text-sm text-muted-foreground italic">
-                    Jawaban teks panjang
-                  </p>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 p-2 bg-muted/50 border rounded-md">
+                    <div className="w-4 h-4 border-2 border-primary rounded-full bg-primary"></div>
+                    <span className="text-sm">A - Sangat Baik (4)</span>
+                  </div>
+                  <div className="flex items-center space-x-2 p-2 bg-muted/30 border rounded-md">
+                    <div className="w-4 h-4 border-2 border-border rounded-full"></div>
+                    <span className="text-sm">B - Baik (3)</span>
+                  </div>
+                  <div className="flex items-center space-x-2 p-2 bg-muted/30 border rounded-md">
+                    <div className="w-4 h-4 border-2 border-border rounded-full"></div>
+                    <span className="text-sm">C - Cukup (2)</span>
+                  </div>
+                  <div className="flex items-center space-x-2 p-2 bg-muted/30 border rounded-md">
+                    <div className="w-4 h-4 border-2 border-border rounded-full"></div>
+                    <span className="text-sm">D - Perlu Perbaikan (1)</span>
+                  </div>
                 </div>
               </div>
 
