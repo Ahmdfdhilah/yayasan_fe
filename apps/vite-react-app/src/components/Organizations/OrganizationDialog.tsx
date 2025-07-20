@@ -51,6 +51,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
   const [loading, setLoading] = useState(false);
   const [usersLoading, setUsersLoading] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
+  const [searchValue, setSearchValue] = useState('');
   const isEdit = !!editingOrganization;
 
   const form = useForm<OrganizationFormData>({
@@ -99,7 +100,8 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
           head_id: undefined,
         });
       }
-      // Load initial users
+      // Reset search and load initial users
+      setSearchValue('');
       loadUsers();
     }
   }, [open, editingOrganization, form]);
@@ -131,22 +133,24 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
   const handleCancel = () => {
     if (!loading) {
       form.reset();
+      setSearchValue('');
       onOpenChange(false);
     }
   };
 
   // Prepare users for combobox
   const userOptions = users.map(user => ({
-    value: user.id.toString(),
+    value: user.id,
     label: `${user.profile?.name || user.display_name} (${user.email})`,
   }));
 
   const handleUserSearch = async (search: string) => {
+    setSearchValue(search);
     await loadUsers(search);
   };
 
-  const handleUserSelect = (value: string) => {
-    const userId = parseInt(value);
+  const handleUserSelect = (value: string | number) => {
+    const userId = typeof value === 'string' ? parseInt(value) : value;
     form.setValue('head_id', userId);
   };
 
@@ -205,20 +209,20 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
                 <FormField
                   control={form.control}
                   name="head_id"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>Kepala Organisasi</FormLabel>
                       <FormControl>
                         <Combobox
                           options={userOptions}
-                          value={selectedUser ? selectedUser.id.toString() : ''}
-                          onValueChange={handleUserSelect}
-                          onSearch={handleUserSearch}
+                          value={selectedUser ? selectedUser.id : null}
+                          onChange={handleUserSelect}
                           placeholder="Cari dan pilih kepala organisasi..."
-                          emptyText="Tidak ada pengguna ditemukan"
+                          emptyMessage="Tidak ada pengguna ditemukan"
                           searchPlaceholder="Cari pengguna..."
-                          disabled={loading}
-                          loading={usersLoading}
+                          searchValue={searchValue}
+                          onSearchChange={handleUserSearch}
+                          isLoading={usersLoading}
                         />
                       </FormControl>
                       <FormMessage />
