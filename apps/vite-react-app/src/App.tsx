@@ -23,6 +23,9 @@ import { RoleBasedHome } from './components/Auth/RoleBasedHome';
 import { RoleProtectedRoute } from './components/Auth/RoleProtectedRoute';
 import PeriodsPage from './pages/periods/PeriodsPage';
 import { EvaluationAspectsPage } from './pages/evaluation-aspects/EvaluationAspectsPage';
+import TeacherEvaluationsPage from './pages/teacher-evaluations/TeacherEvaluationsPage';
+import MyEvaluationsPage from './pages/teacher-evaluations/MyEvaluationsPage';
+import TeacherEvaluationDetailPage from './pages/teacher-evaluations/TeacherEvaluationDetailPage';
 
 function App() {
   return (
@@ -94,6 +97,27 @@ function App() {
                     <Route path="evaluation-aspects" element={
                       <RoleProtectedRoute allowedRoles={['admin']}>
                         <EvaluationAspectsPage />
+                      </RoleProtectedRoute>
+                    } />
+                    
+                    {/* Teacher Evaluations - Admin and Kepala Sekolah */}
+                    <Route path="teacher-evaluations" element={
+                      <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah']}>
+                        <TeacherEvaluationsPage />
+                      </RoleProtectedRoute>
+                    } />
+                    
+                    {/* Teacher Evaluation Detail - Admin, Kepala Sekolah, and Guru */}
+                    <Route path="teacher-evaluations/:id" element={
+                      <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
+                        <TeacherEvaluationDetailPage />
+                      </RoleProtectedRoute>
+                    } />
+                    
+                    {/* My Evaluations - Guru only */}
+                    <Route path="my-evaluations" element={
+                      <RoleProtectedRoute allowedRoles={['guru']}>
+                        <MyEvaluationsPage />
                       </RoleProtectedRoute>
                     } />
                   </Route>

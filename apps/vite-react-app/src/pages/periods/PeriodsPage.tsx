@@ -18,6 +18,7 @@ import { Plus } from 'lucide-react';
 import { PeriodTable } from '@/components/Periods/PeriodTable';
 import { PeriodCards } from '@/components/Periods/PeriodCards';
 import { PeriodDialog } from '@/components/Periods/PeriodDialog';
+import AssignTeachersDialog from '@/components/TeacherEvaluations/AssignTeachersDialog';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import SearchContainer from '@/components/common/SearchContainer';
@@ -78,6 +79,8 @@ const PeriodsPage: React.FC = () => {
   const [editingPeriod, setEditingPeriod] = useState<Period | null>(null);
   const [viewingPeriod, setViewingPeriod] = useState<Period | null>(null);
   const [periodToDelete, setPeriodToDelete] = useState<Period | null>(null);
+  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+  const [selectedPeriodForAssign, setSelectedPeriodForAssign] = useState<Period | null>(null);
 
   // Calculate access control
   const hasAccess = isAdmin();
@@ -144,6 +147,15 @@ const PeriodsPage: React.FC = () => {
 
   const handleDelete = (period: Period) => {
     setPeriodToDelete(period);
+  };
+
+  const handleAssignTeachers = (period: Period) => {
+    setSelectedPeriodForAssign(period);
+    setIsAssignDialogOpen(true);
+  };
+
+  const handleAssignSuccess = () => {
+    // Could refresh periods or evaluations if needed
   };
 
 
@@ -383,6 +395,7 @@ const PeriodsPage: React.FC = () => {
                 onView={handleView}
                 onEdit={canManage ? handleEdit : () => {}}
                 onDelete={canManage ? handleDelete : () => {}}
+                onAssignTeachers={canManage ? handleAssignTeachers : undefined}
               />
             </div>
 
@@ -394,6 +407,7 @@ const PeriodsPage: React.FC = () => {
                 onView={handleView}
                 onEdit={canManage ? handleEdit : () => {}}
                 onDelete={canManage ? handleDelete : () => {}}
+                onAssignTeachers={canManage ? handleAssignTeachers : undefined}
               />
             </div>
 
@@ -511,6 +525,13 @@ const PeriodsPage: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Assign Teachers Dialog */}
+      <AssignTeachersDialog
+        open={isAssignDialogOpen}
+        onOpenChange={setIsAssignDialogOpen}
+        onSuccess={handleAssignSuccess}
+      />
     </div>
   );
 };

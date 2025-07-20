@@ -72,8 +72,8 @@ export const appMenuItems: SidebarItem[] = [
     allowedRoles: ['kepala_sekolah', 'admin'],
     children: [
       {
-        title: 'Penilaian Kinerja',
-        href: '/evaluations/performance',
+        title: 'Daftar Evaluasi',
+        href: '/teacher-evaluations',
         icon: ClipboardCheck,
         allowedRoles: ['kepala_sekolah', 'admin'],
       },
@@ -90,6 +90,14 @@ export const appMenuItems: SidebarItem[] = [
         allowedRoles: ['kepala_sekolah', 'admin'],
       },
     ],
+  },
+
+  // My Evaluations - Teachers only
+  {
+    title: 'Evaluasi Saya',
+    href: '/my-evaluations',
+    icon: ClipboardCheck,
+    allowedRoles: ['guru'],
   },
 
   // Period Management - Admin only

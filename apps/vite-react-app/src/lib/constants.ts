@@ -68,6 +68,34 @@ export const GRADE_LABELS = {
   [EVALUATION_GRADES.D]: 'Perlu Perbaikan (1)'
 } as const;
 
+// Evaluation Rating Options for forms
+export const EVALUATION_RATINGS = [
+  {
+    value: 'A',
+    label: 'A',
+    description: 'Sangat Baik',
+    score: 4,
+  },
+  {
+    value: 'B',
+    label: 'B',
+    description: 'Baik',
+    score: 3,
+  },
+  {
+    value: 'C',
+    label: 'C',
+    description: 'Cukup',
+    score: 2,
+  },
+  {
+    value: 'D',
+    label: 'D',
+    description: 'Perlu Perbaikan',
+    score: 1,
+  },
+] as const;
+
 
 // API Pagination defaults
 export const PAGINATION_DEFAULTS = {
