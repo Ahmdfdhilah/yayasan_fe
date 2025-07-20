@@ -9,8 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
-import { Badge } from '@workspace/ui/components/badge';
-import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import ActionDropdown  from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -30,18 +28,6 @@ export const UserTable: React.FC<UserTableProps> = ({
   onDelete,
   onView
 }) => {
-  const getStatusBadge = (status: UserStatus) => {
-    return (
-      <Badge variant={status === UserStatus.ACTIVE ? 'default' : 'destructive'}>
-        {status === UserStatus.ACTIVE ? 'Aktif' : 'Tidak Aktif'}
-      </Badge>
-    );
-  };
-
-
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
-  };
 
 
   return (
@@ -76,16 +62,9 @@ export const UserTable: React.FC<UserTableProps> = ({
             users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>
-                  <div className="flex items-center space-x-3">
-                    <Avatar className="w-8 h-8">
-                      <AvatarFallback className="text-xs">
-                        {getInitials(user.profile?.name || user.display_name || 'N')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{user.profile?.name || user.display_name}</p>
-                      <p className="text-sm text-muted-foreground">ID: {user.id}</p>
-                    </div>
+                  <div>
+                    <p className="font-medium">{user.profile?.name || user.display_name}</p>
+                    <p className="text-sm text-muted-foreground">ID: {user.id}</p>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -103,7 +82,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                   </span>
                 </TableCell>
                 <TableCell>
-                  {getStatusBadge(user.status)}
+                  {user.status === UserStatus.ACTIVE ? 'Aktif' : 'Tidak Aktif'}
                 </TableCell>
                 <TableCell>
                   <span className="text-sm text-muted-foreground">

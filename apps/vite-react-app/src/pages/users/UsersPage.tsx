@@ -96,8 +96,14 @@ const UsersPage: React.FC = () => {
       const response = await userService.getUsers(params);
       setUsers(response.items);
       setTotalItems(response.total);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch users:', error);
+      const errorMessage = error?.message || 'Gagal memuat data pengguna. Silakan coba lagi.';
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive'
+      });
     } finally {
       setLoading(false);
     }
@@ -138,8 +144,14 @@ const UsersPage: React.FC = () => {
           description: `User ${userToDelete.profile?.name || userToDelete.display_name} telah dihapus dari sistem.`,
           variant: 'default'
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to delete user:', error);
+        const errorMessage = error?.message || 'Gagal menghapus pengguna. Silakan coba lagi.';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive'
+        });
       }
     }
   };
@@ -171,8 +183,14 @@ const UsersPage: React.FC = () => {
       setIsDialogOpen(false);
       setEditingUser(null);
       fetchUsers(); // Refresh the list
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save user:', error);
+      const errorMessage = error?.message || 'Gagal menyimpan pengguna. Silakan coba lagi.';
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive'
+      });
     }
   };
 

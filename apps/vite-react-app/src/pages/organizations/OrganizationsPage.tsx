@@ -141,11 +141,12 @@ const OrganizationsPage: React.FC = () => {
           title: 'Organisasi berhasil dihapus',
           description: `Organisasi ${organizationToDelete.name} telah dihapus dari sistem.`,
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to delete organization:', error);
+        const errorMessage = error?.message || 'Gagal menghapus organisasi. Silakan coba lagi.';
         toast({
           title: 'Error',
-          description: 'Gagal menghapus organisasi. Silakan coba lagi.',
+          description: errorMessage,
           variant: 'destructive'
         });
       }
@@ -177,11 +178,12 @@ const OrganizationsPage: React.FC = () => {
       setIsDialogOpen(false);
       setEditingOrganization(null);
       fetchOrganizations(); // Refresh the list
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save organization:', error);
+      const errorMessage = error?.message || 'Gagal menyimpan organisasi. Silakan coba lagi.';
       toast({
         title: 'Error',
-        description: 'Gagal menyimpan organisasi. Silakan coba lagi.',
+        description: errorMessage,
         variant: 'destructive'
       });
     }

@@ -8,11 +8,9 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
-import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Building, Users, User } from 'lucide-react';
 
 interface OrganizationTableProps {
   organizations: Organization[];
@@ -29,23 +27,6 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
   onDelete,
   onView
 }) => {
-  const getUserCountBadge = (userCount: number) => {
-    return (
-      <Badge variant={userCount > 0 ? 'default' : 'secondary'} className="flex items-center gap-1">
-        <Users className="w-3 h-3" />
-        {userCount}
-      </Badge>
-    );
-  };
-
-  const getHeadBadge = (headName?: string) => {
-    return (
-      <Badge variant={headName ? 'default' : 'outline'} className="flex items-center gap-1">
-        <User className="w-3 h-3" />
-        {headName || 'Belum ada'}
-      </Badge>
-    );
-  };
 
   return (
     <div className="rounded-md border">
@@ -77,14 +58,9 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
             organizations.map((organization) => (
               <TableRow key={organization.id}>
                 <TableCell>
-                  <div className="flex items-center space-x-3">
-                    <div className="flex items-center justify-center w-8 h-8 bg-muted rounded-full">
-                      <Building className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{organization.name}</p>
-                      <p className="text-sm text-muted-foreground">ID: {organization.id}</p>
-                    </div>
+                  <div>
+                    <p className="font-medium">{organization.name}</p>
+                    <p className="text-sm text-muted-foreground">ID: {organization.id}</p>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -97,10 +73,10 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
                   </span>
                 </TableCell>
                 <TableCell>
-                  {getHeadBadge(organization.head_name)}
+                  {organization.head_name || 'Belum ada'}
                 </TableCell>
                 <TableCell>
-                  {getUserCountBadge(organization.user_count)}
+                  {organization.user_count}
                 </TableCell>
                 <TableCell>
                   <span className="text-sm text-muted-foreground">

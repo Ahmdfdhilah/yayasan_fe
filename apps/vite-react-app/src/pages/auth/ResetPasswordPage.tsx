@@ -82,7 +82,8 @@ export function ResetPasswordPage() {
         state: { message: 'Password berhasil direset. Silakan login dengan password baru.' }
       });
     } catch (error: any) {
-      setError(error || 'Terjadi kesalahan saat reset password');
+      const errorMessage = error?.message || 'Terjadi kesalahan saat reset password';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

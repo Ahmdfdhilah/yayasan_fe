@@ -57,7 +57,8 @@ export function ForgotPasswordPage() {
         state: { email: data.email }
       });
     } catch (error: any) {
-      setError(error || 'Terjadi kesalahan saat mengirim email reset password');
+      const errorMessage = error?.message || 'Terjadi kesalahan saat mengirim email reset password';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

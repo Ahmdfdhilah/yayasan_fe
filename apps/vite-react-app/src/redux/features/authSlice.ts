@@ -27,7 +27,8 @@ export const updateProfileAsync = createAsyncThunk(
       const response = await userService.updateCurrentUser(profileData);
       return response;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Profile update failed');
+      const errorMessage = error?.message || error?.response?.data?.detail || 'Profile update failed';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -58,7 +59,8 @@ export const loginAsync = createAsyncThunk(
         user: response.user
       };
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Login failed');
+      const errorMessage = error?.message || error?.response?.data?.detail || 'Login failed';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -70,7 +72,8 @@ export const logoutAsync = createAsyncThunk(
       await authService.logout();
       return;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Logout failed');
+      const errorMessage = error?.message || error?.response?.data?.detail || 'Logout failed';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -88,7 +91,8 @@ export const refreshTokenAsync = createAsyncThunk(
         tokenExpiry
       };
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Token refresh failed');
+      const errorMessage = error?.message || error?.response?.data?.detail || 'Token refresh failed';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -100,7 +104,8 @@ export const getCurrentUserAsync = createAsyncThunk(
       const response = await authService.getCurrentUser();
       return response;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to get current user');
+      const errorMessage = error?.message || error?.response?.data?.detail || 'Failed to get current user';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -112,7 +117,8 @@ export const requestPasswordResetAsync = createAsyncThunk(
       const response = await authService.requestPasswordReset(resetData);
       return response.message;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Password reset request failed');
+      const errorMessage = error?.message || error?.response?.data?.detail || 'Password reset request failed';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -124,7 +130,8 @@ export const confirmPasswordResetAsync = createAsyncThunk(
       const response = await authService.confirmPasswordReset(resetData);
       return response.message;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Password reset confirmation failed');
+      const errorMessage = error?.message || error?.response?.data?.detail || 'Password reset confirmation failed';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -136,7 +143,8 @@ export const changePasswordAsync = createAsyncThunk(
       const response = await authService.changePassword(passwordData);
       return response.message;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Password change failed');
+      const errorMessage = error?.message || error?.response?.data?.detail || 'Password change failed';
+      return rejectWithValue(errorMessage);
     }
   }
 );
