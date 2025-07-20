@@ -276,14 +276,17 @@ export const exportEvaluationReportToExcel = async (
     year: 'numeric' 
   });
 
-  // Prepare category statistics data
-  const categoryData = stats.category_stats?.map((category: any, index: number) => ({
+  // Prepare teacher summaries data
+  const teacherData = stats.teacher_summaries?.map((teacher: any, index: number) => ({
     no: index + 1,
-    category: category.category,
-    total_evaluations: category.total_evaluations,
-    average_score: category.average_score.toFixed(2),
-    highest_score: category.highest_score,
-    lowest_score: category.lowest_score
+    teacher_name: teacher.teacher_name !== 'Unknown' ? teacher.teacher_name : teacher.teacher_email,
+    teacher_email: teacher.teacher_email,
+    average_score: teacher.average_score.toFixed(2),
+    completion_percentage: teacher.completion_percentage.toFixed(1) + '%',
+    grade_a: teacher.grade_distribution?.A || 0,
+    grade_b: teacher.grade_distribution?.B || 0,
+    grade_c: teacher.grade_distribution?.C || 0,
+    grade_d: teacher.grade_distribution?.D || 0
   })) || [];
 
   // Prepare grade distribution data
@@ -294,25 +297,23 @@ export const exportEvaluationReportToExcel = async (
     { grade: 'D - Perlu Perbaikan', count: stats.grade_distribution?.D || 0 }
   ];
 
-  const completionPercentage = stats.total_teachers > 0 
-    ? Math.round((stats.completed_evaluations / stats.total_evaluations) * 100)
-    : 0;
-
-  const averageScore = stats.total_evaluations > 0 
-    ? (stats.total_score / stats.total_evaluations).toFixed(2)
-    : '0.00';
+  const completionPercentage = stats.completion_percentage || 0;
+  const averageScore = stats.average_score ? stats.average_score.toFixed(2) : '0.00';
 
   const config: ExcelExportConfig = {
-    title: `Laporan Statistik Evaluasi Kinerja Guru`,
+    title: `Laporan Evaluasi Kinerja Guru`,
     fileName: `Laporan_Evaluasi_${period.academic_year}_${period.semester}_${new Date().getFullYear()}.xlsx`,
-    sheetName: 'Laporan Statistik',
+    sheetName: 'Ringkasan Guru',
     columns: [
       { width: 5, header: 'No' },
-      { width: 30, header: 'Kategori', key: 'category' },
-      { width: 15, header: 'Total Evaluasi', key: 'total_evaluations' },
-      { width: 15, header: 'Rata-rata Skor', key: 'average_score' },
-      { width: 15, header: 'Skor Tertinggi', key: 'highest_score' },
-      { width: 15, header: 'Skor Terendah', key: 'lowest_score' }
+      { width: 25, header: 'Nama Guru', key: 'teacher_name' },
+      { width: 30, header: 'Email', key: 'teacher_email' },
+      { width: 12, header: 'Rata-rata', key: 'average_score' },
+      { width: 12, header: 'Selesai', key: 'completion_percentage' },
+      { width: 8, header: 'A', key: 'grade_a' },
+      { width: 8, header: 'B', key: 'grade_b' },
+      { width: 8, header: 'C', key: 'grade_c' },
+      { width: 8, header: 'D', key: 'grade_d' }
     ],
     headerInfo: [
       { label: 'Yayasan', value: 'Yayasan Baitul Muslim Lampung Timur' },
@@ -320,12 +321,12 @@ export const exportEvaluationReportToExcel = async (
       { label: 'Periode Evaluasi', value: `${period.academic_year} - ${period.semester}` },
       { label: 'Tanggal Laporan', value: today },
       { label: 'Total Guru', value: stats.total_teachers.toString() },
-      { label: 'Total Evaluasi', value: `${stats.completed_evaluations} dari ${stats.total_evaluations}` },
-      { label: 'Persentase Selesai', value: `${completionPercentage}%` },
+      { label: 'Total Evaluasi', value: `${stats.completed_evaluations} dari ${stats.total_possible_evaluations}` },
+      { label: 'Persentase Selesai', value: `${completionPercentage.toFixed(1)}%` },
       { label: 'Rata-rata Keseluruhan', value: `${averageScore} / 4.0` }
     ],
-    data: categoryData,
-    noDataMessage: 'Tidak ada data statistik kategori',
+    data: teacherData,
+    noDataMessage: 'Tidak ada data guru',
     successMessage: `Laporan evaluasi periode ${period.academic_year} - ${period.semester} berhasil diekspor ke Excel.`,
     errorMessage: 'Gagal mengekspor laporan ke Excel. Silakan coba lagi.'
   };

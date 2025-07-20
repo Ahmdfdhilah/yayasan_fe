@@ -26,7 +26,7 @@ interface ReportPageFilters {
 
 const EvaluationReportsPage: React.FC = () => {
   const { toast } = useToast();
-  
+
   // URL Filters configuration
   const { updateURL, getCurrentFilters } = useURLFilters<ReportPageFilters>({
     defaults: {
@@ -37,7 +37,7 @@ const EvaluationReportsPage: React.FC = () => {
 
   // Get current filters from URL
   const filters = getCurrentFilters();
-  
+
   const [periods, setPeriods] = useState<Period[]>([]);
   const [currentPeriod, setCurrentPeriod] = useState<Period | null>(null);
   const [stats, setStats] = useState<PeriodEvaluationStats | null>(null);
@@ -144,13 +144,13 @@ const EvaluationReportsPage: React.FC = () => {
   };
 
   const getCompletionPercentage = () => {
-    if (!stats || stats.total_teachers === 0) return 0;
-    return Math.round((stats.completed_evaluations / stats.total_evaluations) * 100);
+    if (!stats || stats.total_possible_evaluations === 0) return 0;
+    return Math.round((stats.completed_evaluations / stats.total_possible_evaluations) * 100);
   };
 
   const getAverageScore = () => {
-    if (!stats || stats.total_evaluations === 0) return 0;
-    return (stats.total_score / stats.total_evaluations).toFixed(2);
+    if (!stats || stats.completed_evaluations === 0) return 0;
+    return stats.average_score.toFixed(2);
   };
 
   if (loading) {
@@ -220,7 +220,7 @@ const EvaluationReportsPage: React.FC = () => {
               <CardContent>
                 <div className="text-2xl font-bold">{stats.completed_evaluations}</div>
                 <p className="text-xs text-muted-foreground">
-                  dari {stats.total_evaluations} total evaluasi
+                  dari {stats.total_possible_evaluations} total evaluasi
                 </p>
               </CardContent>
             </Card>
@@ -265,10 +265,6 @@ const EvaluationReportsPage: React.FC = () => {
                 <div>
                   <h4 className="font-medium text-sm text-muted-foreground mb-1">Periode</h4>
                   <p className="text-sm">{currentPeriod.academic_year} - {currentPeriod.semester}</p>
-                </div>
-                <div>
-                  <h4 className="font-medium text-sm text-muted-foreground mb-1">Status</h4>
-                  <p className="text-sm capitalize">{currentPeriod.status}</p>
                 </div>
                 <div>
                   <h4 className="font-medium text-sm text-muted-foreground mb-1">Tanggal Dibuat</h4>

@@ -94,23 +94,6 @@ export interface TeacherEvaluationResponse extends TeacherEvaluation {}
 export interface TeacherEvaluationListResponse extends PaginatedResponse<TeacherEvaluation> {}
 
 // Teacher summary for period stats
-export interface TeacherEvaluationSummary {
-  teacher_id: number;
-  teacher_name: string;
-  teacher_email: string;
-  period_id: number;
-  period_name: string;
-  total_aspects: number;
-  completed_evaluations: number;
-  average_score: number;
-  grade_distribution: {
-    A: number;
-    B: number;
-    C: number;
-    D: number;
-  };
-  completion_percentage: number;
-}
 
 // Period evaluation statistics
 export interface CategoryStats {
@@ -121,10 +104,25 @@ export interface CategoryStats {
   lowest_score: number;
 }
 
+export interface TeacherEvaluationSummary {
+  teacher_id: number;
+  teacher_name: string;
+  teacher_email: string;
+  period_id: number;
+  period_name: string;
+  total_aspects: number;
+  completed_evaluations: number;
+  average_score: number;
+  grade_distribution: {
+    A?: number;
+    B?: number;
+    C?: number;
+    D?: number;
+  };
+  completion_percentage: number;
+}
+
 export interface PeriodEvaluationStats {
-  total_evaluations: number;
-  total_score: number;
-  category_stats: CategoryStats[];
   period_id: number;
   period_name: string;
   total_teachers: number;
@@ -134,12 +132,13 @@ export interface PeriodEvaluationStats {
   completion_percentage: number;
   average_score: number;
   grade_distribution: {
-    A: number;
-    B: number;
-    C: number;
-    D: number;
+    A?: number;
+    B?: number;
+    C?: number;
+    D?: number;
   };
   teacher_summaries: TeacherEvaluationSummary[];
+  category_stats?: CategoryStats[]; // Optional since it's not in current API response
 }
 
 // Filter Types (sesuai backend filter params)
