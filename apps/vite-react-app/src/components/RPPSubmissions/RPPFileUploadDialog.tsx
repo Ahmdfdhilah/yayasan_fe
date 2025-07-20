@@ -75,7 +75,7 @@ export const RPPFileUploadDialog: React.FC<RPPFileUploadDialogProps> = ({
         is_public: false // RPP files are private
       });
       
-      const fileId = uploadResult.file.id;
+      const fileId = uploadResult.id;
       
       if (!fileId) {
         throw new Error('File ID not returned from upload');

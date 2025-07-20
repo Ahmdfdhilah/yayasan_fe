@@ -1,69 +1,32 @@
-import { API_BASE_URL } from '@/config/api';
+import { mediaFileService } from '@/services';
 
 export const fileUtils = {
   /**
    * Generate file view URL for opening files in a new tab
    */
   getFileViewUrl(fileId: number): string {
-    return `${API_BASE_URL}/files/${fileId}/view`;
+    return mediaFileService.getViewUrl(fileId);
   },
 
   /**
    * Generate file download URL
    */
   getFileDownloadUrl(fileId: number): string {
-    return `${API_BASE_URL}/files/${fileId}/download`;
+    return mediaFileService.getDownloadUrl(fileId);
   },
 
   /**
    * Download a file by file ID
    */
   async downloadFile(fileId: number, fileName?: string): Promise<void> {
-    try {
-      const response = await fetch(this.getFileDownloadUrl(fileId), {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to download file');
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      
-      // Get filename from Content-Disposition header or use provided filename
-      const contentDisposition = response.headers.get('Content-Disposition');
-      let downloadFileName = fileName || 'download';
-      
-      if (contentDisposition) {
-        const matches = contentDisposition.match(/filename="?([^"]+)"?/);
-        if (matches && matches[1]) {
-          downloadFileName = matches[1];
-        }
-      }
-      
-      link.download = downloadFileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading file:', error);
-      throw error;
-    }
+    await mediaFileService.downloadFileWithName(fileId, fileName);
   },
 
   /**
    * Open file in a new tab for viewing
    */
-  viewFile(fileId: number): void {
-    const viewUrl = this.getFileViewUrl(fileId);
-    window.open(viewUrl, '_blank');
+  async viewFile(fileId: number): Promise<void> {
+    await mediaFileService.viewFileInNewTab(fileId);
   },
 
   /**

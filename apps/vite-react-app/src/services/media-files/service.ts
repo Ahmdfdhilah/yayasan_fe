@@ -1,6 +1,6 @@
-// Media Files Service Layer
-import { BaseService } from "../base";
+// Media Files Service Layer - Updated to match backend endpoints
 import { API_BASE_URL } from "@/config/api";
+import { BaseService } from "../base";
 import {
   MediaFileResponse,
   MediaFileListResponse,
@@ -9,6 +9,10 @@ import {
   MediaFileUpdate,
   MediaFileUploadResponse,
   MediaFileUploadData,
+  MediaFileViewResponse,
+  FileUrlResponse,
+  FileBulkUpdate,
+  FileMetadataUpdate,
 } from "./types";
 
 class MediaFileService extends BaseService {
@@ -29,22 +33,15 @@ class MediaFileService extends BaseService {
       formData.append('is_public', uploadData.is_public.toString());
     }
 
-    // Use custom fetch for multipart/form-data
-    const response = await fetch(`${API_BASE_URL}${this.baseEndpoint}/upload`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        // Don't set Content-Type for FormData - browser will set it with boundary
-      },
-      body: formData
+    // Use axios instance to leverage auth interceptors and automatic token refresh
+    return this.handleRequest(async () => {
+      const { default: api } = await import('@/utils/api');
+      return api.post(`${this.baseEndpoint}/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || errorData.detail || 'Failed to upload file');
-    }
-
-    return response.json();
   }
 
   // ===== QUERY ENDPOINTS =====
@@ -78,126 +75,70 @@ class MediaFileService extends BaseService {
   }
 
   /**
-   * Download media file
+   * Get file view information for static serving
+   */
+  async getFileViewInfo(fileId: number): Promise<MediaFileViewResponse> {
+    return this.get(`/${fileId}/view`);
+  }
+
+  /**
+   * Get files uploaded by specific user
+   */
+  async getFilesByUploader(
+    uploaderId: number,
+    params?: Omit<MediaFileFilterParams, 'uploader_id'>
+  ): Promise<MediaFileListResponse> {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    
+    const endpoint = queryParams.toString() 
+      ? `/uploader/${uploaderId}?${queryParams.toString()}` 
+      : `/uploader/${uploaderId}`;
+    return this.get(endpoint);
+  }
+
+  /**
+   * Get public files only (no authentication required)
+   */
+  async getPublicFiles(
+    params?: Omit<MediaFileFilterParams, 'is_public'>
+  ): Promise<MediaFileListResponse> {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    
+    const endpoint = queryParams.toString() 
+      ? `/public/list?${queryParams.toString()}` 
+      : "/public/list";
+    
+    return this.get(endpoint);
+  }
+
+  /**
+   * Download media file using backend endpoint
    */
   async downloadFile(fileId: number): Promise<Blob> {
-    const response = await fetch(`${API_BASE_URL}${this.baseEndpoint}/${fileId}/download`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
+    return this.handleRequest(async () => {
+      const { default: api } = await import('@/utils/api');
+      return api.get(`${this.baseEndpoint}/${fileId}/download`, {
+        responseType: 'blob',
+      });
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to download file');
-    }
-
-    return response.blob();
   }
 
   /**
-   * Get download URL for a file
-   */
-  getDownloadUrl(fileId: number): string {
-    return `${API_BASE_URL}${this.baseEndpoint}/${fileId}/download`;
-  }
-
-  /**
-   * Get view URL for a file (same as download but opens in browser)
-   */
-  getViewUrl(fileId: number): string {
-    return this.getDownloadUrl(fileId);
-  }
-
-  // ===== UPDATE ENDPOINTS =====
-
-  /**
-   * Update media file metadata
-   */
-  async updateMediaFile(
-    fileId: number, 
-    updateData: MediaFileUpdate
-  ): Promise<MediaFileResponse> {
-    return this.put(`/${fileId}`, updateData);
-  }
-
-  // ===== DELETE ENDPOINTS =====
-
-  /**
-   * Delete media file
-   */
-  async deleteMediaFile(fileId: number): Promise<MediaFileMessageResponse> {
-    return this.delete(`/${fileId}`);
-  }
-
-  // ===== HELPER METHODS =====
-
-  /**
-   * Check if file type can be previewed in browser
-   */
-  canPreviewFile(mediaFile: MediaFileResponse): boolean {
-    return mediaFile.can_preview;
-  }
-
-  /**
-   * Get file icon based on file type/category
-   */
-  getFileIcon(mediaFile: MediaFileResponse): string {
-    const extension = mediaFile.extension.toLowerCase();
-    
-    switch (extension) {
-      case '.pdf':
-        return '📄';
-      case '.doc':
-      case '.docx':
-        return '📝';
-      case '.xls':
-      case '.xlsx':
-        return '📊';
-      case '.ppt':
-      case '.pptx':
-        return '📽️';
-      case '.txt':
-        return '📄';
-      case '.png':
-      case '.jpg':
-      case '.jpeg':
-      case '.gif':
-      case '.svg':
-      case '.webp':
-        return '🖼️';
-      case '.zip':
-      case '.rar':
-      case '.7z':
-        return '📦';
-      case '.mp4':
-      case '.avi':
-      case '.mov':
-        return '🎥';
-      case '.mp3':
-      case '.wav':
-      case '.flac':
-        return '🎵';
-      default:
-        return '📎';
-    }
-  }
-
-  /**
-   * Format file size for display
-   */
-  formatFileSize(bytes: number): string {
-    if (bytes === 0) return '0 Bytes';
-    
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
-
-  /**
-   * Download file with proper filename handling
+   * Download file and trigger browser download with proper filename
    */
   async downloadFileWithName(fileId: number, filename?: string): Promise<void> {
     try {
@@ -217,12 +158,145 @@ class MediaFileService extends BaseService {
   }
 
   /**
-   * Open file in new tab for viewing
+   * View file in new tab using static URL
    */
-  viewFileInNewTab(fileId: number): void {
-    const viewUrl = this.getViewUrl(fileId);
-    window.open(viewUrl, '_blank');
+  async viewFileInNewTab(fileId: number): Promise<void> {
+    try {
+      const viewInfo = await this.getFileViewInfo(fileId);
+      console.log(viewInfo);
+      
+      const staticUrl = `${API_BASE_URL}${viewInfo.view_url}`;
+      window.open(staticUrl, '_blank');
+    } catch (error) {
+      console.error('Error viewing file:', error);
+      throw error;
+    }
   }
+
+  /**
+   * Get download URL for direct linking (requires authentication)
+   */
+  getDownloadUrl(fileId: number): string {
+    const { API_BASE_URL } = require('@/config/api');
+    return `${API_BASE_URL}${this.baseEndpoint}/${fileId}/download`;
+  }
+
+  /**
+   * Get view URL (same as download URL since backend handles both)
+   */
+  getViewUrl(fileId: number): string {
+    return this.getDownloadUrl(fileId);
+  }
+
+  // ===== UPDATE ENDPOINTS =====
+
+  /**
+   * Update media file metadata
+   */
+  async updateMediaFile(
+    fileId: number, 
+    updateData: MediaFileUpdate
+  ): Promise<MediaFileResponse> {
+    return this.put(`/${fileId}`, updateData);
+  }
+
+  /**
+   * Update file metadata only
+   */
+  async updateFileMetadata(
+    fileId: number,
+    metadataUpdate: FileMetadataUpdate
+  ): Promise<MediaFileResponse> {
+    return this.updateMediaFile(fileId, {
+      file_metadata: metadataUpdate.metadata
+    });
+  }
+
+  // ===== DELETE ENDPOINTS =====
+
+  /**
+   * Delete media file
+   */
+  async deleteMediaFile(fileId: number): Promise<MediaFileMessageResponse> {
+    return this.delete(`/${fileId}`);
+  }
+
+
+  // ===== BULK OPERATIONS =====
+
+  /**
+   * Bulk update files
+   */
+  async bulkUpdateFiles(bulkUpdate: FileBulkUpdate): Promise<MediaFileMessageResponse> {
+    return this.put('/bulk', bulkUpdate);
+  }
+
+  // ===== HELPER METHODS =====
+
+  /**
+   * Check if file type can be previewed in browser
+   */
+  canPreviewFile(mediaFile: MediaFileResponse): boolean {
+    return mediaFile.can_preview;
+  }
+
+  /**
+   * Get file icon based on file type/category
+   */
+  getFileIcon(mediaFile: MediaFileResponse): string {
+    const extension = mediaFile.extension.toLowerCase();
+    
+    switch (extension) {
+      case 'pdf':
+        return '📄';
+      case 'doc':
+      case 'docx':
+        return '📝';
+      case 'xls':
+      case 'xlsx':
+        return '📊';
+      case 'ppt':
+      case 'pptx':
+        return '📽️';
+      case 'txt':
+        return '📄';
+      case 'png':
+      case 'jpg':
+      case 'jpeg':
+      case 'gif':
+      case 'svg':
+      case 'webp':
+        return '🖼️';
+      case 'zip':
+      case 'rar':
+      case '7z':
+        return '📦';
+      case 'mp4':
+      case 'avi':
+      case 'mov':
+        return '🎥';
+      case 'mp3':
+      case 'wav':
+      case 'flac':
+        return '🎵';
+      default:
+        return '📎';
+    }
+  }
+
+  /**
+   * Format file size for display
+   */
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
 
   /**
    * Validate file before upload
@@ -247,19 +321,6 @@ class MediaFileService extends BaseService {
   }
 
   /**
-   * Get files by uploader
-   */
-  async getFilesByUploader(
-    uploaderId: number,
-    params?: Omit<MediaFileFilterParams, 'uploader_id'>
-  ): Promise<MediaFileListResponse> {
-    return this.getMediaFiles({
-      ...params,
-      uploader_id: uploaderId
-    });
-  }
-
-  /**
    * Get files by organization
    */
   async getFilesByOrganization(
@@ -273,15 +334,63 @@ class MediaFileService extends BaseService {
   }
 
   /**
-   * Get public files only
+   * Create file URL response for compatibility
    */
-  async getPublicFiles(
-    params?: Omit<MediaFileFilterParams, 'is_public'>
-  ): Promise<MediaFileListResponse> {
-    return this.getMediaFiles({
-      ...params,
-      is_public: true
-    });
+  createFileUrlResponse(file: MediaFileResponse): FileUrlResponse {
+    return {
+      file_id: file.id,
+      file_name: file.file_name,
+      file_url: this.getDownloadUrl(file.id),
+      thumbnail_url: null, // Backend doesn't support thumbnails yet
+      expires_at: null
+    };
+  }
+
+  /**
+   * Get file category color for UI
+   */
+  getCategoryColor(category: string): string {
+    switch (category.toLowerCase()) {
+      case 'image':
+        return 'blue';
+      case 'document':
+        return 'green';
+      case 'video':
+        return 'purple';
+      case 'audio':
+        return 'orange';
+      default:
+        return 'gray';
+    }
+  }
+
+  /**
+   * Check if user can access file
+   */
+  canAccessFile(file: MediaFileResponse, currentUserId?: number): boolean {
+    // Public files can be accessed by anyone
+    if (file.is_public) {
+      return true;
+    }
+    
+    // Private files can only be accessed by uploader
+    return currentUserId !== undefined && file.uploader_id === currentUserId;
+  }
+
+  /**
+   * Get mime type icon
+   */
+  getMimeTypeIcon(mimeType: string): string {
+    if (mimeType.startsWith('image/')) return '🖼️';
+    if (mimeType.startsWith('video/')) return '🎥';
+    if (mimeType.startsWith('audio/')) return '🎵';
+    if (mimeType.includes('pdf')) return '📄';
+    if (mimeType.includes('word')) return '📝';
+    if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return '📊';
+    if (mimeType.includes('powerpoint') || mimeType.includes('presentation')) return '📽️';
+    if (mimeType.includes('text')) return '📄';
+    if (mimeType.includes('zip') || mimeType.includes('archive')) return '📦';
+    return '📎';
   }
 }
 

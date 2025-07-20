@@ -32,7 +32,7 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
     setUploadDialogOpen(true);
   };
 
-  const handleViewFile = () => {
+  const handleViewFile = async () => {
     if (!item.file_id) {
       toast({
         title: 'Error',
@@ -43,7 +43,7 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
     }
 
     try {
-      fileUtils.viewFile(item.file_id);
+      await fileUtils.viewFile(item.file_id);
     } catch (error) {
       toast({
         title: 'Error',
