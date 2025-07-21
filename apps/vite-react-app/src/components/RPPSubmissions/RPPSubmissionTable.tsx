@@ -80,7 +80,7 @@ export const RPPSubmissionTable: React.FC<RPPSubmissionTableProps> = ({
                       ></div>
                     </div>
                     <span className="text-xs text-muted-foreground">
-                      {submission.completion_percentage}%
+                      {submission.completion_percentage.toFixed(1)}%
                     </span>
                   </div>
                 </TableCell>

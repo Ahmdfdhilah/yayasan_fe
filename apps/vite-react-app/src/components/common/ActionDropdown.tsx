@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit, Eye, Trash2, Mail, Download, Users } from 'lucide-react';
+import { Edit, Eye, Trash2, Mail, Download, Users, Upload } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,6 +51,7 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
       Trash2,
       Mail,
       Download,
+      Upload,
     };
     return iconMap[iconName] || Edit;
   };

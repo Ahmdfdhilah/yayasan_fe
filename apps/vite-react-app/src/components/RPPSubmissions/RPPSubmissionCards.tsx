@@ -99,7 +99,7 @@ export const RPPSubmissionCards: React.FC<RPPSubmissionCardsProps> = ({
               <div className="flex-1">
                 <div className="flex justify-between items-center mb-1">
                   <span>Progress</span>
-                  <span>{submission.completion_percentage}%</span>
+                  <span>{submission.completion_percentage.toFixed(1)}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
