@@ -154,7 +154,7 @@ export const MfaGuard: React.FC<Omit<AuthGuardProps, 'requireMfa'>> = (props) =>
 // Public route guard (for login/register pages)
 export const PublicRoute: React.FC<{ children: ReactNode; redirectTo?: string }> = ({ 
   children, 
-  redirectTo = '/' 
+  redirectTo = '/dashboard' 
 }) => {
   const { isAuthenticated, loading, user, isTokenValid, checkAuth } = useAuth();
 

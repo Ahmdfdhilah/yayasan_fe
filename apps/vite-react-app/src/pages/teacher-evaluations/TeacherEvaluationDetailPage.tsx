@@ -59,6 +59,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   const [aspects, setAspects] = useState<EvaluationAspect[]>([]);
   const [periods, setPeriods] = useState<Period[]>([]);
   const [currentPeriod, setCurrentPeriod] = useState<Period | null>(null);
+  const [activePeriod, setActivePeriod] = useState<Period | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [mode, setMode] = useState<'view' | 'edit'>('view');
@@ -75,6 +76,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     if (teacherId) {
       loadPeriods();
       loadEvaluationAspects();
+      loadActivePeriod();
     }
   }, [teacherId]);
 
@@ -170,6 +172,15 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     }
   };
 
+  const loadActivePeriod = async () => {
+    try {
+      const activeResponse = await periodService.getActivePeriod();
+      setActivePeriod(activeResponse);
+    } catch (error) {
+      console.error('Error loading active period:', error);
+    }
+  };
+
   const onSubmit = async (data: EvaluationFormData) => {
     if (!teacherId || !currentPeriod) return;
 
@@ -208,7 +219,8 @@ const TeacherEvaluationDetailPage: React.FC = () => {
 
 
   const toggleMode = () => {
-    const canEdit = (isAdmin() || isKepalaSekolah()) && evaluations.length > 0;
+    const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
+    const canEdit = (isAdmin() || isKepalaSekolah()) && evaluations.length > 0 && isActivePeriod;
 
     if (canEdit) {
       setMode(mode === 'view' ? 'edit' : 'view');
@@ -288,7 +300,8 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   };
 
   const categories = [...new Set(aspects.map(aspect => aspect.category))];
-  const canEdit = (isAdmin() || isKepalaSekolah());
+  const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
+  const canEdit = (isAdmin() || isKepalaSekolah()) && isActivePeriod;
 
   // Create evaluation data mapping for display
   const evaluationData: Record<string, string> = {};
@@ -327,6 +340,13 @@ const TeacherEvaluationDetailPage: React.FC = () => {
                     Lihat
                   </>
                 )}
+              </Button>
+            )}
+            {/* Show disabled edit button for non-active periods */}
+            {(isAdmin() || isKepalaSekolah()) && evaluations.length > 0 && !isActivePeriod && (
+              <Button variant="outline" disabled title="Edit evaluasi hanya dapat dilakukan pada periode aktif">
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
               </Button>
             )}
           </div>

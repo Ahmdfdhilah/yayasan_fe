@@ -72,6 +72,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
   const [teacher, setTeacher] = useState<User | null>(null);
   const [periods, setPeriods] = useState<Period[]>([]);
   const [currentPeriod, setCurrentPeriod] = useState<Period | null>(null);
+  const [activePeriod, setActivePeriod] = useState<Period | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
 
@@ -92,6 +93,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
 
   useEffect(() => {
     loadInitialData();
+    loadActivePeriod();
   }, [teacherId, periodId, filters.period_id]);
 
   const loadInitialData = async () => {
@@ -123,6 +125,15 @@ const RPPSubmissionDetailPage: React.FC = () => {
       setPeriods(response.items || []);
     } catch (error) {
       console.error('Error loading periods:', error);
+    }
+  };
+
+  const loadActivePeriod = async () => {
+    try {
+      const activeResponse = await periodService.getActivePeriod();
+      setActivePeriod(activeResponse);
+    } catch (error) {
+      console.error('Error loading active period:', error);
     }
   };
 
@@ -185,7 +196,16 @@ const RPPSubmissionDetailPage: React.FC = () => {
 
       if (isOwnSubmission || periodId) {
         // Teacher viewing own submission or direct period access
-        submissionData = await rppSubmissionService.getMySubmissionForPeriod(targetPeriodId);
+        try {
+          submissionData = await rppSubmissionService.getMySubmissionForPeriod(targetPeriodId);
+        } catch (error: any) {
+          // If teacher doesn't have submission for this period, handle gracefully
+          if (error.message?.includes('not found') || error.status === 404) {
+            setSubmission(null);
+            return;
+          }
+          throw error; // Re-throw other errors
+        }
       } else if (teacherId) {
         // Admin/kepala sekolah viewing teacher's submission
         // We need to find the submission for this teacher and period
@@ -200,7 +220,9 @@ const RPPSubmissionDetailPage: React.FC = () => {
         if (submissionsResponse.items && submissionsResponse.items.length > 0) {
           submissionData = submissionsResponse.items[0];
         } else {
-          throw new Error('Submission not found for this teacher and period');
+          // No submission found - this is not an error, just no data
+          setSubmission(null);
+          return;
         }
       } else {
         throw new Error('Invalid access parameters');
@@ -265,13 +287,14 @@ const RPPSubmissionDetailPage: React.FC = () => {
     const isDraftStatus = submission?.status === RPPSubmissionStatus.DRAFT;
     const isRejectedStatus = submission?.status === RPPSubmissionStatus.REJECTED;
     const statusAllowsUpload = isDraftStatus || isRejectedStatus;
-    const canUpload = isOwnSubmission && statusAllowsUpload;
+    const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
+    const canUpload = isOwnSubmission && statusAllowsUpload && isActivePeriod;
 
     return (
       <RPPItemCard
         key={item.id}
         item={item}
-        canUpload={canUpload}
+        canUpload={canUpload ?? false}
         submissionStatus={submission!.status}
         onFileUploaded={handleFileUploaded}
       />
@@ -305,22 +328,88 @@ const RPPSubmissionDetailPage: React.FC = () => {
     );
   }
 
-  if (!submission) {
-    return (
+  const renderNoSubmissionState = () => (
+    <div className="space-y-6">
+      <PageHeader
+        title={
+          <div className="flex items-center space-x-3">
+            <span>
+              {isOwnSubmission 
+                ? "RPP Submission Saya" 
+                : `RPP Submission - ${teacher?.profile?.name || teacher?.display_name || 'Unknown'}`
+              }
+            </span>
+            {isAdminView && (
+              <Badge variant="outline" className="text-blue-600">
+                Admin View
+              </Badge>
+            )}
+            {isKepalaSekolahView && (
+              <Badge variant="outline" className="text-purple-600">
+                Kepala Sekolah
+              </Badge>
+            )}
+          </div>
+        }
+        description={
+          <div>
+            <p>{`Detail RPP submission untuk periode ${currentPeriod?.academic_year} - ${currentPeriod?.semester}`}</p>
+            {teacher?.profile?.organization_name && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Organisasi: {teacher.profile.organization_name}
+              </p>
+            )}
+          </div>
+        }
+      />
+
+      {/* Period Filter (only for teacher view) */}
+      {teacherId && !periodId && periods.length > 0 && (
+        <Filtering>
+          <div className="space-y-2">
+            <Label htmlFor="period-filter">Periode</Label>
+            <Select value={filters.period_id} onValueChange={handlePeriodChange}>
+              <SelectTrigger id="period-filter">
+                <SelectValue placeholder="Pilih periode" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="latest">Periode Terbaru</SelectItem>
+                {periods.map((period) => (
+                  <SelectItem key={period.id} value={period.id.toString()}>
+                    {period.academic_year} - {period.semester}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </Filtering>
+      )}
+
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-2">Submission Tidak Ditemukan</h2>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mb-4">
             Submission RPP untuk periode ini tidak ditemukan.
           </p>
+          {teacherId && !periodId && periods.length > 0 && (
+            <p className="text-sm text-muted-foreground">
+              Coba pilih periode lain menggunakan filter di atas untuk mencari submission RPP.
+            </p>
+          )}
         </div>
       </div>
-    );
+    </div>
+  );
+
+  if (!submission) {
+    return renderNoSubmissionState();
   }
 
+  const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
   const canSubmitForApproval = isOwnSubmission &&
     (submission.status === RPPSubmissionStatus.DRAFT || submission.status === RPPSubmissionStatus.REJECTED) &&
-    rppSubmissionService.isSubmissionReady(submission);
+    rppSubmissionService.isSubmissionReady(submission) &&
+    isActivePeriod;
 
   return (
     <div className="space-y-6">
@@ -382,6 +471,16 @@ const RPPSubmissionDetailPage: React.FC = () => {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+            )}
+            {/* Show disabled button with tooltip for non-active periods */}
+            {isOwnSubmission && 
+             (submission.status === RPPSubmissionStatus.DRAFT || submission.status === RPPSubmissionStatus.REJECTED) &&
+             rppSubmissionService.isSubmissionReady(submission) &&
+             !isActivePeriod && (
+              <Button disabled title="Upload dan submit hanya dapat dilakukan pada periode aktif">
+                <Send className="h-4 w-4 mr-2" />
+                {submission.status === RPPSubmissionStatus.REJECTED ? 'Submit Ulang' : 'Submit untuk Approval'}
+              </Button>
             )}
           </div>
         }

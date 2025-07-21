@@ -21,6 +21,8 @@ interface UserCardsProps {
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
   onView: (user: User) => void;
+  disableEdit?: boolean;
+  editDisabledTooltip?: string;
 }
 
 export const UserCards: React.FC<UserCardsProps> = ({
@@ -28,7 +30,9 @@ export const UserCards: React.FC<UserCardsProps> = ({
   loading = false,
   onEdit,
   onDelete,
-  onView
+  onView,
+  disableEdit = false,
+  editDisabledTooltip = 'Edit tidak tersedia'
 }) => {
   const getStatusBadge = (status: UserStatus) => {
     return (
@@ -84,6 +88,8 @@ export const UserCards: React.FC<UserCardsProps> = ({
                 onView={() => onView(user)}
                 onEdit={() => onEdit(user)}
                 onDelete={() => onDelete(user)}
+                disableEdit={disableEdit}
+                editDisabledTooltip={editDisabledTooltip}
               />
             </div>
 

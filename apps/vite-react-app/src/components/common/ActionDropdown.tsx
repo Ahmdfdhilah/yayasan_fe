@@ -26,6 +26,8 @@ interface ActionDropdownProps {
   showDelete?: boolean;
   showComposeEmail?: boolean;
   showExport?: boolean;
+  disableEdit?: boolean;
+  editDisabledTooltip?: string;
   customActions?: CustomAction[];
 }
 
@@ -40,6 +42,8 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
   showDelete = true,
   showComposeEmail = false,
   showExport = false,
+  disableEdit = false,
+  editDisabledTooltip = 'Edit tidak tersedia',
   customActions = [],
 }) => {
   
@@ -70,7 +74,12 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
           </DropdownMenuItem>
         )}
         {showEdit && (
-          <DropdownMenuItem onClick={onEdit}>
+          <DropdownMenuItem 
+            onClick={disableEdit ? undefined : onEdit}
+            disabled={disableEdit}
+            title={disableEdit ? editDisabledTooltip : undefined}
+            className={disableEdit ? 'opacity-50 cursor-not-allowed' : ''}
+          >
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>

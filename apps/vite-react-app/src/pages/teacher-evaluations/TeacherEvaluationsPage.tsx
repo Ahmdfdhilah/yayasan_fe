@@ -6,7 +6,7 @@ import { useToast } from '@workspace/ui/components/sonner';
 import { UserRole } from '@/services/auth/types';
 import { User, UserFilterParams } from '@/services/users/types';
 import { Organization } from '@/services/organizations/types';
-import { userService, organizationService } from '@/services';
+import { userService, organizationService, periodService } from '@/services';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { Button } from '@workspace/ui/components/button';
@@ -66,6 +66,7 @@ const TeacherEvaluationsPage: React.FC = () => {
   
   const [teachers, setTeachers] = useState<User[]>([]);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [activePeriod, setActivePeriod] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
@@ -121,10 +122,21 @@ const TeacherEvaluationsPage: React.FC = () => {
     }
   };
 
+  // Load active period
+  const loadActivePeriod = async () => {
+    try {
+      const activeResponse = await periodService.getActivePeriod();
+      setActivePeriod(activeResponse);
+    } catch (error) {
+      console.error('Error loading active period:', error);
+    }
+  };
+
   // Effect to fetch data when filters change
   useEffect(() => {
     if (hasAccess) {
       loadOrganizations();
+      loadActivePeriod();
       fetchTeachers();
     }
   }, [filters.page, filters.size, filters.search, filters.organization_id, hasAccess]);
@@ -138,6 +150,15 @@ const TeacherEvaluationsPage: React.FC = () => {
   };
 
   const handleCreateEvaluation = (teacher: User) => {
+    // Only allow editing if there's an active period
+    if (!activePeriod) {
+      toast({
+        title: 'Periode Tidak Aktif',
+        description: 'Edit evaluasi hanya dapat dilakukan pada periode aktif.',
+        variant: 'destructive'
+      });
+      return;
+    }
     // Navigate to create evaluation page (same as view for now, will be edit mode)
     navigate(`/teacher-evaluations/${teacher.id}`);
   };
@@ -261,6 +282,8 @@ const TeacherEvaluationsPage: React.FC = () => {
                 onView={handleViewTeacherEvaluations}
                 onEdit={handleCreateEvaluation}
                 onDelete={() => {}}
+                disableEdit={!activePeriod}
+                editDisabledTooltip="Edit evaluasi hanya dapat dilakukan pada periode aktif"
               />
             </div>
 
@@ -272,6 +295,8 @@ const TeacherEvaluationsPage: React.FC = () => {
                 onView={handleViewTeacherEvaluations}
                 onEdit={handleCreateEvaluation}
                 onDelete={() => {}}
+                disableEdit={!activePeriod}
+                editDisabledTooltip="Edit evaluasi hanya dapat dilakukan pada periode aktif"
               />
             </div>
 
