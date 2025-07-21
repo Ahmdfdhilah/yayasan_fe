@@ -12,6 +12,7 @@ export { evaluationAspectService } from "./evaluation-aspects";
 export { teacherEvaluationService } from "./teacher-evaluations";
 export { rppSubmissionService } from "./rpp-submissions";
 export { mediaFileService } from "./media-files";
+export { dashboardService } from "./dashboard";
 
 // Export types with explicit imports to avoid conflicts
 export type {
@@ -108,3 +109,22 @@ export type {
   MediaFileUploadResponse,
   MediaFileUploadData,
 } from "./media-files";
+
+export type {
+  RPPDashboardStats,
+  TeacherEvaluationDashboardStats,
+  OrganizationSummary,
+  PeriodSummary,
+  QuickStats,
+  BaseDashboard,
+  TeacherDashboard,
+  PrincipalDashboard,
+  AdminDashboard,
+  DashboardResponse,
+  DashboardQueryParams,
+  QuickStatsQueryParams,
+  TeacherSummary,
+  OrganizationOverview,
+  SystemOverview,
+  SystemActivity,
+} from "./dashboard";
