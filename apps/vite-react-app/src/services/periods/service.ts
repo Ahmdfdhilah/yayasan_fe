@@ -87,6 +87,11 @@ class PeriodService extends BaseService {
   async getCurrentPeriods(): Promise<PeriodResponse[]> {
     return this.get("/current");
   }
+
+  // Get single active period
+  async getActivePeriod(): Promise<PeriodResponse> {
+    return this.get("/active");
+  }
 }
 
 export const periodService = new PeriodService();
