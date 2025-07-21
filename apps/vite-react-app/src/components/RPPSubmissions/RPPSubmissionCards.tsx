@@ -1,5 +1,5 @@
 import React from 'react';
-import { RPPSubmissionResponse } from '@/services/rpp-submissions/types';
+import { RPPSubmissionResponse, RPPSubmissionStatus } from '@/services/rpp-submissions/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
@@ -70,13 +70,13 @@ export const RPPSubmissionCards: React.FC<RPPSubmissionCardsProps> = ({
                 onView={() => onView(submission)}
                 onEdit={onEdit ? () => onEdit(submission) : undefined}
                 onDelete={onDelete ? () => onDelete(submission) : undefined}
-                showEdit={userRole === 'guru' && submission.status === 'draft'}
-                showDelete={userRole === 'guru' && submission.status === 'draft'}
+                showEdit={userRole === 'guru' && submission.status === RPPSubmissionStatus.DRAFT}
+                showDelete={userRole === 'guru' && submission.status === RPPSubmissionStatus.DRAFT}
                 customActions={
                   userRole === 'guru' && 
                   onSubmit && 
                   rppSubmissionService.isSubmissionReady(submission) && 
-                  submission.status === 'draft'
+                  submission.status === RPPSubmissionStatus.DRAFT
                     ? [{
                         label: 'Kirim',
                         onClick: () => onSubmit(submission),

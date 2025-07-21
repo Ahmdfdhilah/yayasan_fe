@@ -9,10 +9,10 @@ export enum RPPType {
 }
 
 export enum RPPSubmissionStatus {
-  DRAFT = "draft",
-  PENDING = "pending", 
-  APPROVED = "approved",
-  REJECTED = "rejected",
+  DRAFT = "DRAFT",
+  PENDING = "PENDING", 
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
 }
 
 // ===== RPP SUBMISSION ITEM TYPES =====
