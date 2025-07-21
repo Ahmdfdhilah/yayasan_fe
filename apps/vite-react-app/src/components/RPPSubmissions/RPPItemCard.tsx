@@ -108,7 +108,7 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">{item.rpp_type_display_name}</CardTitle>
             <Badge variant={item.is_uploaded ? "default" : "secondary"}>
-              {item.is_uploaded ? "Uploaded" : "Belum Upload"}
+              {item.is_uploaded ? "Sudah di Upload" : "Belum Upload"}
             </Badge>
           </div>
         </CardHeader>
@@ -122,28 +122,30 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
                 </span>
               </div>
               
-              <ActionDropdown
-                onView={item.is_uploaded ? handleViewFile : undefined}
-                customActions={[
-                  ...(item.is_uploaded ? [
-                    {
-                      label: 'Download',
-                      onClick: handleDownloadFile,
-                      icon: 'Download'
-                    }
-                  ] : []),
-                  ...(canUpload ? [
-                    {
-                      label: item.is_uploaded ? 'Ganti File' : 'Upload File',
-                      onClick: handleUploadClick,
-                      icon: 'Upload'
-                    }
-                  ] : [])
-                ]}
-                showView={item.is_uploaded}
-                showEdit={false}
-                showDelete={false}
-              />
+{(item.is_uploaded || canUpload) && (
+                <ActionDropdown
+                  onView={item.is_uploaded ? handleViewFile : undefined}
+                  customActions={[
+                    ...(item.is_uploaded ? [
+                      {
+                        label: 'Download',
+                        onClick: handleDownloadFile,
+                        icon: 'Download'
+                      }
+                    ] : []),
+                    ...(canUpload ? [
+                      {
+                        label: item.is_uploaded ? 'Ganti File' : 'Upload File',
+                        onClick: handleUploadClick,
+                        icon: 'Upload'
+                      }
+                    ] : [])
+                  ]}
+                  showView={item.is_uploaded}
+                  showEdit={false}
+                  showDelete={false}
+                />
+              )}
             </div>
 
             {item.uploaded_at && (

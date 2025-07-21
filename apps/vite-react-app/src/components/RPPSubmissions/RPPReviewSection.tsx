@@ -3,6 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/componen
 import { Button } from '@workspace/ui/components/button';
 import { Label } from '@workspace/ui/components/label';
 import { Textarea } from '@workspace/ui/components/textarea';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@workspace/ui/components/alert-dialog';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@workspace/ui/components/sonner';
 import { 
@@ -23,6 +34,8 @@ export const RPPReviewSection: React.FC<RPPReviewSectionProps> = ({
   const { toast } = useToast();
   const [reviewNotes, setReviewNotes] = useState(submission.review_notes || '');
   const [reviewing, setReviewing] = useState(false);
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
 
   const handleReview = async (status: RPPSubmissionStatus) => {
     try {
@@ -44,6 +57,10 @@ export const RPPReviewSection: React.FC<RPPReviewSectionProps> = ({
         description: statusMessages[status] || 'Review berhasil disimpan.',
       });
 
+      // Close dialogs
+      setApproveDialogOpen(false);
+      setRejectDialogOpen(false);
+      
       onReviewComplete();
     } catch (error: any) {
       console.error('Error reviewing submission:', error);
@@ -52,6 +69,9 @@ export const RPPReviewSection: React.FC<RPPReviewSectionProps> = ({
         description: error.message || 'Gagal mereview RPP submission.',
         variant: 'destructive'
       });
+      // Close dialogs on error too
+      setApproveDialogOpen(false);
+      setRejectDialogOpen(false);
     } finally {
       setReviewing(false);
     }
@@ -77,30 +97,73 @@ export const RPPReviewSection: React.FC<RPPReviewSectionProps> = ({
           </div>
 
           <div className="flex space-x-2">
-            <Button
-              onClick={() => handleReview(RPPSubmissionStatus.APPROVED)}
-              disabled={reviewing}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              {reviewing ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <CheckCircle className="h-4 w-4 mr-2" />
-              )}
-              Setujui
-            </Button>
-            <Button
-              onClick={() => handleReview(RPPSubmissionStatus.REJECTED)}
-              disabled={reviewing}
-              variant="destructive"
-            >
-              {reviewing ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <XCircle className="h-4 w-4 mr-2" />
-              )}
-              Tolak
-            </Button>
+            {/* Approve Dialog */}
+            <AlertDialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button
+                  disabled={reviewing}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {reviewing ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                  )}
+                  Setujui
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Konfirmasi Persetujuan</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Apakah Anda yakin ingin menyetujui RPP submission ini? Setelah disetujui, status submission akan berubah menjadi "Approved" dan guru akan mendapat notifikasi.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Batal</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={() => handleReview(RPPSubmissionStatus.APPROVED)}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    Setujui
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Reject Dialog */}
+            <AlertDialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button
+                  disabled={reviewing}
+                  variant="destructive"
+                >
+                  {reviewing ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <XCircle className="h-4 w-4 mr-2" />
+                  )}
+                  Tolak
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Konfirmasi Penolakan</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Apakah Anda yakin ingin menolak RPP submission ini? Setelah ditolak, guru dapat memperbaiki dan submit ulang RPP mereka. Pastikan Anda telah memberikan catatan review yang jelas.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Batal</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={() => handleReview(RPPSubmissionStatus.REJECTED)}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    Tolak
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       </CardContent>

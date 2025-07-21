@@ -7,6 +7,17 @@ import { useToast } from '@workspace/ui/components/sonner';
 import { Button } from '@workspace/ui/components/button';
 import { Badge } from '@workspace/ui/components/badge';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@workspace/ui/components/alert-dialog';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -62,6 +73,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
   const [periods, setPeriods] = useState<Period[]>([]);
   const [currentPeriod, setCurrentPeriod] = useState<Period | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
 
   // Determine if this is a teacher's own submission or viewing someone else's
   const isOwnSubmission = isGuru() && currentUser?.id?.toString() === teacherId;
@@ -231,6 +243,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
         title: 'Berhasil',
         description: 'RPP submission berhasil disubmit untuk review.',
       });
+      setSubmitDialogOpen(false);
       await loadSubmissionDetail();
     } catch (error: any) {
       console.error('Error submitting for approval:', error);
@@ -239,6 +252,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
         description: error.message || 'Gagal submit RPP submission.',
         variant: 'destructive'
       });
+      setSubmitDialogOpen(false);
     }
   };
 
@@ -344,10 +358,30 @@ const RPPSubmissionDetailPage: React.FC = () => {
         actions={
           <div className="flex space-x-2">
             {canSubmitForApproval && (
-              <Button onClick={handleSubmitForApproval}>
-                <Send className="h-4 w-4 mr-2" />
-                {submission.status === RPPSubmissionStatus.REJECTED ? 'Submit Ulang' : 'Submit untuk Approval'}
-              </Button>
+              <AlertDialog open={submitDialogOpen} onOpenChange={setSubmitDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button>
+                    <Send className="h-4 w-4 mr-2" />
+                    {submission.status === RPPSubmissionStatus.REJECTED ? 'Submit Ulang' : 'Submit untuk Approval'}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Konfirmasi Submit</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {submission.status === RPPSubmissionStatus.REJECTED 
+                        ? 'Apakah Anda yakin ingin submit ulang RPP submission ini untuk review?' 
+                        : 'Apakah Anda yakin ingin submit RPP submission ini untuk review? Setelah disubmit, Anda tidak dapat mengubah file RPP hingga mendapat feedback.'}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleSubmitForApproval}>
+                      {submission.status === RPPSubmissionStatus.REJECTED ? 'Submit Ulang' : 'Submit'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
           </div>
         }
