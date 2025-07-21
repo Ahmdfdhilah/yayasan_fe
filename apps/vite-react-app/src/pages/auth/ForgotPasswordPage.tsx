@@ -15,7 +15,6 @@ import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@workspace/ui/components/form';
 
 import logo from '@/assets/logo.png';
-import loginIcon from '@/assets/loginIcon.png';
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Please enter a valid email address').min(1, 'Email is required'),
@@ -66,202 +65,93 @@ export function ForgotPasswordPage() {
   };
 
   return (
-    <div className="max-h-screen relative overflow-hidden">
-      {/* Desktop Layout */}
-      <div className="hidden md:flex max-h-screen">
-        {/* Left Side - Banner Image */}
-        <div className="flex-[2] relative bg-gray-100 dark:bg-gray-900">
-          <img 
-            src={loginIcon} 
-            alt="Login Banner" 
-            className="w-[80%] object-cover"
-          />
-        </div>
-
-        {/* Right Side - Forgot Password Form */}
-        <div className="flex-1 flex items-center justify-center bg-background p-8">
-          <div className="w-full max-w-md space-y-6">
-            
-            {/* Logo and Header */}
-            <div className="text-center space-y-4">
-              <div className="flex justify-center">
-                <img src={logo} alt="YAYASAN BAITUL MUSLIM
-LAMPUNG TIMUR " className="w-12 h-12 object-contain" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight">Lupa Password</h1>
-                <p className="text-muted-foreground">
-                  Masukkan email Anda untuk mendapatkan link reset password
-                </p>
-              </div>
-            </div>
-
-            {/* Forgot Password Form */}
-            <Card>
-              <CardHeader className="space-y-1">
-                <CardTitle className="text-xl">Reset Password</CardTitle>
-                <CardDescription>
-                  Kami akan mengirimkan link reset password ke email Anda
-                </CardDescription>
-              </CardHeader>
-
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
-                  <CardContent className="space-y-4">
-                    {/* Error Alert */}
-                    {error && (
-                      <Alert variant="destructive">
-                        <AlertDescription>
-                          {error}
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
-                    {/* Email Field */}
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="email"
-                              placeholder="Enter your email address"
-                              disabled={loading}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </CardContent>
-
-                  <CardFooter className="flex flex-col space-y-4 mt-4">
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={loading}
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Mengirim...
-                        </>
-                      ) : (
-                        'Kirim Link Reset Password'
-                      )}
-                    </Button>
-                    
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full"
-                      onClick={handleBackToLogin}
-                      disabled={loading}
-                    >
-                      <ArrowLeft className="mr-2 h-4 w-4" />
-                      Kembali ke Login
-                    </Button>
-                  </CardFooter>
-                </form>
-              </Form>
-            </Card>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="w-full max-w-md space-y-6">
+        {/* Logo and Header */}
+        <div className="text-center space-y-4">
+          <div className="flex justify-center">
+            <img src={logo} alt="" className="w-16 h-16 object-contain" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Lupa Password</h1>
+            <p className="text-muted-foreground">
+              Masukkan email Anda untuk mendapatkan link reset password
+            </p>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Layout */}
-      <div className="md:hidden min-h-screen flex items-center justify-center p-4 relative z-10">
-        <div className="w-full max-w-md space-y-6">
-          {/* Logo and Header */}
-          <div className="text-center space-y-4">
-            <div className="flex justify-center">
-              <img src={logo} alt="YAYASAN BAITUL MUSLIM
-LAMPUNG TIMUR " className="w-12 h-12 object-contain" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-white">Lupa Password</h1>
-              <p className="text-white/80">
-                Masukkan email Anda untuk mendapatkan link reset password
-              </p>
-            </div>
-          </div>
+        {/* Forgot Password Form */}
+        <Card className="shadow-lg">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-xl">Reset Password</CardTitle>
+            <CardDescription>
+              Kami akan mengirimkan link reset password ke email Anda
+            </CardDescription>
+          </CardHeader>
 
-          {/* Forgot Password Form */}
-          <Card className="bg-white/95 backdrop-blur-sm">
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-xl">Reset Password</CardTitle>
-              <CardDescription>
-                Kami akan mengirimkan link reset password ke email Anda
-              </CardDescription>
-            </CardHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <CardContent className="space-y-4">
+                {/* Error Alert */}
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>
+                      {error}
+                    </AlertDescription>
+                  </Alert>
+                )}
 
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)}>
-                <CardContent className="space-y-4">
-                  {/* Error Alert */}
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertDescription>
-                        {error}
-                      </AlertDescription>
-                    </Alert>
+                {/* Email Field */}
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="Masukkan email"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
+                />
+              </CardContent>
 
-                  {/* Email Field */}
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="email"
-                            placeholder="Enter your email address"
-                            disabled={loading}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-
-                <CardFooter className="flex flex-col space-y-4 mt-4">
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Mengirim...
-                      </>
-                    ) : (
-                      'Kirim Link Reset Password'
-                    )}
-                  </Button>
-                  
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={handleBackToLogin}
-                    disabled={loading}
-                  >
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Kembali ke Login
-                  </Button>
-                </CardFooter>
-              </form>
-            </Form>
-          </Card>
-        </div>
+              <CardFooter className="flex flex-col space-y-4 mt-4">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Mengirim...
+                    </>
+                  ) : (
+                    'Kirim Link Reset Password'
+                  )}
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleBackToLogin}
+                  disabled={loading}
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Kembali ke Login
+                </Button>
+              </CardFooter>
+            </form>
+          </Form>
+        </Card>
       </div>
     </div>
   );

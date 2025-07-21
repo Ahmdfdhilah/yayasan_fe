@@ -130,14 +130,14 @@ export function DashboardPage() {
             </Select>
           </div>
 
-          <Button asChild variant="outline">
+          <Button asChild variant="default">
             <Link to="/profile">
               <User className="h-4 w-4 mr-2" />
               Profile
             </Link>
           </Button>
 
-          <Button variant="outline" onClick={handleLogout}>
+          <Button variant="destructive" onClick={handleLogout}>
             Logout
           </Button>
         </div>

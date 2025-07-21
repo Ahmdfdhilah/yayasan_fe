@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
-import { 
+import {
   FileText
 } from 'lucide-react';
 import { useToast } from '@workspace/ui/components/sonner';
@@ -68,11 +68,11 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
 
     try {
       const blob = await mediaFileService.downloadFile(item.file_id);
-      
+
       if (blob.size === 0) {
         throw new Error('File is empty');
       }
-      
+
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -80,13 +80,13 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
       link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
-      
+
       // Clean up
       setTimeout(() => {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       }, 100);
-      
+
       toast({
         title: 'Berhasil',
         description: 'File berhasil didownload.',
@@ -121,8 +121,8 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
                   {item.is_uploaded ? item.file_name : 'Belum ada file yang diupload'}
                 </span>
               </div>
-              
-{(item.is_uploaded || canUpload) && (
+
+              {(item.is_uploaded || canUpload) && (
                 <ActionDropdown
                   onView={item.is_uploaded ? handleViewFile : undefined}
                   customActions={[
@@ -149,7 +149,7 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
             </div>
 
             {item.uploaded_at && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs">
                 Diupload: {new Date(item.uploaded_at).toLocaleString()}
               </p>
             )}

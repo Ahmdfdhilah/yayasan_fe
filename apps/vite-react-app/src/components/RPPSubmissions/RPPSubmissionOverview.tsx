@@ -60,10 +60,10 @@ export const RPPSubmissionOverview: React.FC<RPPSubmissionOverviewProps> = ({
               ></div>
             </div>
             <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm">
                 {submission.completion_percentage.toFixed(1)}% Complete
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs">
                 {submission.completion_percentage === 100 ? 'Siap untuk submit' : 'Masih dalam progress'}
               </p>
             </div>
@@ -76,7 +76,7 @@ export const RPPSubmissionOverview: React.FC<RPPSubmissionOverviewProps> = ({
             {submission.submitted_at && (
               <div className="space-y-1">
                 <Label className="text-sm font-medium">Tanggal Submit</Label>
-                <p className="text-sm text-gray-600 break-words">
+                <p className="text-sm  break-words">
                   {new Date(submission.submitted_at).toLocaleString('id-ID', {
                     weekday: 'short',
                     year: 'numeric',
@@ -92,7 +92,7 @@ export const RPPSubmissionOverview: React.FC<RPPSubmissionOverviewProps> = ({
             {submission.reviewed_at && (
               <div className="space-y-1">
                 <Label className="text-sm font-medium">Tanggal Review</Label>
-                <p className="text-sm text-gray-600 break-words">
+                <p className="text-sm  break-words">
                   {new Date(submission.reviewed_at).toLocaleString('id-ID', {
                     weekday: 'short',
                     year: 'numeric',
@@ -111,8 +111,8 @@ export const RPPSubmissionOverview: React.FC<RPPSubmissionOverviewProps> = ({
         {submission.review_notes && (
           <div className="space-y-2">
             <Label className="text-sm font-medium">Catatan Review</Label>
-            <div className="p-3 bg-gray-50 rounded-md border">
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+            <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md border">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">
                 {submission.review_notes}
               </p>
             </div>

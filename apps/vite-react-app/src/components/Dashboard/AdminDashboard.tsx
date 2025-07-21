@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
-import { Building, FileText, GraduationCap, Settings, Activity } from 'lucide-react';
+import { Building, FileText, GraduationCap, HomeIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { dashboardService, type AdminDashboard as AdminDashboardType } from '@/services';
 import { StatCard, GradeDistribution } from './DashboardStats';
@@ -22,7 +22,7 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
       try {
         setLoading(true);
         setError(null);
-        const dashboardData = await dashboardService.getAdminDashboard({ 
+        const dashboardData = await dashboardService.getAdminDashboard({
           period_id: periodId,
           ...(organizationId && { organization_id: organizationId })
         });
@@ -58,8 +58,8 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
       <Card>
         <CardContent className="p-6">
           <p className="text-red-500">Error: {error}</p>
-          <Button 
-            onClick={() => window.location.reload()} 
+          <Button
+            onClick={() => window.location.reload()}
             className="mt-4"
             variant="outline"
           >
@@ -98,10 +98,6 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
               <p className="text-sm text-muted-foreground">Periode</p>
               <p className="font-medium">{data.period.period_name}</p>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Filter Organisasi</p>
-              <p className="font-medium">{data.organization_name || 'Semua Organisasi'}</p>
-            </div>
           </div>
         </CardContent>
       </Card>
@@ -110,7 +106,7 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Settings className="h-5 w-5" />
+            <HomeIcon className="h-5 w-5" />
             Ringkasan Sistem
           </CardTitle>
         </CardHeader>
@@ -121,15 +117,9 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
               value={data.system_overview.total_users}
             />
             <StatCard
-              title="Total Organisasi"
+              title="Total Sekolah"
               value={data.system_overview.total_organizations}
             />
-            <div>
-              <p className="text-sm text-muted-foreground">Status Sistem</p>
-              <Badge variant={data.system_overview.system_health === 'good' ? 'default' : 'destructive'}>
-                {data.system_overview.system_health === 'good' ? 'Baik' : 'Bermasalah'}
-              </Badge>
-            </div>
           </div>
         </CardContent>
       </Card>
@@ -237,34 +227,7 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
         </CardContent>
       </Card>
 
-      {/* Recent Activities */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Activity className="h-5 w-5" />
-            Aktivitas Sistem Terkini
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {data.recent_system_activities.length === 0 ? (
-              <p className="text-muted-foreground text-center py-4">
-                Belum ada aktivitas terkini
-              </p>
-            ) : (
-              data.recent_system_activities.map((activity, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                  <div>
-                    <p className="font-medium text-sm">{activity.type}</p>
-                    <p className="text-xs text-muted-foreground">{activity.message}</p>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </CardContent>
-      </Card>
+
 
       {/* Quick Actions */}
       <Card>

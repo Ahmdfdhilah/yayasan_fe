@@ -161,50 +161,75 @@ body {
   }
   
   .dark {
-    --background: hsl(0 0% 3.9216%);
-    --foreground: hsl(0 0% 98.0392%);
-    --card: hsl(0 0% 6.2745%);
-    --card-foreground: hsl(0 0% 96.0784%);
-    --popover: hsl(0 0% 3.9216%);
-    --popover-foreground: hsl(0 0% 98.0392%);
-    --primary: hsl(152.2222 95.2941% 33.3333%);
-    --primary-foreground: hsl(150 100.0000% 9.0196%);
-    --secondary: hsl(240 5.8824% 10%);
-    --secondary-foreground: hsl(0 0% 98.0392%);
-    --muted: hsl(240 5.8824% 10%);
-    --muted-foreground: hsl(240 5.0279% 64.9020%);
-    --accent: hsl(0 0% 6.2745%);
-    --accent-foreground: hsl(0 0% 96.0784%);
-    --destructive: hsl(0 100% 27.2549%);
-    --destructive-foreground: hsl(0 0% 98.0392%);
-    --border: hsl(240 3.7037% 15.8824%);
-    --input: hsl(240 3.7037% 15.8824%);
-    --ring: hsl(152.2222 95.2941% 33.3333%);
-    --chart-1: hsl(152.2222 95.2941% 33.3333%);
-    --chart-2: hsl(152.0301 95.6835% 27.2549%);
-    --chart-3: hsl(151.7308 96.2963% 21.1765%);
-    --chart-4: hsl(151.2000 97.4026% 15.0980%);
-    --chart-5: hsl(150 100.0000% 9.0196%);
-    --sidebar: hsl(0 0% 6.2745%);
-    --sidebar-foreground: hsl(240 5.0279% 64.9020%);
-    --sidebar-primary: hsl(152.2222 95.2941% 33.3333%);
-    --sidebar-primary-foreground: hsl(150 100.0000% 9.0196%);
-    --sidebar-accent: hsl(152.2222 95.2941% 33.3333%);
-    --sidebar-accent-foreground: hsl(150 100.0000% 9.0196%);
-    --sidebar-border: hsl(240 3.7037% 15.8824%);
-    --sidebar-ring: hsl(152.2222 95.2941% 33.3333%);
+    /* Background yang lebih gelap untuk kontras yang lebih baik */
+    --background: hsl(240 12% 8%);
+    --foreground: hsl(0 0% 96%);
+    
+    /* Card dengan kontras yang jelas */
+    --card: hsl(240 10% 12%);
+    --card-foreground: hsl(0 0% 95%);
+    
+    /* Popover dengan background yang cukup gelap */
+    --popover: hsl(240 12% 8%);
+    --popover-foreground: hsl(0 0% 96%);
+    
+    /* Primary tetap hijau tapi lebih terang untuk dark mode */
+    --primary: hsl(152 75% 55%);
+    --primary-foreground: hsl(240 12% 8%);
+    
+    /* Secondary dengan kontras yang lebih baik */
+    --secondary: hsl(240 8% 20%);
+    --secondary-foreground: hsl(0 0% 92%);
+    
+    /* Muted dengan kontras yang adequate */
+    --muted: hsl(240 8% 20%);
+    --muted-foreground: hsl(240 5% 72%);
+    
+    /* Accent dengan kontras yang baik */
+    --accent: hsl(240 8% 18%);
+    --accent-foreground: hsl(0 0% 94%);
+    
+    /* Destructive yang lebih readable */
+    --destructive: hsl(0 84% 65%);
+    --destructive-foreground: hsl(240 12% 8%);
+    
+    /* Border yang lebih visible */
+    --border: hsl(240 8% 28%);
+    --input: hsl(240 8% 25%);
+    --ring: hsl(152 75% 55%);
+    
+    /* Chart colors dengan lightness yang disesuaikan */
+    --chart-1: hsl(152 75% 55%);
+    --chart-2: hsl(152 70% 48%);
+    --chart-3: hsl(152 65% 42%);
+    --chart-4: hsl(152 60% 36%);
+    --chart-5: hsl(152 55% 30%);
+    
+    /* Sidebar dengan kontras yang jelas */
+    --sidebar: hsl(240 10% 12%);
+    --sidebar-foreground: hsl(240 5% 75%);
+    --sidebar-primary: hsl(152 75% 55%);
+    --sidebar-primary-foreground: hsl(240 12% 8%);
+    --sidebar-accent: hsl(152 75% 55%);
+    --sidebar-accent-foreground: hsl(240 12% 8%);
+    --sidebar-border: hsl(240 8% 28%);
+    --sidebar-ring: hsl(152 75% 55%);
+    
+    /* Font tetap sama */
     --font-sans: Geist;
     --font-serif: Lora;
     --font-mono: Geist Mono;
     --radius: 0.5rem;
-    --shadow-2xs: 0px 2px 4px 0px hsl(0 0% 0% / 0.40);
-    --shadow-xs: 0px 2px 4px 0px hsl(0 0% 0% / 0.40);
-    --shadow-sm: 0px 2px 4px 0px hsl(0 0% 0% / 0.80), 0px 1px 2px -1px hsl(0 0% 0% / 0.80);
-    --shadow: 0px 2px 4px 0px hsl(0 0% 0% / 0.80), 0px 1px 2px -1px hsl(0 0% 0% / 0.80);
-    --shadow-md: 0px 2px 4px 0px hsl(0 0% 0% / 0.80), 0px 2px 4px -1px hsl(0 0% 0% / 0.80);
-    --shadow-lg: 0px 2px 4px 0px hsl(0 0% 0% / 0.80), 0px 4px 6px -1px hsl(0 0% 0% / 0.80);
-    --shadow-xl: 0px 2px 4px 0px hsl(0 0% 0% / 0.80), 0px 8px 10px -1px hsl(0 0% 0% / 0.80);
-    --shadow-2xl: 0px 2px 4px 0px hsl(0 0% 0% / 2.00);
+    
+    /* Shadow yang lebih terlihat untuk dark mode */
+    --shadow-2xs: 0px 2px 4px 0px hsl(0 0% 0% / 0.30);
+    --shadow-xs: 0px 2px 4px 0px hsl(0 0% 0% / 0.30);
+    --shadow-sm: 0px 2px 4px 0px hsl(0 0% 0% / 0.50), 0px 1px 2px -1px hsl(0 0% 0% / 0.50);
+    --shadow: 0px 2px 4px 0px hsl(0 0% 0% / 0.50), 0px 1px 2px -1px hsl(0 0% 0% / 0.50);
+    --shadow-md: 0px 2px 4px 0px hsl(0 0% 0% / 0.50), 0px 2px 4px -1px hsl(0 0% 0% / 0.50);
+    --shadow-lg: 0px 2px 4px 0px hsl(0 0% 0% / 0.50), 0px 4px 6px -1px hsl(0 0% 0% / 0.50);
+    --shadow-xl: 0px 2px 4px 0px hsl(0 0% 0% / 0.50), 0px 8px 10px -1px hsl(0 0% 0% / 0.50);
+    --shadow-2xl: 0px 2px 4px 0px hsl(0 0% 0% / 0.80);
   }
   
   @theme inline {
