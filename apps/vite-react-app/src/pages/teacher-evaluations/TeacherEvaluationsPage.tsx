@@ -7,6 +7,7 @@ import { UserRole } from '@/services/auth/types';
 import { User, UserFilterParams } from '@/services/users/types';
 import { Organization } from '@/services/organizations/types';
 import { userService, organizationService, periodService } from '@/services';
+import { Period } from '@/services/periods/types';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { Button } from '@workspace/ui/components/button';
@@ -22,7 +23,7 @@ import { Label } from '@workspace/ui/components/label';
 import { Plus } from 'lucide-react';
 import { UserTable } from '@/components/Users/UserTable';
 import { UserCards } from '@/components/Users/UserCards';
-import AssignTeachersDialog from '@/components/TeacherEvaluations/AssignTeachersDialog';
+import { AssignTeachersToPeriodDialog } from '@/components/TeacherEvaluations';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import SearchContainer from '@/components/common/SearchContainer';
@@ -66,10 +67,10 @@ const TeacherEvaluationsPage: React.FC = () => {
   
   const [teachers, setTeachers] = useState<User[]>([]);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [periods, setPeriods] = useState<Period[]>([]);
   const [activePeriod, setActivePeriod] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
-  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
 
   // Check access
   const hasAccess = isAdmin() || isKepalaSekolah();
@@ -122,6 +123,16 @@ const TeacherEvaluationsPage: React.FC = () => {
     }
   };
 
+  // Load periods
+  const loadPeriods = async () => {
+    try {
+      const response = await periodService.getPeriods();
+      setPeriods(response.items || []);
+    } catch (error) {
+      console.error('Error loading periods:', error);
+    }
+  };
+
   // Load active period
   const loadActivePeriod = async () => {
     try {
@@ -136,6 +147,7 @@ const TeacherEvaluationsPage: React.FC = () => {
   useEffect(() => {
     if (hasAccess) {
       loadOrganizations();
+      loadPeriods();
       loadActivePeriod();
       fetchTeachers();
     }
@@ -161,10 +173,6 @@ const TeacherEvaluationsPage: React.FC = () => {
     }
     // Navigate to create evaluation page (same as view for now, will be edit mode)
     navigate(`/teacher-evaluations/${teacher.id}`);
-  };
-
-  const handleAssignTeachers = () => {
-    setIsAssignDialogOpen(true);
   };
 
   const handleAssignSuccess = () => {
@@ -230,10 +238,10 @@ const TeacherEvaluationsPage: React.FC = () => {
         description="Kelola evaluasi kinerja guru - pilih guru untuk membuat evaluasi atau melihat riwayat evaluasi"
         actions={
           isAdmin() && (
-            <Button onClick={handleAssignTeachers}>
-              <Plus className="h-4 w-4 mr-2" />
-              Assign Teachers to Period
-            </Button>
+            <AssignTeachersToPeriodDialog
+              periods={periods}
+              onSuccess={handleAssignSuccess}
+            />
           )
         }
       />
@@ -315,12 +323,6 @@ const TeacherEvaluationsPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Assign Teachers Dialog */}
-      <AssignTeachersDialog
-        open={isAssignDialogOpen}
-        onOpenChange={setIsAssignDialogOpen}
-        onSuccess={handleAssignSuccess}
-      />
     </div>
   );
 };

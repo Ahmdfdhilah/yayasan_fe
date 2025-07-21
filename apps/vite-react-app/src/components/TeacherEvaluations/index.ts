@@ -2,5 +2,6 @@
 export { TeacherEvaluationTable } from './TeacherEvaluationTable';
 export { TeacherEvaluationCards } from './TeacherEvaluationCards';
 export { default as AssignTeachersDialog } from './AssignTeachersDialog';
+export { default as AssignTeachersToPeriodDialog } from './AssignTeachersToPeriodDialog';
 export { default as EvaluationRatingItem } from './EvaluationRatingItem';
 export { default as EvaluationCategorySection } from './EvaluationCategorySection';

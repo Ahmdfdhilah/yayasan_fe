@@ -22,6 +22,7 @@ import {
 import { Label } from '@workspace/ui/components/label';
 import { RPPSubmissionTable } from '@/components/RPPSubmissions/RPPSubmissionTable';
 import { RPPSubmissionCards } from '@/components/RPPSubmissions/RPPSubmissionCards';
+import { GenerateRPPDialog } from '@/components/RPPSubmissions';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import SearchContainer from '@/components/common/SearchContainer';
@@ -186,6 +187,11 @@ const RPPSubmissionsPage: React.FC = () => {
     updateURL({ page });
   };
 
+  // Handle successful generation - refresh the list
+  const handleGenerateSuccess = async () => {
+    await fetchSubmissions();
+  };
+
   // Generate composite title
   const getCompositeTitle = () => {
     let title = "RPP Submissions";
@@ -243,6 +249,14 @@ const RPPSubmissionsPage: React.FC = () => {
       <PageHeader
         title="RPP Submissions"
         description="Kelola dan review RPP submissions dari semua guru"
+        actions={
+          isAdmin() && (
+            <GenerateRPPDialog
+              periods={periods}
+              onSuccess={handleGenerateSuccess}
+            />
+          )
+        }
       />
 
       <Filtering>
