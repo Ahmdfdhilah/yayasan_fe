@@ -119,10 +119,10 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
             {!collapsed && (
               <>
                 <div className="flex flex-col items-start flex-1 min-w-0">
-                  <span className="text-sm font-medium text-sidebar-foreground truncate">
+                  <span className="text-sm font-medium text-sidebar-foreground truncate w-full">
                     {getUserDisplayName()}
                   </span>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 w-full">
                     <span className="text-xs text-muted-foreground truncate">
                       {getUserRole()}
                     </span>
@@ -137,9 +137,17 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
         <DropdownMenuContent align={collapsed ? "start" : "end"} className="w-56" side={collapsed ? "right" : "bottom"}>
           <DropdownMenuLabel>
             <div className="flex flex-col space-y-1">
-              <span className="font-medium">{getUserDisplayName()}</span>
-              {user.email && <span className="text-xs text-muted-foreground">{user.email}</span>}
-              <span className="text-xs text-muted-foreground">{getUserRole()}</span>
+              <span className="font-medium truncate" title={getUserDisplayName()}>
+                {getUserDisplayName()}
+              </span>
+              {user.email && (
+                <span className="text-xs text-muted-foreground truncate" title={user.email}>
+                  {user.email}
+                </span>
+              )}
+              <span className="text-xs text-muted-foreground truncate" title={getUserRole()}>
+                {getUserRole()}
+              </span>
             </div>
           </DropdownMenuLabel>
 

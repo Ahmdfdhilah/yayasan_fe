@@ -5,7 +5,6 @@ import { useAuth } from '@/components/Auth/AuthProvider';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { Button } from '@workspace/ui/components/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
 import {
   Select,
@@ -16,10 +15,6 @@ import {
 } from '@workspace/ui/components/select';
 import { Label } from '@workspace/ui/components/label';
 import {
-  CheckCircle,
-  XCircle,
-  Clock,
-  FileText,
   Send
 } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -29,7 +24,7 @@ import {
   RPPSubmissionItemResponse,
   RPPSubmissionStatus,
 } from '@/services/rpp-submissions/types';
-import { RPPItemCard, RPPReviewSection } from '@/components/RPPSubmissions';
+import { RPPItemCard, RPPReviewSection, RPPSubmissionOverview } from '@/components/RPPSubmissions';
 import { Period } from '@/services/periods/types';
 import { User } from '@/services/users/types';
 import {
@@ -251,28 +246,10 @@ const RPPSubmissionDetailPage: React.FC = () => {
     await loadSubmissionDetail();
   };
 
-  const getStatusIcon = (status: RPPSubmissionStatus) => {
-    switch (status) {
-      case RPPSubmissionStatus.APPROVED:
-        return <CheckCircle className="h-4 w-4" />;
-      case RPPSubmissionStatus.REJECTED:
-        return <XCircle className="h-4 w-4" />;
-      case RPPSubmissionStatus.PENDING:
-        return <Clock className="h-4 w-4" />;
-      default:
-        return <FileText className="h-4 w-4" />;
-    }
-  };
-
-  const getStatusColor = (status: RPPSubmissionStatus) => {
-    return rppSubmissionService.getStatusColor(status);
-  };
 
   const renderRPPItem = (item: RPPSubmissionItemResponse) => {
-    // Handle both lowercase and uppercase status values
-    const statusLower = submission?.status?.toLowerCase();
-    const isDraftStatus = statusLower === 'draft';
-    const isRejectedStatus = statusLower === 'rejected';
+    const isDraftStatus = submission?.status === RPPSubmissionStatus.DRAFT;
+    const isRejectedStatus = submission?.status === RPPSubmissionStatus.REJECTED;
     const statusAllowsUpload = isDraftStatus || isRejectedStatus;
     const canUpload = isOwnSubmission && statusAllowsUpload;
 
@@ -369,7 +346,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
             {canSubmitForApproval && (
               <Button onClick={handleSubmitForApproval}>
                 <Send className="h-4 w-4 mr-2" />
-                Submit untuk Approval
+                {submission.status === RPPSubmissionStatus.REJECTED ? 'Submit Ulang' : 'Submit untuk Approval'}
               </Button>
             )}
           </div>
@@ -399,64 +376,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
       )}
 
       {/* Submission Overview */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Status Submission</CardTitle>
-            <div className="flex items-center space-x-2">
-              {getStatusIcon(submission.status)}
-              <Badge variant="outline" className={`text-${getStatusColor(submission.status)}-600`}>
-                {rppSubmissionService.getStatusDisplayName(submission.status)}
-              </Badge>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label>Progress</Label>
-              <div className="mt-1">
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${submission.completion_percentage}%` }}
-                  ></div>
-                </div>
-                <p className="text-sm text-gray-600 mt-1">
-                  {submission.completion_percentage}% Complete
-                </p>
-              </div>
-            </div>
-
-            {submission.submitted_at && (
-              <div>
-                <Label>Tanggal Submit</Label>
-                <p className="text-sm mt-1">
-                  {new Date(submission.submitted_at).toLocaleString()}
-                </p>
-              </div>
-            )}
-
-            {submission.reviewed_at && (
-              <div>
-                <Label>Tanggal Review</Label>
-                <p className="text-sm mt-1">
-                  {new Date(submission.reviewed_at).toLocaleString()}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {submission.review_notes && (
-            <div className="mt-4">
-              <Label>Catatan Review</Label>
-              <div className="mt-1 p-3 bg-gray-50 rounded-md">
-                <p className="text-sm">{submission.review_notes}</p>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <RPPSubmissionOverview submission={submission} />
 
       {/* RPP Items */}
       <div className="space-y-4">

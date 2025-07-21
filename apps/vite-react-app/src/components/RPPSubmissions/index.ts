@@ -4,3 +4,4 @@ export { RPPSubmissionCards } from './RPPSubmissionCards';
 export { RPPFileUploadDialog } from './RPPFileUploadDialog';
 export { RPPItemCard } from './RPPItemCard';
 export { RPPReviewSection } from './RPPReviewSection';
+export { RPPSubmissionOverview } from './RPPSubmissionOverview';
