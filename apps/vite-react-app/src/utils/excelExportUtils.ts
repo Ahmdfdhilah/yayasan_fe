@@ -305,7 +305,7 @@ export const exportEvaluationReportToExcel = async (
     columns: [
       { width: 5, header: 'No' },
       { width: 30, header: 'Nama Guru', key: 'teacher_name' },
-      { width: 25, header: 'Organisasi', key: 'organization_name' },
+      { width: 25, header: 'Sekolah', key: 'organization_name' },
       { width: 15, header: 'Total Skor', key: 'total_score' },
       { width: 18, header: 'Rata-rata Skor', key: 'average_score' },
       { width: 18, header: 'Nilai Akhir', key: 'final_grade' },

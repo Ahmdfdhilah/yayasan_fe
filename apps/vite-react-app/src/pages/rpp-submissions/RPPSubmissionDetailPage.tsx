@@ -311,7 +311,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
           <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
           <p className="text-muted-foreground">
             {isKepalaSekolah() 
-              ? "Anda hanya dapat melihat RPP submission dari guru di organisasi Anda."
+              ? "Anda hanya dapat melihat RPP submission dari guru di Sekolah Anda."
               : "Anda tidak memiliki akses untuk melihat halaman ini."
             }
           </p>
@@ -356,7 +356,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
             <p>{`Detail RPP submission untuk periode ${currentPeriod?.academic_year} - ${currentPeriod?.semester}`}</p>
             {teacher?.profile?.organization_name && (
               <p className="text-sm text-muted-foreground mt-1">
-                Organisasi: {teacher.profile.organization_name}
+                Sekolah: {teacher.profile.organization_name}
               </p>
             )}
           </div>
@@ -439,7 +439,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
             <p>{`Detail RPP submission untuk periode ${currentPeriod?.academic_year} - ${currentPeriod?.semester}`}</p>
             {teacher?.profile?.organization_name && (
               <p className="text-sm text-muted-foreground mt-1">
-                Organisasi: {teacher.profile.organization_name}
+                Sekolah: {teacher.profile.organization_name}
               </p>
             )}
           </div>

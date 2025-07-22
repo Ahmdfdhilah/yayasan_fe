@@ -47,7 +47,7 @@ export const OrganizationCards: React.FC<OrganizationCardsProps> = ({
   if (loading) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        Memuat organisasi...
+        Memuat Sekolah...
       </div>
     );
   }
@@ -55,7 +55,7 @@ export const OrganizationCards: React.FC<OrganizationCardsProps> = ({
   if (organizations.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        Tidak ada organisasi ditemukan
+        Tidak ada Sekolah ditemukan
       </div>
     );
   }

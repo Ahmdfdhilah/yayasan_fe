@@ -225,7 +225,7 @@ const RPPSubmissionsPage: React.FC = () => {
         activeFilters.push(org.name);
       }
     } else if (isKepalaSekolah()) {
-      activeFilters.push("Organisasi Saya");
+      activeFilters.push("Sekolah Saya");
     }
     
     if (activeFilters.length > 0) {
@@ -301,13 +301,13 @@ const RPPSubmissionsPage: React.FC = () => {
         {/* Only show organization filter for admin */}
         {isAdmin() && (
           <div className="space-y-2">
-            <Label htmlFor="organization-filter">Organisasi</Label>
+            <Label htmlFor="organization-filter">Sekolah</Label>
             <Select value={filters.organization_id} onValueChange={handleOrganizationChange}>
               <SelectTrigger id="organization-filter">
-                <SelectValue placeholder="Filter berdasarkan organisasi" />
+                <SelectValue placeholder="Filter berdasarkan Sekolah" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Semua Organisasi</SelectItem>
+                <SelectItem value="all">Semua Sekolah</SelectItem>
                 {organizations.map((org) => (
                   <SelectItem key={org.id} value={org.id.toString()}>
                     {org.name}

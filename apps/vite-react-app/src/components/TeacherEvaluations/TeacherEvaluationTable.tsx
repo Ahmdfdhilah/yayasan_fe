@@ -46,6 +46,7 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
           <TableHeader>
             <TableRow>
               <TableHead>Guru</TableHead>
+              <TableHead>Sekolah</TableHead>
               <TableHead>Evaluator</TableHead>
               <TableHead>Periode</TableHead>
               <TableHead>Total Aspek</TableHead>
@@ -57,7 +58,7 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
           <TableBody>
             {[1, 2, 3, 4, 5].map((i) => (
               <TableRow key={i}>
-                {[1, 2, 3, 4, 5, 6, 7].map((j) => (
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((j) => (
                   <TableCell key={j}>
                     <div className="h-4 bg-muted animate-pulse rounded"></div>
                   </TableCell>
@@ -76,6 +77,7 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>Guru</TableHead>
+            <TableHead>Sekolah</TableHead>
             <TableHead>Evaluator</TableHead>
             <TableHead>Periode</TableHead>
             <TableHead>Total Aspek</TableHead>
@@ -88,7 +90,7 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
           {evaluations.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={7}
+                colSpan={8}
                 className="h-24 text-center text-muted-foreground"
               >
                 Tidak ada data evaluasi guru.
@@ -99,6 +101,9 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
               <TableRow key={evaluation.id}>
                 <TableCell>
                   {evaluation.teacher?.full_name || 'N/A'}
+                </TableCell>
+                <TableCell>
+                  {evaluation.organization_name || 'N/A'}
                 </TableCell>
                 <TableCell>
                   {evaluation.evaluator?.full_name || 'N/A'}

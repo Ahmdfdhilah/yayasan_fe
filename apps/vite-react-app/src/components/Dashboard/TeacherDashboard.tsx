@@ -95,7 +95,7 @@ export function TeacherDashboard({ periodId }: TeacherDashboardProps) {
                 <p className="font-medium">{data.period.period_name}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Organisasi</p>
+                <p className="text-sm text-muted-foreground">Sekolah</p>
                 <p className="font-medium">{data.organization_name || 'N/A'}</p>
               </div>
             </div>

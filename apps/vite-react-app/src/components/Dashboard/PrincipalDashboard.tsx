@@ -95,7 +95,7 @@ export function PrincipalDashboard({ periodId }: PrincipalDashboardProps) {
                 <p className="font-medium">{data.period.period_name}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Organisasi</p>
+                <p className="text-sm text-muted-foreground">Sekolah</p>
                 <p className="font-medium">{data.organization_name || 'N/A'}</p>
               </div>
             </div>
@@ -184,7 +184,7 @@ export function PrincipalDashboard({ periodId }: PrincipalDashboardProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building className="h-5 w-5" />
-            Ringkasan Organisasi
+            Ringkasan Sekolah
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -208,7 +208,7 @@ export function PrincipalDashboard({ periodId }: PrincipalDashboardProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Statistik RPP Organisasi
+            Statistik RPP Sekolah
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -241,7 +241,7 @@ export function PrincipalDashboard({ periodId }: PrincipalDashboardProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <GraduationCap className="h-5 w-5" />
-              Statistik Evaluasi Organisasi
+              Statistik Evaluasi Sekolah
             </CardTitle>
           </CardHeader>
           <CardContent>

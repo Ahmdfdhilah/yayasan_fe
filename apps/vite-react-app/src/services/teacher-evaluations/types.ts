@@ -25,6 +25,7 @@ export interface TeacherEvaluation {
   last_updated: string;
   created_at?: string;
   updated_at?: string;
+  organization_name?: string;
   
   // Child relationships
   items: TeacherEvaluationItem[];

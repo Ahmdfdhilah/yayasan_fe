@@ -122,7 +122,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
       console.error('Error saving organization:', error);
       toast({
         title: 'Error',
-        description: 'Gagal menyimpan organisasi. Silakan coba lagi.',
+        description: 'Gagal menyimpan Sekolah. Silakan coba lagi.',
         variant: 'destructive'
       });
     } finally {
@@ -161,7 +161,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>
-            {isEdit ? 'Edit Organisasi' : 'Tambah Organisasi Baru'}
+            {isEdit ? 'Edit Sekolah' : 'Tambah Sekolah Baru'}
           </DialogTitle>
         </DialogHeader>
 
@@ -174,10 +174,10 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nama Organisasi</FormLabel>
+                      <FormLabel>Nama Sekolah</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Masukkan nama organisasi"
+                          placeholder="Masukkan nama Sekolah"
                           disabled={loading}
                           {...field}
                         />
@@ -195,7 +195,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
                       <FormLabel>Deskripsi</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Masukkan deskripsi organisasi (opsional)"
+                          placeholder="Masukkan deskripsi Sekolah (opsional)"
                           disabled={loading}
                           rows={3}
                           {...field}
@@ -211,13 +211,13 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
                   name="head_id"
                   render={() => (
                     <FormItem>
-                      <FormLabel>Kepala Organisasi</FormLabel>
+                      <FormLabel>Kepala Sekolah</FormLabel>
                       <FormControl>
                         <Combobox
                           options={userOptions}
                           value={selectedUser ? selectedUser.id : null}
                           onChange={handleUserSelect}
-                          placeholder="Cari dan pilih kepala organisasi..."
+                          placeholder="Cari dan pilih kepala Sekolah..."
                           emptyMessage="Tidak ada pengguna ditemukan"
                           searchPlaceholder="Cari pengguna..."
                           searchValue={searchValue}
@@ -252,7 +252,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
             onClick={form.handleSubmit(onSubmit)}
             disabled={loading}
           >
-            {loading ? 'Menyimpan...' : isEdit ? 'Perbarui Organisasi' : 'Buat Organisasi'}
+            {loading ? 'Menyimpan...' : isEdit ? 'Perbarui Sekolah' : 'Buat Sekolah'}
           </Button>
         </DialogFooter>
       </DialogContent>

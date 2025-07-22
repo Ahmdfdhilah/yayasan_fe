@@ -163,7 +163,7 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <GraduationCap className="h-5 w-5" />
-              {organizationId ? 'Statistik Evaluasi Organisasi' : 'Statistik Evaluasi Sistem'}
+              {organizationId ? 'Statistik Evaluasi Sekolah' : 'Statistik Evaluasi Sistem'}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -205,14 +205,14 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building className="h-5 w-5" />
-            Ringkasan Organisasi
+            Ringkasan Sekolah
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {data.organization_summaries.length === 0 ? (
               <p className="text-muted-foreground text-center py-4">
-                Belum ada data organisasi tersedia
+                Belum ada data Sekolah tersedia
               </p>
             ) : (
               <div className="grid gap-4">

@@ -9,6 +9,7 @@ import {
   GraduationCap,
   Star,
   BarChart3,
+  Building,
 } from 'lucide-react';
 
 interface TeacherEvaluationCardsProps {
@@ -84,6 +85,13 @@ export const TeacherEvaluationCards: React.FC<TeacherEvaluationCardsProps> = ({
             </div>
 
             <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm">
+                <Building className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">
+                  {evaluation.organization_name || 'N/A'}
+                </span>
+              </div>
+
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">

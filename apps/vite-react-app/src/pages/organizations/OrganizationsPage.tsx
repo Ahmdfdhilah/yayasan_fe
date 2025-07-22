@@ -99,7 +99,7 @@ const OrganizationsPage: React.FC = () => {
       console.error('Failed to fetch organizations:', error);
       toast({
         title: 'Error',
-        description: 'Gagal memuat data organisasi. Silakan coba lagi.',
+        description: 'Gagal memuat data Sekolah. Silakan coba lagi.',
         variant: 'destructive'
       });
     } finally {
@@ -138,12 +138,12 @@ const OrganizationsPage: React.FC = () => {
         setOrganizationToDelete(null);
         fetchOrganizations(); // Refresh the list
         toast({
-          title: 'Organisasi berhasil dihapus',
-          description: `Organisasi ${organizationToDelete.name} telah dihapus dari sistem.`,
+          title: 'Sekolah berhasil dihapus',
+          description: `Sekolah ${organizationToDelete.name} telah dihapus dari sistem.`,
         });
       } catch (error: any) {
         console.error('Failed to delete organization:', error);
-        const errorMessage = error?.message || 'Gagal menghapus organisasi. Silakan coba lagi.';
+        const errorMessage = error?.message || 'Gagal menghapus Sekolah. Silakan coba lagi.';
         toast({
           title: 'Error',
           description: errorMessage,
@@ -164,15 +164,15 @@ const OrganizationsPage: React.FC = () => {
         // Update existing organization
         await organizationService.updateOrganization(editingOrganization.id, organizationData);
         toast({
-          title: 'Organisasi berhasil diperbarui',
-          description: `Organisasi ${organizationData.name} telah diperbarui.`,
+          title: 'Sekolah berhasil diperbarui',
+          description: `Sekolah ${organizationData.name} telah diperbarui.`,
         });
       } else {
         // Create new organization
         await organizationService.createOrganization(organizationData);
         toast({
-          title: 'Organisasi berhasil dibuat',
-          description: `Organisasi ${organizationData.name} telah ditambahkan ke sistem.`,
+          title: 'Sekolah berhasil dibuat',
+          description: `Sekolah ${organizationData.name} telah ditambahkan ke sistem.`,
         });
       }
       setIsDialogOpen(false);
@@ -180,7 +180,7 @@ const OrganizationsPage: React.FC = () => {
       fetchOrganizations(); // Refresh the list
     } catch (error: any) {
       console.error('Failed to save organization:', error);
-      const errorMessage = error?.message || 'Gagal menyimpan organisasi. Silakan coba lagi.';
+      const errorMessage = error?.message || 'Gagal menyimpan Sekolah. Silakan coba lagi.';
       toast({
         title: 'Error',
         description: errorMessage,
@@ -212,7 +212,7 @@ const OrganizationsPage: React.FC = () => {
 
   // Generate composite title
   const getCompositeTitle = () => {
-    let title = "Daftar Organisasi";
+    let title = "Daftar Sekolah";
     const activeFilters = [];
     
     if (filters.has_users !== 'all') {
@@ -247,12 +247,12 @@ const OrganizationsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Manajemen Organisasi"
-        description="Kelola organisasi, tetapkan kepala organisasi, dan lihat jumlah pengguna"
+        title="Manajemen Sekolah"
+        description="Kelola Sekolah, tetapkan kepala Sekolah, dan lihat jumlah pengguna"
         actions={
           <Button onClick={handleCreate}>
             <Plus className="w-4 h-4 mr-2" />
-            Tambah Organisasi
+            Tambah Sekolah
           </Button>
         }
       />
@@ -265,7 +265,7 @@ const OrganizationsPage: React.FC = () => {
               <SelectValue placeholder="Filter berdasarkan pengguna" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Organisasi</SelectItem>
+              <SelectItem value="all">Semua Sekolah</SelectItem>
               <SelectItem value="true">Dengan Pengguna</SelectItem>
               <SelectItem value="false">Tanpa Pengguna</SelectItem>
             </SelectContent>
@@ -273,13 +273,13 @@ const OrganizationsPage: React.FC = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="head-filter">Kepala Organisasi</Label>
+          <Label htmlFor="head-filter">Kepala Sekolah</Label>
           <Select value={filters.has_head} onValueChange={handleHeadFilterChange}>
             <SelectTrigger id="head-filter">
               <SelectValue placeholder="Filter berdasarkan kepala" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Organisasi</SelectItem>
+              <SelectItem value="all">Semua Sekolah</SelectItem>
               <SelectItem value="true">Dengan Kepala</SelectItem>
               <SelectItem value="false">Tanpa Kepala</SelectItem>
             </SelectContent>
@@ -292,13 +292,13 @@ const OrganizationsPage: React.FC = () => {
           <div className="space-y-4">
             <ListHeaderComposite
               title={getCompositeTitle()}
-              subtitle="Kelola organisasi, tetapkan kepala organisasi, dan lihat jumlah pengguna"
+              subtitle="Kelola Sekolah, tetapkan kepala Sekolah, dan lihat jumlah pengguna"
             />
 
             <SearchContainer
               searchQuery={filters.q}
               onSearchChange={handleSearchChange}
-              placeholder="Cari organisasi berdasarkan nama atau deskripsi..."
+              placeholder="Cari Sekolah berdasarkan nama atau deskripsi..."
             />
 
             {/* Desktop Table */}
@@ -351,7 +351,7 @@ const OrganizationsPage: React.FC = () => {
         <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Detail Organisasi</DialogTitle>
+              <DialogTitle>Detail Sekolah</DialogTitle>
             </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -373,7 +373,7 @@ const OrganizationsPage: React.FC = () => {
                 </div>
               </div>
               <div>
-                <Label>Kepala Organisasi</Label>
+                <Label>Kepala Sekolah</Label>
                 <div className="p-2 bg-muted rounded text-sm">
                   {viewingOrganization.head_name || 'Belum ada kepala'}
                 </div>
@@ -411,7 +411,7 @@ const OrganizationsPage: React.FC = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
             <AlertDialogDescription>
-              Tindakan ini tidak dapat dibatalkan. Organisasi{' '}
+              Tindakan ini tidak dapat dibatalkan. Sekolah{' '}
               <span className="font-semibold">{organizationToDelete?.name}</span> akan dihapus
               secara permanen dari sistem.
             </AlertDialogDescription>
@@ -422,7 +422,7 @@ const OrganizationsPage: React.FC = () => {
               onClick={confirmDeleteOrganization}
               className="bg-red-600 hover:bg-red-700"
             >
-              Hapus Organisasi
+              Hapus Sekolah
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -102,7 +102,7 @@ export const appMenuItems: SidebarItem[] = [
 
   // Organization Management - Admin only
   {
-    title: 'Organisasi',
+    title: 'Sekolah',
     href: '/organizations',
     icon: Building,
     allowedRoles: ['admin'],

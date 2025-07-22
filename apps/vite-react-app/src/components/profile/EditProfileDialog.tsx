@@ -209,7 +209,7 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
 
                 {user.organization_id && (
                   <div className="space-y-2">
-                    <Label>Organisasi ID</Label>
+                    <Label>Sekolah ID</Label>
                     <div className="p-3 bg-muted rounded-md text-sm">
                       {user.organization_id}
                     </div>

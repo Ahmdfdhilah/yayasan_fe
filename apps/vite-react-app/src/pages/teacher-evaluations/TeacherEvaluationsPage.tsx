@@ -229,7 +229,7 @@ const TeacherEvaluationsPage: React.FC = () => {
         activeFilters.push(org.name);
       }
     } else if (isKepalaSekolah()) {
-      activeFilters.push("Organisasi Saya");
+      activeFilters.push("Sekolah Saya");
     }
 
     if (activeFilters.length > 0) {
@@ -257,7 +257,7 @@ const TeacherEvaluationsPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Evaluasi Guru"
-        description="Daftar evaluasi kinerja guru berdasarkan periode dan organisasi"
+        description="Daftar evaluasi kinerja guru berdasarkan periode dan Sekolah"
         actions={
           isAdmin() && (
             <AssignTeachersToPeriodDialog
@@ -292,13 +292,13 @@ const TeacherEvaluationsPage: React.FC = () => {
         {/* Organization Filter (Admin only) */}
         {isAdmin() && (
           <div className="space-y-2">
-            <Label htmlFor="organization-filter">Organisasi</Label>
+            <Label htmlFor="organization-filter">Sekolah</Label>
             <Select value={filters.organization_id} onValueChange={handleOrganizationChange}>
               <SelectTrigger id="organization-filter">
-                <SelectValue placeholder="Filter berdasarkan organisasi" />
+                <SelectValue placeholder="Filter berdasarkan Sekolah" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Semua Organisasi</SelectItem>
+                <SelectItem value="all">Semua Sekolah</SelectItem>
                 {organizations.map((org) => (
                   <SelectItem key={org.id} value={org.id.toString()}>
                     {org.name}
@@ -315,7 +315,7 @@ const TeacherEvaluationsPage: React.FC = () => {
           <div className="space-y-4">
             <ListHeaderComposite
               title={getCompositeTitle()}
-              subtitle="Daftar evaluasi kinerja guru berdasarkan periode dan organisasi"
+              subtitle="Daftar evaluasi kinerja guru berdasarkan periode dan Sekolah"
             />
 
             <SearchContainer

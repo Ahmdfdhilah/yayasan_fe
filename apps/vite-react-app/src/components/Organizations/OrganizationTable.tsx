@@ -34,7 +34,7 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Organisasi</TableHead>
+            <TableHead>Sekolah</TableHead>
             <TableHead>Deskripsi</TableHead>
             <TableHead>Kepala</TableHead>
             <TableHead>Pengguna</TableHead>
@@ -46,13 +46,13 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
           {loading ? (
             <TableRow>
               <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                Memuat organisasi...
+                Memuat Sekolah...
               </TableCell>
             </TableRow>
           ) : organizations.length === 0 ? (
             <TableRow>
               <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                Tidak ada organisasi ditemukan
+                Tidak ada Sekolah ditemukan
               </TableCell>
             </TableRow>
           ) : (
