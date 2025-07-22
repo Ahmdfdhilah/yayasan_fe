@@ -152,7 +152,7 @@ const MediaFileCard: React.FC<MediaFileCardProps> = ({ file, onView }) => {
               variant="outline"
               size="sm"
               onClick={handleDownload}
-              title="Download file"
+              title="Unduh file"
             >
               <Download className="h-4 w-4" />
             </Button>

@@ -108,13 +108,13 @@ const MediaFilesPage: React.FC = () => {
   const getPageInfo = () => {
     if (isViewingOwnFiles) {
       return {
-        title: 'Media Files Saya',
-        description: 'Kelola dan akses file media yang telah Anda upload'
+        title: 'File Saya',
+        description: 'Kelola dan akses file yang telah Anda upload'
       };
     } else {
       return {
-        title: 'Media Files',
-        description: `File media yang diupload oleh pengguna`
+        title: 'File Pengguna',
+        description: `File yang diupload oleh pengguna`
       };
     }
   };
@@ -130,7 +130,7 @@ const MediaFilesPage: React.FC = () => {
           <p className="text-muted-foreground">
             {isKepalaSekolah()
               ? "Anda hanya dapat melihat file dari guru di sekolah Anda."
-              : "Anda tidak memiliki akses untuk melihat halaman ini."
+              : "Anda tidak memiliki akses untuk melihat file ini."
             }
           </p>
         </div>
@@ -157,14 +157,14 @@ const MediaFilesPage: React.FC = () => {
         <CardContent>
           <div className="space-y-4">
             <ListHeaderComposite
-              title="Media Files"
-              subtitle="Daftar file media yang telah diupload"
+              title="File & Dokumen"
+              subtitle="Daftar file dan dokumen yang telah diupload"
             />
 
             <SearchContainer
               searchQuery={searchQuery}
               onSearchChange={handleSearchChange}
-              placeholder="Cari berdasarkan nama file..."
+              placeholder="Cari file atau dokumen..."
             />
 
             {/* Error State */}
@@ -213,13 +213,13 @@ const MediaFilesPage: React.FC = () => {
                 </h3>
                 <p className="text-muted-foreground mb-4">
                   {searchQuery || filters.max_size
-                    ? 'Tidak ditemukan file yang sesuai dengan kriteria pencarian.'
-                    : 'Belum ada file yang diupload.'
+                    ? 'Tidak ditemukan file yang sesuai dengan pencarian Anda.'
+                    : 'Belum ada file atau dokumen yang diupload.'
                   }
                 </p>
                 {(searchQuery || filters.max_size) && (
                   <Button variant="outline" onClick={handleClearFilters}>
-                    Clear Filter
+                    Hapus Filter
                   </Button>
                 )}
               </div>

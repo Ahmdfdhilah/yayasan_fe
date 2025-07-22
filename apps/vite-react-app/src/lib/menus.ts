@@ -93,7 +93,7 @@ export const appMenuItems: SidebarItem[] = [
 
   // Media Files Management - All users can view their own files
   {
-    title: 'Media Files',
+    title: 'File Saya',
     href: '/media-files',
     icon: FolderOpen,
     allowedRoles: ['admin', 'guru', 'kepala_sekolah'],
