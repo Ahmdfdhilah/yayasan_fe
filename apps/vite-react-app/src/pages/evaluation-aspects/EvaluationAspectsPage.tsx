@@ -461,9 +461,9 @@ export const EvaluationAspectsPage: React.FC = () => {
           <div className="flex items-center gap-4">
             <Button
               onClick={() => setIsEditMode(!isEditMode)}
-              variant={isEditMode ? "default" : "outline"}
+              variant={isEditMode ? "outline" : "default"}
             >
-              {isEditMode ? 'Selesai Edit' : 'Edit Aspek Evaluasi'}
+              {isEditMode ? 'Selesai Edit' : 'Ubah Aspek Evaluasi'}
             </Button>
 
             {isEditMode && (

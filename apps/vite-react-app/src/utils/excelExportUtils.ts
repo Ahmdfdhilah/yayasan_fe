@@ -357,9 +357,6 @@ export const exportEvaluationReportToExcel = async (
     const workbook = new ExcelJS.Workbook();
     const gradeSheet = workbook.addWorksheet('Distribusi Nilai');
 
-    // Stats sheet (same as above but we'll recreate)
-    await exportToExcel(config, toastFn, customStyles);
-
     // Grade distribution sheet
     gradeSheet.columns = [
       { width: 25, header: 'Nilai' },
