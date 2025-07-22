@@ -19,6 +19,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@workspace/ui/components/alert-dialog';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from '@workspace/ui/components/alert';
 import { PageHeader } from '@/components/common/PageHeader';
 import { CategorySection } from '@/components/EvaluationAspects';
 import { evaluationAspectService } from '@/services';
@@ -32,7 +37,7 @@ import type {
   EvaluationCategoryUpdate,
   CategoryWithAspectsResponse,
 } from '@/services/evaluation-aspects/types';
-import { Plus } from 'lucide-react';
+import { Plus, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
   DndContext,
@@ -64,11 +69,11 @@ export const EvaluationAspectsPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [editingAspectId, setEditingAspectId] = useState<number | null>(null);
   const [newAspectCategoryId, setNewAspectCategoryId] = useState<number | null>(null);
-  
+
   // Edit mode state
   const [isEditMode, setIsEditMode] = useState(false);
   const [isReordering, setIsReordering] = useState(false);
-  
+
   // Drag and drop sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -80,49 +85,49 @@ export const EvaluationAspectsPage: React.FC = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-  
+
   // Handle category drag end
   const handleCategoryDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
-    
+
     if (over && active.id !== over.id) {
       const oldItems = categoriesWithAspects;
-      
+
       // Optimistic update
       setCategoriesWithAspects((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
         return arrayMove(items, oldIndex, newIndex);
       });
-      
+
       try {
         setIsReordering(true);
         // Update category order in backend
-        const newOrder = arrayMove(oldItems, 
+        const newOrder = arrayMove(oldItems,
           oldItems.findIndex((item) => item.id === active.id),
           oldItems.findIndex((item) => item.id === over.id)
         );
-        
+
         // Call API for each category with new order
         await Promise.all(
-          newOrder.map((category, index) => 
+          newOrder.map((category, index) =>
             evaluationAspectService.updateCategoryOrder({
               category_id: category.id,
               new_order: index + 1
             })
           )
         );
-        
+
         toast({
           title: 'Berhasil',
           description: 'Urutan kategori berhasil diperbarui.',
         });
       } catch (error: any) {
         console.error('Error updating category order:', error);
-        
+
         // Rollback on error
         setCategoriesWithAspects(oldItems);
-        
+
         toast({
           title: 'Error',
           description: error?.message || 'Gagal memperbarui urutan kategori.',
@@ -166,7 +171,7 @@ export const EvaluationAspectsPage: React.FC = () => {
 
       // Get each category with its aspects
       const categoriesWithAspectsData = await Promise.all(
-        categoriesData.map(category => 
+        categoriesData.map(category =>
           evaluationAspectService.getCategoryWithAspects(category.id)
         )
       );
@@ -314,22 +319,22 @@ export const EvaluationAspectsPage: React.FC = () => {
     if (newCategoryData.name && newCategoryData.name.trim()) {
       try {
         setSaving(true);
-        
+
         const createdCategory = await evaluationAspectService.createCategory({
           ...newCategoryData,
           name: newCategoryData.name.trim()
         });
-        
+
         setCategories(prev => [...prev, createdCategory]);
         setCategoriesWithAspects(prev => [...prev, {
           ...createdCategory,
           aspects: []
         }]);
-        
+
         handleAddAspect(createdCategory.id);
         setShowCreateCategoryDialog(false);
         setNewCategoryData({ name: '', description: '' });
-        
+
         toast({
           title: 'Berhasil',
           description: 'Kategori baru berhasil dibuat.',
@@ -351,16 +356,16 @@ export const EvaluationAspectsPage: React.FC = () => {
   const handleUpdateCategory = async (categoryId: number, data: EvaluationCategoryUpdate) => {
     try {
       setSaving(true);
-      
+
       const updatedCategory = await evaluationAspectService.updateCategory(categoryId, data);
-      
+
       // Update categories list
       setCategories(prev =>
         prev.map(cat =>
           cat.id === categoryId ? updatedCategory : cat
         )
       );
-      
+
       // Update categoriesWithAspects list
       setCategoriesWithAspects(prev =>
         prev.map(cat =>
@@ -369,7 +374,7 @@ export const EvaluationAspectsPage: React.FC = () => {
             : cat
         )
       );
-      
+
       toast({
         title: 'Berhasil',
         description: 'Kategori berhasil diperbarui.',
@@ -391,13 +396,13 @@ export const EvaluationAspectsPage: React.FC = () => {
   const handleDeleteCategory = async (categoryId: number) => {
     try {
       setSaving(true);
-      
+
       await evaluationAspectService.deleteCategory(categoryId);
-      
+
       // Remove category from both lists
       setCategories(prev => prev.filter(cat => cat.id !== categoryId));
       setCategoriesWithAspects(prev => prev.filter(cat => cat.id !== categoryId));
-      
+
       toast({
         title: 'Berhasil',
         description: 'Kategori berhasil dihapus.',
@@ -454,13 +459,13 @@ export const EvaluationAspectsPage: React.FC = () => {
         description="Kelola aspek-aspek yang digunakan dalam evaluasi kinerja guru"
         actions={
           <div className="flex items-center gap-4">
-            <Button 
+            <Button
               onClick={() => setIsEditMode(!isEditMode)}
               variant={isEditMode ? "default" : "outline"}
             >
               {isEditMode ? 'Selesai Edit' : 'Edit Aspek Evaluasi'}
             </Button>
-            
+
             {isEditMode && (
               <Button onClick={handleCreateNewCategory} disabled={saving}>
                 <Plus className="h-4 w-4 mr-2" />
@@ -540,23 +545,23 @@ export const EvaluationAspectsPage: React.FC = () => {
                         onDeleteCategory={handleDeleteCategory}
                         onAspectReorder={async (aspectId, newIndex) => {
                           const oldCategoriesWithAspects = categoriesWithAspects;
-                          
+
                           // Optimistic update
                           setCategoriesWithAspects(prev =>
                             prev.map(cat =>
                               cat.id === categoryWithAspects.id
                                 ? {
-                                    ...cat,
-                                    aspects: arrayMove(
-                                      cat.aspects,
-                                      cat.aspects.findIndex(a => a.id === aspectId),
-                                      newIndex
-                                    )
-                                  }
+                                  ...cat,
+                                  aspects: arrayMove(
+                                    cat.aspects,
+                                    cat.aspects.findIndex(a => a.id === aspectId),
+                                    newIndex
+                                  )
+                                }
                                 : cat
                             )
                           );
-                          
+
                           try {
                             setIsReordering(true);
                             // Call API to update aspect order
@@ -567,18 +572,18 @@ export const EvaluationAspectsPage: React.FC = () => {
                                 category.aspects.findIndex(a => a.id === aspectId),
                                 newIndex
                               );
-                              
+
                               // Update aspect orders in category
                               const aspectOrders = newAspectsOrder.reduce((acc, aspect, index) => {
                                 acc[aspect.id] = index + 1;
                                 return acc;
                               }, {} as Record<number, number>);
-                              
+
                               await evaluationAspectService.reorderAspectsInCategory({
                                 category_id: categoryWithAspects.id,
                                 aspect_orders: aspectOrders
                               });
-                              
+
                               toast({
                                 title: 'Berhasil',
                                 description: 'Urutan aspek berhasil diperbarui.',
@@ -586,10 +591,10 @@ export const EvaluationAspectsPage: React.FC = () => {
                             }
                           } catch (error: any) {
                             console.error('Error updating aspect order:', error);
-                            
+
                             // Rollback on error
                             setCategoriesWithAspects(oldCategoriesWithAspects);
-                            
+
                             toast({
                               title: 'Error',
                               description: error?.message || 'Gagal memperbarui urutan aspek.',
@@ -641,7 +646,7 @@ export const EvaluationAspectsPage: React.FC = () => {
 
           {/* Add Section Button - only in edit mode */}
           {isEditMode && (
-            <motion.div 
+            <motion.div
               className="flex justify-center mt-8"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -737,6 +742,33 @@ export const EvaluationAspectsPage: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Guidance Alert */}
+      <Alert className="mt-8" variant="default">
+        <div className="flex gap-2">
+          <BookOpen className="h-4 w-4" />
+          <AlertTitle>Panduan Manajemen Aspek Evaluasi</AlertTitle>
+        </div>
+        <AlertDescription className="mt-4 space-y-2">
+          <div className="flex flex-col gap-4 text-sm">
+            <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+              <li>Klik "Edit Aspek Evaluasi" untuk masuk mode editing</li>
+              <li>Seret untuk mengubah urutan bagian dan pertanyaan</li>
+              <li>Edit nama bagian dengan klik ikon pensil</li>
+              <li>Hapus bagian kosong dengan klik ikon tempat sampah</li>
+            </ul>
+          </div>
+          <div className="mt-4 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950 dark:to-yellow-950 border border-amber-200 dark:border-amber-800 rounded-lg">
+            <div className="flex items-start gap-2">
+              <span className="text-lg">💡</span>
+              <div>
+                <p className="font-semibold text-amber-800 dark:text-amber-200 mb-1">Tips Penting:</p>
+                <p className="text-sm text-amber-700 dark:text-amber-300">Bagian yang sudah memiliki pertanyaan tidak dapat dihapus. Hapus semua pertanyaan dalam bagian terlebih dahulu jika ingin menghapus bagian tersebut.</p>
+              </div>
+            </div>
+          </div>
+        </AlertDescription>
+      </Alert>
     </div>
   );
 };
