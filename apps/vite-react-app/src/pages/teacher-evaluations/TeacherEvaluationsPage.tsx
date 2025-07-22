@@ -99,11 +99,8 @@ const TeacherEvaluationsPage: React.FC = () => {
       }
 
       // Organization filtering for admin only
-      // Backend automatically filters by user role, but admin can choose organization
       if (isAdmin() && filters.organization_id !== 'all') {
-        // Note: Backend doesn't have organization filter directly in teacher evaluations
-        // We might need to filter by teachers from specific organization
-        // For now, we'll let backend handle role-based filtering automatically
+        params.organization_id = Number(filters.organization_id);
       }
 
       const response = await teacherEvaluationService.getTeacherEvaluationsFiltered(params);

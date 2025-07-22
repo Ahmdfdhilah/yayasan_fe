@@ -169,6 +169,7 @@ export interface TeacherEvaluationFilterParams {
   teacher_id?: number;
   evaluator_id?: number;
   period_id?: number;
+  organization_id?: number;
   search?: string;
   final_grade?: number;
   min_average_score?: number;
