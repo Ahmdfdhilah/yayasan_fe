@@ -37,6 +37,7 @@ export const RPPSubmissionTable: React.FC<RPPSubmissionTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Guru</TableHead>
             <TableHead>Periode</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Progress</TableHead>
@@ -47,13 +48,13 @@ export const RPPSubmissionTable: React.FC<RPPSubmissionTableProps> = ({
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                 Memuat submission RPP...
               </TableCell>
             </TableRow>
           ) : submissions.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                 Tidak ada submission RPP ditemukan
               </TableCell>
             </TableRow>
@@ -61,12 +62,10 @@ export const RPPSubmissionTable: React.FC<RPPSubmissionTableProps> = ({
             submissions.map((submission) => (
               <TableRow key={submission.id}>
                 <TableCell>
-                  <div>
-                    <div className="font-medium">{submission.period_name}</div>
-                    {submission.teacher_name && (
-                      <div className="text-sm text-muted-foreground">{submission.teacher_name}</div>
-                    )}
-                  </div>
+                  <div className="text-sm">{submission.teacher_name || '-'}</div>
+                </TableCell>
+                <TableCell>
+                  <div className="font-medium">{submission.period_name}</div>
                 </TableCell>
                 <TableCell>
                   {rppSubmissionService.getStatusDisplayName(submission.status)}
@@ -74,8 +73,8 @@ export const RPPSubmissionTable: React.FC<RPPSubmissionTableProps> = ({
                 <TableCell>
                   <div className="space-y-1">
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full" 
+                      <div
+                        className="bg-blue-600 h-2 rounded-full"
                         style={{ width: `${submission.completion_percentage}%` }}
                       ></div>
                     </div>
@@ -98,15 +97,15 @@ export const RPPSubmissionTable: React.FC<RPPSubmissionTableProps> = ({
                     showEdit={userRole === 'guru' && submission.status === RPPSubmissionStatus.DRAFT}
                     showDelete={userRole === 'guru' && submission.status === RPPSubmissionStatus.DRAFT}
                     customActions={
-                      userRole === 'guru' && 
-                      onSubmit && 
-                      rppSubmissionService.isSubmissionReady(submission) && 
-                      submission.status === RPPSubmissionStatus.DRAFT
+                      userRole === 'guru' &&
+                        onSubmit &&
+                        rppSubmissionService.isSubmissionReady(submission) &&
+                        submission.status === RPPSubmissionStatus.DRAFT
                         ? [{
-                            label: 'Kirim',
-                            onClick: () => onSubmit(submission),
-                            icon: 'Send'
-                          }]
+                          label: 'Kirim',
+                          onClick: () => onSubmit(submission),
+                          icon: 'Send'
+                        }]
                         : []
                     }
                   />

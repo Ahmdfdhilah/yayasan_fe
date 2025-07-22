@@ -276,25 +276,20 @@ export const exportEvaluationReportToExcel = async (
     year: 'numeric' 
   });
 
-  // Prepare teacher summaries data
-  const teacherData = stats.teacher_summaries?.map((teacher: any, index: number) => ({
+  // Prepare teacher data from top_performers (show all teachers)
+  const teacherData = stats.top_performers?.map((teacher: any, index: number) => ({
     no: index + 1,
-    teacher_name: teacher.teacher_name !== 'Unknown' ? teacher.teacher_name : teacher.teacher_email,
-    teacher_email: teacher.teacher_email,
-    average_score: teacher.average_score.toFixed(2),
-    completion_percentage: teacher.completion_percentage.toFixed(1) + '%',
-    grade_a: teacher.grade_distribution?.A || 0,
-    grade_b: teacher.grade_distribution?.B || 0,
-    grade_c: teacher.grade_distribution?.C || 0,
-    grade_d: teacher.grade_distribution?.D || 0
+    teacher_name: teacher.teacher_name,
+    final_grade: teacher.final_grade.toFixed(2),
+    average_score: teacher.average_score.toFixed(2)
   })) || [];
 
   // Prepare grade distribution data
   const gradeData = [
-    { grade: 'A - Sangat Baik', count: stats.grade_distribution?.A || 0 },
-    { grade: 'B - Baik', count: stats.grade_distribution?.B || 0 },
-    { grade: 'C - Cukup', count: stats.grade_distribution?.C || 0 },
-    { grade: 'D - Perlu Perbaikan', count: stats.grade_distribution?.D || 0 }
+    { grade: 'A - Sangat Baik', count: stats.final_grade_distribution?.A || 0 },
+    { grade: 'B - Baik', count: stats.final_grade_distribution?.B || 0 },
+    { grade: 'C - Cukup', count: stats.final_grade_distribution?.C || 0 },
+    { grade: 'D - Perlu Perbaikan', count: stats.final_grade_distribution?.D || 0 }
   ];
 
   const completionPercentage = stats.completion_percentage || 0;
@@ -306,14 +301,9 @@ export const exportEvaluationReportToExcel = async (
     sheetName: 'Ringkasan Guru',
     columns: [
       { width: 5, header: 'No' },
-      { width: 25, header: 'Nama Guru', key: 'teacher_name' },
-      { width: 30, header: 'Email', key: 'teacher_email' },
-      { width: 12, header: 'Rata-rata', key: 'average_score' },
-      { width: 12, header: 'Selesai', key: 'completion_percentage' },
-      { width: 8, header: 'A', key: 'grade_a' },
-      { width: 8, header: 'B', key: 'grade_b' },
-      { width: 8, header: 'C', key: 'grade_c' },
-      { width: 8, header: 'D', key: 'grade_d' }
+      { width: 30, header: 'Nama Guru', key: 'teacher_name' },
+      { width: 18, header: 'Jumlah Total Nilai', key: 'final_grade' },
+      { width: 18, header: 'Rata-rata Skor', key: 'average_score' }
     ],
     headerInfo: [
       { label: 'Yayasan', value: 'Yayasan Baitul Muslim Lampung Timur' },
@@ -321,7 +311,7 @@ export const exportEvaluationReportToExcel = async (
       { label: 'Periode Evaluasi', value: `${period.academic_year} - ${period.semester}` },
       { label: 'Tanggal Laporan', value: today },
       { label: 'Total Guru', value: stats.total_teachers.toString() },
-      { label: 'Total Evaluasi', value: `${stats.completed_evaluations} dari ${stats.total_possible_evaluations}` },
+      { label: 'Total Evaluasi', value: `${stats.completed_evaluations} dari ${stats.total_evaluations}` },
       { label: 'Persentase Selesai', value: `${completionPercentage.toFixed(1)}%` },
       { label: 'Rata-rata Keseluruhan', value: `${averageScore} / 4.0` }
     ],
@@ -359,7 +349,6 @@ export const exportEvaluationReportToExcel = async (
   try {
     const ExcelJS = await import('exceljs');
     const workbook = new ExcelJS.Workbook();
-    const statsSheet = workbook.addWorksheet('Statistik Kategori');
     const gradeSheet = workbook.addWorksheet('Distribusi Nilai');
 
     // Stats sheet (same as above but we'll recreate)

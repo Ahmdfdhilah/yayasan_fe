@@ -59,11 +59,9 @@ export const RPPSubmissionCards: React.FC<RPPSubmissionCardsProps> = ({
                 </div>
                 <div>
                   <h3 className="font-medium text-sm">{submission.period_name}</h3>
-                  {submission.teacher_name && (
-                    <div className="text-sm text-muted-foreground mt-1">
-                      {submission.teacher_name}
-                    </div>
-                  )}
+                  <div className="text-sm text-muted-foreground mt-1">
+                    {submission.teacher_name || 'Tidak ada guru'}
+                  </div>
                 </div>
               </div>
               <ActionDropdown

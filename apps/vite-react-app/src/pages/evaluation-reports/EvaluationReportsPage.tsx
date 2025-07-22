@@ -15,7 +15,7 @@ import { BarChart3, Download, Users, FileText, TrendingUp, Clock } from 'lucide-
 import { PageHeader } from '@/components/common/PageHeader';
 import Filtering from '@/components/common/Filtering';
 import { Period } from '@/services/periods/types';
-import { PeriodEvaluationStats, CategoryStats } from '@/services/teacher-evaluations/types';
+import { PeriodEvaluationStats } from '@/services/teacher-evaluations/types';
 import { teacherEvaluationService, periodService } from '@/services';
 import { exportEvaluationReportToExcel } from '@/utils/excelExportUtils';
 
@@ -144,8 +144,8 @@ const EvaluationReportsPage: React.FC = () => {
   };
 
   const getCompletionPercentage = () => {
-    if (!stats || stats.total_possible_evaluations === 0) return 0;
-    return Math.round((stats.completed_evaluations / stats.total_possible_evaluations) * 100);
+    if (!stats) return 0;
+    return Math.round(stats.completion_percentage);
   };
 
   const getAverageScore = () => {
@@ -220,7 +220,7 @@ const EvaluationReportsPage: React.FC = () => {
               <CardContent>
                 <div className="text-2xl font-bold">{stats.completed_evaluations}</div>
                 <p className="text-xs text-muted-foreground">
-                  dari {stats.total_possible_evaluations} total evaluasi
+                  dari {stats.total_evaluations} total evaluasi
                 </p>
               </CardContent>
             </Card>
@@ -277,7 +277,7 @@ const EvaluationReportsPage: React.FC = () => {
           </Card>
 
           {/* Grade Distribution */}
-          {stats.grade_distribution && (
+          {stats.final_grade_distribution && (
             <Card>
               <CardHeader>
                 <CardTitle>Distribusi Nilai</CardTitle>
@@ -285,19 +285,19 @@ const EvaluationReportsPage: React.FC = () => {
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">{stats.grade_distribution.A || 0}</div>
+                    <div className="text-2xl font-bold text-green-600">{stats.final_grade_distribution.A || 0}</div>
                     <div className="text-sm text-muted-foreground">Nilai A (Sangat Baik)</div>
                   </div>
                   <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">{stats.grade_distribution.B || 0}</div>
+                    <div className="text-2xl font-bold text-blue-600">{stats.final_grade_distribution.B || 0}</div>
                     <div className="text-sm text-muted-foreground">Nilai B (Baik)</div>
                   </div>
                   <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-yellow-600">{stats.grade_distribution.C || 0}</div>
+                    <div className="text-2xl font-bold text-yellow-600">{stats.final_grade_distribution.C || 0}</div>
                     <div className="text-sm text-muted-foreground">Nilai C (Cukup)</div>
                   </div>
                   <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-red-600">{stats.grade_distribution.D || 0}</div>
+                    <div className="text-2xl font-bold text-red-600">{stats.final_grade_distribution.D || 0}</div>
                     <div className="text-sm text-muted-foreground">Nilai D (Perlu Perbaikan)</div>
                   </div>
                 </div>
@@ -305,33 +305,59 @@ const EvaluationReportsPage: React.FC = () => {
             </Card>
           )}
 
-          {/* Category Statistics */}
-          {stats.category_stats && Array.isArray(stats.category_stats) && stats.category_stats.length > 0 && (
+          {/* Top Performers */}
+          {stats.top_performers && stats.top_performers.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Statistik per Kategori</CardTitle>
+                <CardTitle>Guru Terbaik</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {stats.category_stats.map((category: CategoryStats, index: number) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <h4 className="font-medium mb-2">{category.category}</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  {stats.top_performers.slice(0, 10).map((teacher, index) => (
+                    <div key={teacher.teacher_id} className="flex items-center justify-between border rounded-lg p-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="text-lg font-bold text-primary">#{index + 1}</div>
                         <div>
-                          <span className="text-muted-foreground">Total Evaluasi:</span>
-                          <span className="ml-2 font-medium">{category.total_evaluations}</span>
+                          <h4 className="font-medium">{teacher.teacher_name}</h4>
+                          <div className="text-sm text-muted-foreground">
+                            Skor Akhir: {teacher.final_grade.toFixed(2)} | Rata-rata: {teacher.average_score.toFixed(2)}
+                          </div>
                         </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Aspect Performance */}
+          {stats.aspect_performance && stats.aspect_performance.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Performa per Aspek</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {stats.aspect_performance.map((aspect) => (
+                    <div key={aspect.aspect_id} className="border rounded-lg p-4">
+                      <h4 className="font-medium mb-2">{aspect.aspect_name}</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground">Rata-rata Skor:</span>
-                          <span className="ml-2 font-medium">{category.average_score.toFixed(2)}</span>
+                          <span className="ml-2 font-medium">{aspect.average_score.toFixed(2)}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Skor Tertinggi:</span>
-                          <span className="ml-2 font-medium">{category.highest_score}</span>
+                          <span className="text-muted-foreground">Jumlah Evaluasi:</span>
+                          <span className="ml-2 font-medium">{aspect.evaluation_count}</span>
                         </div>
-                        <div>
-                          <span className="text-muted-foreground">Skor Terendah:</span>
-                          <span className="ml-2 font-medium">{category.lowest_score}</span>
+                        <div className="md:col-span-1">
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-blue-600 h-2 rounded-full" 
+                              style={{ width: `${(aspect.average_score / 4) * 100}%` }}
+                            ></div>
+                          </div>
                         </div>
                       </div>
                     </div>
