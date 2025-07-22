@@ -29,6 +29,7 @@ import type {
   EvaluationAspectUpdate,
   EvaluationCategory,
   EvaluationCategoryCreate,
+  EvaluationCategoryUpdate,
   CategoryWithAspectsResponse,
 } from '@/services/evaluation-aspects/types';
 import { Plus } from 'lucide-react';
@@ -346,6 +347,74 @@ export const EvaluationAspectsPage: React.FC = () => {
     }
   };
 
+  // Handle category update
+  const handleUpdateCategory = async (categoryId: number, data: EvaluationCategoryUpdate) => {
+    try {
+      setSaving(true);
+      
+      const updatedCategory = await evaluationAspectService.updateCategory(categoryId, data);
+      
+      // Update categories list
+      setCategories(prev =>
+        prev.map(cat =>
+          cat.id === categoryId ? updatedCategory : cat
+        )
+      );
+      
+      // Update categoriesWithAspects list
+      setCategoriesWithAspects(prev =>
+        prev.map(cat =>
+          cat.id === categoryId
+            ? { ...cat, name: updatedCategory.name, description: updatedCategory.description }
+            : cat
+        )
+      );
+      
+      toast({
+        title: 'Berhasil',
+        description: 'Kategori berhasil diperbarui.',
+      });
+    } catch (error: any) {
+      console.error('Error updating category:', error);
+      toast({
+        title: 'Error',
+        description: error?.message || 'Gagal memperbarui kategori.',
+        variant: 'destructive'
+      });
+      throw error; // Re-throw untuk handling di component
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Handle category delete
+  const handleDeleteCategory = async (categoryId: number) => {
+    try {
+      setSaving(true);
+      
+      await evaluationAspectService.deleteCategory(categoryId);
+      
+      // Remove category from both lists
+      setCategories(prev => prev.filter(cat => cat.id !== categoryId));
+      setCategoriesWithAspects(prev => prev.filter(cat => cat.id !== categoryId));
+      
+      toast({
+        title: 'Berhasil',
+        description: 'Kategori berhasil dihapus.',
+      });
+    } catch (error: any) {
+      console.error('Error deleting category:', error);
+      toast({
+        title: 'Error',
+        description: error?.message || 'Gagal menghapus kategori.',
+        variant: 'destructive'
+      });
+      throw error; // Re-throw untuk handling di component
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // Display all categories
   const displayCategoriesWithAspects = categoriesWithAspects.filter(category => 
     category.aspects.length > 0 || newAspectCategoryId === category.id
@@ -469,6 +538,8 @@ export const EvaluationAspectsPage: React.FC = () => {
                         loading={saving}
                         sectionNumber={index + 1}
                         isEditMode={isEditMode}
+                        onUpdateCategory={handleUpdateCategory}
+                        onDeleteCategory={handleDeleteCategory}
                         onAspectReorder={async (aspectId, newIndex) => {
                           const oldCategoriesWithAspects = categoriesWithAspects;
                           
@@ -562,6 +633,8 @@ export const EvaluationAspectsPage: React.FC = () => {
                     loading={saving}
                     sectionNumber={index + 1}
                     isEditMode={isEditMode}
+                    onUpdateCategory={handleUpdateCategory}
+                    onDeleteCategory={handleDeleteCategory}
                   />
                 </motion.div>
               ))}

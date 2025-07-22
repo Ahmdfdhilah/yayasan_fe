@@ -1,8 +1,25 @@
 import React from 'react';
 import { Button } from '@workspace/ui/components/button';
-import { EvaluationAspect, EvaluationAspectCreate, EvaluationAspectUpdate, EvaluationCategory, CategoryWithAspectsResponse } from '@/services/evaluation-aspects/types';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@workspace/ui/components/alert-dialog';
+import {
+  EvaluationAspect,
+  EvaluationAspectCreate,
+  EvaluationAspectUpdate,
+  EvaluationCategory
+  , EvaluationCategoryUpdate,
+  CategoryWithAspectsResponse
+} from '@/services/evaluation-aspects/types';
 import { AspectFormItem } from './AspectFormItem';
-import { Plus, GripVertical } from 'lucide-react';
+import { Plus, GripVertical, Edit, Check, X, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
   DndContext,
@@ -42,6 +59,8 @@ interface CategorySectionProps {
   sectionNumber?: number;
   isEditMode?: boolean;
   onAspectReorder?: (aspectId: number, newOrder: number) => Promise<void>;
+  onUpdateCategory?: (categoryId: number, data: EvaluationCategoryUpdate) => Promise<void>;
+  onDeleteCategory?: (categoryId: number) => Promise<void>;
 }
 
 // Category drag handle component
@@ -89,10 +108,82 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   sectionNumber = 1,
   isEditMode = false,
   onAspectReorder,
+  onUpdateCategory,
+  onDeleteCategory,
 }) => {
   const isAddingToThisCategory = newAspectCategoryId === category.id;
   const categoryAspects = aspects;
-  
+
+  // Category editing state
+  const [isEditingCategory, setIsEditingCategory] = React.useState(false);
+  const [editedCategoryName, setEditedCategoryName] = React.useState(category.name);
+  const [editedCategoryDescription, setEditedCategoryDescription] = React.useState(category.description || '');
+  const [isSavingCategory, setIsSavingCategory] = React.useState(false);
+
+  // Category deletion state
+  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
+  const [isDeletingCategory, setIsDeletingCategory] = React.useState(false);
+
+  // Update local state when category changes
+  React.useEffect(() => {
+    setEditedCategoryName(category.name);
+    setEditedCategoryDescription(category.description || '');
+  }, [category.name, category.description]);
+
+  // Handle category edit
+  const handleEditCategory = () => {
+    setIsEditingCategory(true);
+  };
+
+  // Handle cancel category edit
+  const handleCancelCategoryEdit = () => {
+    setIsEditingCategory(false);
+    setEditedCategoryName(category.name);
+    setEditedCategoryDescription(category.description || '');
+  };
+
+  // Handle save category
+  const handleSaveCategory = async () => {
+    if (!onUpdateCategory || !editedCategoryName.trim()) return;
+
+    try {
+      setIsSavingCategory(true);
+
+      await onUpdateCategory(category.id, {
+        name: editedCategoryName.trim(),
+        description: editedCategoryDescription.trim() || undefined
+      });
+
+      setIsEditingCategory(false);
+    } catch (error) {
+      console.error('Error updating category:', error);
+      // Error handling will be done by parent component
+    } finally {
+      setIsSavingCategory(false);
+    }
+  };
+
+  // Handle delete category
+  const handleDeleteCategory = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  // Handle confirm delete
+  const handleConfirmDelete = async () => {
+    if (!onDeleteCategory) return;
+
+    try {
+      setIsDeletingCategory(true);
+      await onDeleteCategory(category.id);
+      setShowDeleteConfirm(false);
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      // Error handling will be done by parent component
+    } finally {
+      setIsDeletingCategory(false);
+    }
+  };
+
   // Drag and drop sensors for aspects
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -104,14 +195,14 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-  
+
   // Handle aspect drag end within category
   const handleAspectDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
-    
+
     if (over && active.id !== over.id && onAspectReorder) {
       const newIndex = categoryAspects.findIndex((aspect) => aspect.id === over.id);
-      
+
       await onAspectReorder(active.id as number, newIndex);
     }
   };
@@ -124,7 +215,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
         {isEditMode && (
           <CategoryDragHandle categoryId={category.id} />
         )}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
               <span className="text-sm text-primary font-medium whitespace-nowrap">
@@ -135,13 +226,84 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 {categoryAspects.length} pertanyaan
               </span>
             </div>
-            <h2 className="text-lg sm:text-xl font-medium mt-1 break-words">
-              {category.name}
-            </h2>
-            {category.description && (
-              <p className="text-sm text-muted-foreground mt-1">
-                {category.description}
-              </p>
+
+            {isEditingCategory ? (
+              /* Category Edit Form */
+              <div className="mt-2 space-y-3">
+                <input
+                  type="text"
+                  value={editedCategoryName}
+                  onChange={(e) => setEditedCategoryName(e.target.value)}
+                  className="text-lg sm:text-xl font-medium bg-transparent border-none outline-none focus:ring-0 p-0 w-full placeholder-muted-foreground border-b-2 border-primary/30 focus:border-primary"
+                  placeholder="Nama bagian"
+                  disabled={isSavingCategory}
+                />
+                <textarea
+                  value={editedCategoryDescription}
+                  onChange={(e) => setEditedCategoryDescription(e.target.value)}
+                  className="text-sm text-muted-foreground bg-transparent border-none outline-none focus:ring-0 p-0 w-full resize-none placeholder-muted-foreground border-b border-muted focus:border-primary"
+                  placeholder="Deskripsi bagian (opsional)"
+                  rows={2}
+                  disabled={isSavingCategory}
+                />
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={handleSaveCategory}
+                    disabled={isSavingCategory || !editedCategoryName.trim()}
+                    size="sm"
+                  >
+                    <Check className="h-3 w-3 mr-1" />
+                    {isSavingCategory ? 'Menyimpan...' : 'Simpan'}
+                  </Button>
+                  <Button
+                    onClick={handleCancelCategoryEdit}
+                    disabled={isSavingCategory}
+                    variant="ghost"
+                    size="sm"
+                  >
+                    <X className="h-3 w-3 mr-1" />
+                    Batal
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              /* Category Display */
+              <div className="mt-1">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg sm:text-xl font-medium break-words">
+                    {category.name}
+                  </h2>
+                  {isEditMode && (
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {onUpdateCategory && (
+                        <Button
+                          onClick={handleEditCategory}
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                      )}
+                      {onDeleteCategory && categoryAspects.length === 0 && (
+                        <Button
+                          onClick={handleDeleteCategory}
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
+                {category.description && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {category.description}
+                  </p>
+                )}
+              </div>
             )}
           </div>
           {/* Only show add button in edit mode */}
@@ -246,6 +408,33 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
           )
         )}
       </div>
+
+      {/* Delete Category Confirmation Dialog */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Bagian</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus bagian "{category.name}"?
+              Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => setShowDeleteConfirm(false)}
+            >
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              disabled={isDeletingCategory}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeletingCategory ? 'Menghapus...' : 'Hapus'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

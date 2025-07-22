@@ -9,6 +9,7 @@ import type {
   EvaluationAspectFilterParams,
   MessageResponse,
   EvaluationCategoryCreate,
+  EvaluationCategoryUpdate,
   EvaluationCategoryResponse,
   CategoryWithAspectsResponse,
   EvaluationAspectBulkCreate,
@@ -52,6 +53,16 @@ export class EvaluationAspectService extends BaseService {
   // Create evaluation category (Admin only)
   async createCategory(categoryData: EvaluationCategoryCreate): Promise<EvaluationCategoryResponse> {
     return this.post('/categories', categoryData);
+  }
+
+  // Update evaluation category (Admin only)
+  async updateCategory(categoryId: number, categoryData: EvaluationCategoryUpdate): Promise<EvaluationCategoryResponse> {
+    return this.put(`/categories/${categoryId}`, categoryData);
+  }
+
+  // Delete evaluation category (Admin only)
+  async deleteCategory(categoryId: number): Promise<MessageResponse> {
+    return this.delete(`/categories/${categoryId}`);
   }
 
   // Get all categories
