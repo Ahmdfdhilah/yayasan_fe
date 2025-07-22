@@ -12,6 +12,7 @@ export interface User {
     [key: string]: any;
   };
   organization_id?: number;
+  organization_name?: string;
   status: UserStatus;
   last_login_at?: string;
   created_at: string;
@@ -54,9 +55,9 @@ export interface UserChangePassword {
 }
 
 // Response Types
-export interface UserResponse extends User {}
+export interface UserResponse extends User { }
 
-export interface UserListResponse extends PaginatedResponse<User> {}
+export interface UserListResponse extends PaginatedResponse<User> { }
 
 // Filter Types
 export interface UserFilterParams {

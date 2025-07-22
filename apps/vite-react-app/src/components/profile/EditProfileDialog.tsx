@@ -184,45 +184,6 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
                 />
               </div>
 
-              {/* Read-only fields */}
-              <div className="grid grid-cols-1  gap-6">
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <div className="p-3 bg-muted rounded-md text-sm">
-                    {user.email}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>User ID</Label>
-                  <div className="p-3 bg-muted rounded-md text-sm">
-                    {user.id}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Roles</Label>
-                  <div className="p-3 bg-muted rounded-md text-sm">
-                    {user.roles?.join(', ') || 'Tidak ada role'}
-                  </div>
-                </div>
-
-                {user.organization_id && (
-                  <div className="space-y-2">
-                    <Label>Sekolah ID</Label>
-                    <div className="p-3 bg-muted rounded-md text-sm">
-                      {user.organization_id}
-                    </div>
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <Label>Status</Label>
-                  <div className="p-3 bg-muted rounded-md text-sm">
-                    {user.status}
-                  </div>
-                </div>
-              </div>
             </form>
           </Form>
         </div>

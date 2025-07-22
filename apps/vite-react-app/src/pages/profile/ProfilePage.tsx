@@ -4,7 +4,6 @@ import { selectUser, selectAuthLoading, updateProfileAsync } from '@/redux/featu
 import { useToast } from '@workspace/ui/components/sonner';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import { PageHeader } from '@/components/common/PageHeader';
 import { EditProfileDialog } from '@/components/Profile/EditProfileDialog';
@@ -12,15 +11,13 @@ import { ChangePasswordDialog } from '@/components/Profile/ChangePasswordDialog'
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { UserUpdate } from '@/services/users/types';
-import { USER_STATUS, ROLE_LABELS } from '@/lib/constants';
+import { ROLE_LABELS } from '@/lib/constants';
 import {
   Mail,
   Building,
   Shield,
   User as UserIcon,
   Edit,
-  CheckCircle,
-  XCircle,
   IdCard,
   Lock,
 } from 'lucide-react';
@@ -48,38 +45,6 @@ const ProfilePage: React.FC = () => {
     return user.profile?.name || user.display_name || user.full_name || 'N/A';
   };
 
-  const getStatusIcon = () => {
-    if (user.status !== USER_STATUS.ACTIVE) {
-      return <XCircle className="w-4 h-4 text-red-500" />;
-    }
-    return <CheckCircle className="w-4 h-4 text-green-500" />;
-  };
-
-  const getStatusText = () => {
-    switch (user.status) {
-      case USER_STATUS.ACTIVE:
-        return 'Aktif';
-      case USER_STATUS.INACTIVE:
-        return 'Tidak Aktif';
-      case USER_STATUS.SUSPENDED:
-        return 'Ditangguhkan';
-      default:
-        return user.status;
-    }
-  };
-
-  const getStatusBadgeVariant = () => {
-    switch (user.status) {
-      case USER_STATUS.ACTIVE:
-        return 'default';
-      case USER_STATUS.INACTIVE:
-        return 'secondary';
-      case USER_STATUS.SUSPENDED:
-        return 'destructive';
-      default:
-        return 'secondary';
-    }
-  };
 
   const getRoleDisplayNames = () => {
     return user.roles?.map(role => ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role) || ['N/A'];
@@ -169,12 +134,6 @@ const ProfilePage: React.FC = () => {
               </Avatar>
             </div>
             <CardTitle className="text-xl">{getFullName()}</CardTitle>
-            <div className="flex items-center justify-center gap-2 mt-2">
-              {getStatusIcon()}
-              <Badge variant={getStatusBadgeVariant()}>
-                {getStatusText()}
-              </Badge>
-            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">
@@ -199,18 +158,12 @@ const ProfilePage: React.FC = () => {
 
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-muted-foreground" />
-                <div className="flex flex-wrap gap-1">
-                  {getRoleDisplayNames().map((role, index) => (
-                    <Badge key={index} variant="outline" className="text-xs">
-                      {role}
-                    </Badge>
-                  ))}
-                </div>
+                <span className="text-sm">{getRoleDisplayNames().join(', ')}</span>
               </div>
-              {user.organization_id && (
+              {user.organization_name && (
                 <div className="flex items-center gap-2">
                   <Building className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm">Organisasi ID: {user.organization_id}</span>
+                  <span className="text-sm">{user.organization_name}</span>
                 </div>
               )}
             </div>
@@ -226,7 +179,7 @@ const ProfilePage: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex flex-col gap-6">
               {/* Personal Information */}
               <div className="space-y-4">
                 <h3 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">
@@ -234,39 +187,19 @@ const ProfilePage: React.FC = () => {
                 </h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="text-sm font-medium">Nama Lengkap</label>
-                    <p className="text-sm text-muted-foreground">{getFullName()}</p>
-                  </div>
-                  <div>
                     <label className="text-sm font-medium">User ID</label>
                     <p className="text-sm text-muted-foreground">{user.id}</p>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium">Email</label>
-                    <p className="text-sm text-muted-foreground">{user.email || 'Tidak ada email'}</p>
-                  </div>
-                  {user.profile?.phone && (
-                    <div>
-                      <label className="text-sm font-medium">Nomor Telepon</label>
-                      <p className="text-sm text-muted-foreground">{user.profile.phone}</p>
-                    </div>
-                  )}
-                  {user.profile?.position && (
-                    <div>
-                      <label className="text-sm font-medium">Posisi/Jabatan</label>
-                      <p className="text-sm text-muted-foreground">{user.profile.position}</p>
-                    </div>
-                  )}
                   {user.profile?.address && (
                     <div>
                       <label className="text-sm font-medium">Alamat</label>
                       <p className="text-sm text-muted-foreground">{user.profile.address}</p>
                     </div>
                   )}
-                  {user.organization_id && (
+                  {user.organization_name && (
                     <div>
-                      <label className="text-sm font-medium">Organisasi ID</label>
-                      <p className="text-sm text-muted-foreground">{user.organization_id}</p>
+                      <label className="text-sm font-medium">Organisasi</label>
+                      <p className="text-sm text-muted-foreground">{user.organization_name}</p>
                     </div>
                   )}
                   <div>
@@ -286,22 +219,7 @@ const ProfilePage: React.FC = () => {
                 <div className="space-y-3">
                   <div>
                     <label className="text-sm font-medium">Peran</label>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {getRoleDisplayNames().map((role, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          {role}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Status Akun</label>
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon()}
-                      <span className="text-sm text-muted-foreground">
-                        {getStatusText()}
-                      </span>
-                    </div>
+                    <p className="text-sm text-muted-foreground">{getRoleDisplayNames().join(', ')}</p>
                   </div>
 
                   {user.last_login_at && (
