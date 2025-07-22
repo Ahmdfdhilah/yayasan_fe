@@ -94,6 +94,11 @@ const RPPSubmissionsPage: React.FC = () => {
         params.status = filters.status as RPPSubmissionStatus;
       }
 
+      // Handle search filter
+      if (filters.search && filters.search.trim()) {
+        params.search = filters.search.trim();
+      }
+
       // Auto-filter by organization for kepala sekolah, or allow admin to choose
       // Note: This will be handled by backend based on user permissions
 

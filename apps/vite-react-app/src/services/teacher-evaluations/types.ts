@@ -175,6 +175,15 @@ export interface TeacherEvaluationFilterParams {
   to_date?: string;
 }
 
+// Response wrapper for bulk assign operations
+export interface AssignTeachersToEvaluationPeriodResponse {
+  success: boolean;
+  message: string;
+  period_name: string;
+  created_evaluations: number;
+  skipped_evaluations: number;
+}
+
 // Response wrapper for operations
 export interface MessageResponse {
   message: string;

@@ -3,8 +3,6 @@ import { TeacherEvaluationResponse } from '@/services/teacher-evaluations/types'
 import { UserRole } from '@/lib/constants';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 import { 
   User, 
   Calendar,
@@ -28,11 +26,6 @@ export const TeacherEvaluationCards: React.FC<TeacherEvaluationCardsProps> = ({
   onEvaluate,
   userRole
 }) => {
-  
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'dd MMM yyyy', { locale: id });
-  };
-
 
   const getActionProps = (evaluation: TeacherEvaluationResponse) => {
     const canEvaluate = userRole !== 'guru' && !!onEvaluate;

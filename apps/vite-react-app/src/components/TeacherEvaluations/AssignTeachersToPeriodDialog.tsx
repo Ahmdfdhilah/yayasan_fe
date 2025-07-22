@@ -20,6 +20,7 @@ import {
 import { Label } from '@workspace/ui/components/label';
 import { Users, RotateCcw } from 'lucide-react';
 import { Period } from '@/services/periods/types';
+import { AssignTeachersToEvaluationPeriodResponse } from '@/services/teacher-evaluations/types';
 import { teacherEvaluationService } from '@/services';
 
 interface AssignTeachersToPeriodDialogProps {
@@ -50,22 +51,14 @@ const AssignTeachersToPeriodDialog: React.FC<AssignTeachersToPeriodDialogProps> 
 
     try {
       setIsAssigning(true);
-      const result = await teacherEvaluationService.assignTeachersToPeriod({
+      const result: AssignTeachersToEvaluationPeriodResponse = await teacherEvaluationService.assignTeachersToPeriod({
         period_id: Number(selectedPeriod)
       });
 
-      if (result.errors && result.errors.length > 0) {
-        toast({
-          title: 'Penetapan Guru Selesai dengan Peringatan',
-          description: `${result.created_count} evaluasi berhasil dibuat. ${result.errors.length} error: ${result.errors.join(', ')}`,
-          variant: 'default'
-        });
-      } else {
-        toast({
-          title: 'Berhasil Menetapkan Guru',
-          description: `${result.created_count} evaluasi guru berhasil dibuat untuk periode ini.`,
-        });
-      }
+      toast({
+        title: result.success ? 'Berhasil Menetapkan Guru' : 'Penetapan Guru Selesai',
+        description: result.message || `${result.created_evaluations} evaluasi berhasil dibuat, ${result.skipped_evaluations} sudah ada sebelumnya. Periode: ${result.period_name}`,
+      });
 
       // Call success callback
       if (onSuccess) {

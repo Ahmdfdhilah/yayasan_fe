@@ -90,9 +90,11 @@ export interface GenerateRPPSubmissionsRequest {
 }
 
 export interface GenerateRPPSubmissionsResponse extends MessageResponse {
-  generated_count: number;
-  skipped_count: number;
-  total_teachers: number;
+  success: boolean;
+  message: string;
+  period_name: string;
+  created_evaluations: number;
+  skipped_evaluations: number;
 }
 
 // ===== LIST RESPONSES =====
@@ -159,6 +161,7 @@ export interface RPPSubmissionFilterParams {
   period_id?: number;
   status?: RPPSubmissionStatus;
   reviewer_id?: number;
+  search?: string;
   limit?: number;
   offset?: number;
 }

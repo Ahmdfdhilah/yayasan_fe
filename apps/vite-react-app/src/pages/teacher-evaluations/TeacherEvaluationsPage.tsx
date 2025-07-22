@@ -26,10 +26,12 @@ import {
 } from '@/components/TeacherEvaluations';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
+import SearchContainer from '@/components/common/SearchContainer';
 import Filtering from '@/components/common/Filtering';
 import Pagination from '@/components/common/Pagination';
 
 interface EvaluationPageFilters {
+  search: string;
   period_id: string;
   organization_id: string;
   skip: number;
@@ -53,6 +55,7 @@ const TeacherEvaluationsPage: React.FC = () => {
   // URL Filters configuration
   const { updateURL, getCurrentFilters } = useURLFilters<EvaluationPageFilters>({
     defaults: {
+      search: '',
       period_id: 'active',
       organization_id: 'all',
       skip: 0,
@@ -88,6 +91,11 @@ const TeacherEvaluationsPage: React.FC = () => {
         params.period_id = activePeriod.id;
       } else if (filters.period_id !== 'active' && filters.period_id !== 'all') {
         params.period_id = Number(filters.period_id);
+      }
+
+      // Handle search filter
+      if (filters.search && filters.search.trim()) {
+        params.search = filters.search.trim();
       }
 
       // Organization filtering for admin only
@@ -160,7 +168,7 @@ const TeacherEvaluationsPage: React.FC = () => {
     if (hasAccess && (filters.period_id !== 'active' || activePeriod)) {
       fetchEvaluations();
     }
-  }, [filters.skip, filters.limit, filters.period_id, filters.organization_id, activePeriod, hasAccess]);
+  }, [filters.skip, filters.limit, filters.search, filters.period_id, filters.organization_id, activePeriod, hasAccess]);
 
   // Pagination
   const totalPages = Math.ceil(totalItems / filters.limit);
@@ -203,6 +211,10 @@ const TeacherEvaluationsPage: React.FC = () => {
   };
 
   // Filter handlers
+  const handleSearchChange = (search: string) => {
+    updateURL({ search, skip: 0 });
+  };
+
   const handlePeriodChange = (period_id: string) => {
     updateURL({ period_id, skip: 0 });
   };
@@ -325,6 +337,12 @@ const TeacherEvaluationsPage: React.FC = () => {
             <ListHeaderComposite
               title={getCompositeTitle()}
               subtitle="Daftar evaluasi kinerja guru berdasarkan periode dan organisasi"
+            />
+
+            <SearchContainer
+              searchQuery={filters.search}
+              onSearchChange={handleSearchChange}
+              placeholder="Cari berdasarkan nama guru..."
             />
 
             {/* Desktop Table */}

@@ -55,8 +55,8 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
       });
 
       toast({
-        title: 'Berhasil Membuat RPP Submissions',
-        description: `${result.generated_count} submissions berhasil dibuat, ${result.skipped_count} sudah ada sebelumnya. Total guru: ${result.total_teachers}`,
+        title: result.success ? 'Berhasil Membuat RPP Submissions' : 'RPP Submissions Selesai',
+        description: result.message || `${result.created_evaluations} submissions berhasil dibuat, ${result.skipped_evaluations} sudah ada sebelumnya. Periode: ${result.period_name}`,
       });
 
       // Call success callback
