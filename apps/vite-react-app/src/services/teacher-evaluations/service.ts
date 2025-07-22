@@ -2,17 +2,19 @@
 import { BaseService } from "../base";
 import {
   TeacherEvaluationCreate,
-  TeacherEvaluationUpdate,
+  TeacherEvaluationWithItemsCreate,
+  TeacherEvaluationItemCreate,
+  UpdateEvaluationItemGrade,
+  UpdateEvaluationFinalNotes,
+  TeacherEvaluationBulkItemUpdate,
+  AssignTeachersToEvaluationPeriod,
   TeacherEvaluationResponse,
-  TeacherEvaluationListResponse,
+  TeacherEvaluationItemResponse,
   TeacherEvaluationFilterParams,
-  TeacherEvaluationMessageResponse,
-  AssignTeachersToPeriodRequest,
-  AssignTeachersResponse,
-  TeacherEvaluationBulkUpdate,
-  CompleteTeacherEvaluation,
+  TeacherEvaluationSummary,
+  TeacherEvaluationItem,
   PeriodEvaluationStats,
-  BulkOperationResponse,
+  MessageResponse,
 } from "./types";
 
 class TeacherEvaluationService extends BaseService {
@@ -20,13 +22,20 @@ class TeacherEvaluationService extends BaseService {
     super("/teacher-evaluations");
   }
 
-  // ===== BASIC CRUD OPERATIONS (sesuai backend) =====
+  // ===== PARENT EVALUATION OPERATIONS =====
 
-  // Create new teacher evaluation
+  // Create new teacher evaluation (parent record)
   async createTeacherEvaluation(
     evaluationData: TeacherEvaluationCreate
   ): Promise<TeacherEvaluationResponse> {
     return this.post("/", evaluationData);
+  }
+
+  // Create evaluation with items (parent + children)
+  async createEvaluationWithItems(
+    evaluationData: TeacherEvaluationWithItemsCreate
+  ): Promise<TeacherEvaluationResponse> {
+    return this.post("/with-items", evaluationData);
   }
 
   // Get teacher evaluation by ID
@@ -36,88 +45,101 @@ class TeacherEvaluationService extends BaseService {
     return this.get(`/${evaluationId}`);
   }
 
-  // Update teacher evaluation
-  async updateTeacherEvaluation(
+  // Update evaluation final notes
+  async updateEvaluationFinalNotes(
     evaluationId: number,
-    evaluationData: TeacherEvaluationUpdate
+    updateData: UpdateEvaluationFinalNotes
   ): Promise<TeacherEvaluationResponse> {
-    return this.put(`/${evaluationId}`, evaluationData);
+    return this.put(`/${evaluationId}/final-notes`, updateData);
   }
 
   // Delete teacher evaluation (admin only)
   async deleteTeacherEvaluation(
     evaluationId: number
-  ): Promise<TeacherEvaluationMessageResponse> {
+  ): Promise<MessageResponse> {
     return this.delete(`/${evaluationId}`);
   }
 
-  // ===== PERIOD-BASED OPERATIONS (sesuai backend endpoints) =====
+  // ===== EVALUATION ITEM OPERATIONS =====
+
+  // Create evaluation item for specific aspect
+  async createEvaluationItem(
+    evaluationId: number,
+    itemData: TeacherEvaluationItemCreate
+  ): Promise<TeacherEvaluationItemResponse> {
+    return this.post(`/${evaluationId}/items`, itemData);
+  }
+
+  // Update evaluation item for specific aspect
+  async updateEvaluationItem(
+    evaluationId: number,
+    aspectId: number,
+    itemData: UpdateEvaluationItemGrade
+  ): Promise<TeacherEvaluationItemResponse> {
+    return this.put(`/${evaluationId}/items/${aspectId}`, itemData);
+  }
+
+  // Delete evaluation item for specific aspect
+  async deleteEvaluationItem(
+    evaluationId: number,
+    aspectId: number
+  ): Promise<MessageResponse> {
+    return this.delete(`/${evaluationId}/items/${aspectId}`);
+  }
+
+  // Bulk update evaluation items
+  async bulkUpdateEvaluationItems(
+    evaluationId: number,
+    bulkData: TeacherEvaluationBulkItemUpdate
+  ): Promise<TeacherEvaluationResponse> {
+    return this.patch(`/${evaluationId}/bulk-items`, bulkData);
+  }
+
+  // ===== QUERY OPERATIONS =====
+
+  // Get filtered teacher evaluations
+  async getTeacherEvaluationsFiltered(
+    params?: TeacherEvaluationFilterParams
+  ): Promise<{ data: TeacherEvaluationResponse[]; total: number; skip: number; limit: number }> {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    
+    const endpoint = queryParams.toString() ? `/?${queryParams.toString()}` : "/";
+    return this.get(endpoint);
+  }
+
+  // Get teacher evaluation by period and evaluator
+  async getTeacherEvaluationByPeriod(
+    teacherId: number,
+    periodId: number,
+    evaluatorId: number
+  ): Promise<TeacherEvaluationResponse> {
+    return this.get(`/teacher/${teacherId}/period/${periodId}/evaluator/${evaluatorId}`);
+  }
 
   // Get evaluations by period
   async getEvaluationsByPeriod(
-    periodId: number,
-    params?: Omit<TeacherEvaluationFilterParams, 'period_id'>
-  ): Promise<TeacherEvaluationListResponse> {
-    const queryParams = new URLSearchParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          queryParams.append(key, value.toString());
-        }
-      });
-    }
-    
-    const endpoint = queryParams.toString() 
-      ? `/period/${periodId}?${queryParams.toString()}` 
-      : `/period/${periodId}`;
-    return this.get(endpoint);
+    periodId: number
+  ): Promise<TeacherEvaluationResponse[]> {
+    return this.get(`/period/${periodId}`);
   }
 
-  // Get teacher evaluations in specific period
-  async getTeacherEvaluationsInPeriod(
-    teacherId: number,
-    periodId: number,
-    params?: Omit<TeacherEvaluationFilterParams, 'teacher_id' | 'period_id'>
-  ): Promise<TeacherEvaluationListResponse> {
-    const queryParams = new URLSearchParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          queryParams.append(key, value.toString());
-        }
-      });
-    }
-    
-    const endpoint = queryParams.toString() 
-      ? `/teacher/${teacherId}/period/${periodId}?${queryParams.toString()}` 
-      : `/teacher/${teacherId}/period/${periodId}`;
-    return this.get(endpoint);
-  }
-
-  // ===== BULK OPERATIONS (sesuai backend) =====
+  // ===== BULK OPERATIONS =====
 
   // Assign teachers to period (bulk assignment)
   async assignTeachersToPeriod(
-    assignmentData: AssignTeachersToPeriodRequest
-  ): Promise<AssignTeachersResponse> {
+    assignmentData: AssignTeachersToEvaluationPeriod
+  ): Promise<TeacherEvaluationResponse[]> {
     return this.post("/assign-teachers-to-period", assignmentData);
   }
 
-  // Bulk update grades
-  async bulkUpdateGrades(
-    bulkUpdateData: TeacherEvaluationBulkUpdate
-  ): Promise<BulkOperationResponse> {
-    return this.patch("/bulk-grade", bulkUpdateData);
-  }
-
-  // Complete teacher evaluation (all aspects for a teacher in period)
-  async completeTeacherEvaluation(
-    completionData: CompleteTeacherEvaluation
-  ): Promise<BulkOperationResponse> {
-    return this.post("/complete-teacher-evaluation", completionData);
-  }
-
-  // ===== STATISTICS (sesuai backend) =====
+  // ===== STATISTICS AND ANALYTICS =====
 
   // Get period evaluation statistics
   async getPeriodEvaluationStats(
@@ -126,155 +148,78 @@ class TeacherEvaluationService extends BaseService {
     return this.get(`/period/${periodId}/stats`);
   }
 
-  // ===== GRADE SPECIFIC OPERATIONS (sesuai backend) =====
-
-  // Update evaluation grade (alternative endpoint)
-  async updateEvaluationGrade(
-    evaluationId: number,
-    evaluationData: TeacherEvaluationUpdate
-  ): Promise<TeacherEvaluationResponse> {
-    return this.put(`/${evaluationId}/grade`, evaluationData);
+  // Get teacher evaluation summary
+  async getTeacherEvaluationSummary(
+    teacherId: number,
+    periodId: number
+  ): Promise<TeacherEvaluationSummary> {
+    return this.get(`/teacher/${teacherId}/period/${periodId}/summary`);
   }
 
   // ===== HELPER METHODS FOR FRONTEND CONVENIENCE =====
 
-  // Get all evaluations with filtering (untuk general listing)
-  async getAllEvaluations(
-    params?: TeacherEvaluationFilterParams
-  ): Promise<TeacherEvaluationListResponse> {
-    // Karena backend tidak punya endpoint umum untuk listing,
-    // kita perlu gunakan period-based endpoint atau filter
-    if (params?.period_id) {
-      const { period_id, ...otherParams } = params;
-      return this.getEvaluationsByPeriod(period_id, otherParams);
-    }
-    
-    // Fallback: buat query params untuk endpoint root jika ada
-    const queryParams = new URLSearchParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          queryParams.append(key, value.toString());
-        }
-      });
-    }
-    
-    // Note: Backend mungkin tidak punya endpoint ini, 
-    // perlu diskusi dengan backend developer
-    const endpoint = queryParams.toString() ? `/?${queryParams.toString()}` : "/";
-    return this.get(endpoint);
-  }
-
-  // Get evaluations by teacher (across all periods)
+  // Get evaluations by teacher (using filtered endpoint)
   async getEvaluationsByTeacher(
     teacherId: number,
     params?: Omit<TeacherEvaluationFilterParams, 'teacher_id'>
-  ): Promise<TeacherEvaluationListResponse> {
-    const queryParams = new URLSearchParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          queryParams.append(key, value.toString());
-        }
-      });
-    }
-    
-    queryParams.append('teacher_id', teacherId.toString());
-    
-    // Gunakan endpoint umum dengan filter teacher_id
-    const endpoint = `/?${queryParams.toString()}`;
-    return this.get(endpoint);
+  ): Promise<{ data: TeacherEvaluationResponse[]; total: number; skip: number; limit: number }> {
+    return this.getTeacherEvaluationsFiltered({
+      ...params,
+      teacher_id: teacherId
+    });
   }
 
-  // Get evaluations by evaluator
+  // Get evaluations by evaluator (using filtered endpoint)
   async getEvaluationsByEvaluator(
     evaluatorId: number,
     params?: Omit<TeacherEvaluationFilterParams, 'evaluator_id'>
-  ): Promise<TeacherEvaluationListResponse> {
-    const queryParams = new URLSearchParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          queryParams.append(key, value.toString());
-        }
-      });
-    }
-    
-    queryParams.append('evaluator_id', evaluatorId.toString());
-    
-    // Gunakan endpoint umum dengan filter evaluator_id
-    const endpoint = `/?${queryParams.toString()}`;
-    return this.get(endpoint);
+  ): Promise<{ data: TeacherEvaluationResponse[]; total: number; skip: number; limit: number }> {
+    return this.getTeacherEvaluationsFiltered({
+      ...params,
+      evaluator_id: evaluatorId
+    });
   }
 
-  // ===== HELPER METHODS UNTUK GRUP EVALUATIONS =====
+  // ===== HELPER METHODS FOR CALCULATION =====
 
-  // Helper: Group evaluations by teacher for display
-  groupEvaluationsByTeacher(evaluations: TeacherEvaluationResponse[]) {
-    const grouped = evaluations.reduce((acc, evaluation) => {
-      const teacherId = evaluation.teacher_id;
-      if (!acc[teacherId]) {
-        acc[teacherId] = {
-          teacher: {
-            id: evaluation.teacher_id,
-            name: evaluation.teacher_name || 'Unknown',
-            email: evaluation.teacher_email || '',
-          },
-          evaluations: [],
-          totalScore: 0,
-          averageScore: 0,
-          gradeDistribution: { A: 0, B: 0, C: 0, D: 0 }
-        };
-      }
-      
-      acc[teacherId].evaluations.push(evaluation);
-      acc[teacherId].totalScore += evaluation.score;
-      acc[teacherId].gradeDistribution[evaluation.grade]++;
-      acc[teacherId].averageScore = acc[teacherId].totalScore / acc[teacherId].evaluations.length;
-      
-      return acc;
-    }, {} as Record<number, any>);
-
-    return Object.values(grouped);
+  // Calculate completion percentage for evaluation
+  calculateCompletionPercentage(evaluation: TeacherEvaluationResponse, totalAspects: number): number {
+    const completedItems = evaluation.items?.length || 0;
+    return totalAspects > 0 ? (completedItems / totalAspects) * 100 : 0;
   }
 
-  // Helper: Group evaluations by aspect for analysis
-  groupEvaluationsByAspect(evaluations: TeacherEvaluationResponse[]) {
-    const grouped = evaluations.reduce((acc, evaluation) => {
-      const aspectId = evaluation.aspect_id;
+  // Get final grade description
+  getFinalGradeDescription(finalGrade: number): string {
+    if (finalGrade >= 87.5) return "Excellent (A)";
+    if (finalGrade >= 62.5) return "Good (B)";
+    if (finalGrade >= 37.5) return "Satisfactory (C)";
+    return "Needs Improvement (D)";
+  }
+
+  // Group evaluation items by aspect for analysis
+  groupItemsByAspect(items: TeacherEvaluationItem[]) {
+    const grouped = items.reduce((acc, item) => {
+      const aspectId = item.aspect_id;
       if (!acc[aspectId]) {
         acc[aspectId] = {
-          aspect: {
-            id: evaluation.aspect_id,
-            name: evaluation.aspect_name || 'Unknown',
-            category: evaluation.aspect_category || '',
-          },
-          evaluations: [],
-          averageScore: 0,
-          gradeDistribution: { A: 0, B: 0, C: 0, D: 0 }
+          aspect_id: aspectId,
+          aspect: item.aspect,
+          items: [],
+          average_score: 0,
+          grade_distribution: { A: 0, B: 0, C: 0, D: 0 }
         };
       }
       
-      acc[aspectId].evaluations.push(evaluation);
-      acc[aspectId].gradeDistribution[evaluation.grade]++;
+      acc[aspectId].items.push(item);
+      acc[aspectId].grade_distribution[item.grade]++;
       
-      const totalScore = acc[aspectId].evaluations.reduce((sum: any, evaluation: { score: any; }) => sum + evaluation.score, 0);
-      acc[aspectId].averageScore = totalScore / acc[aspectId].evaluations.length;
+      const totalScore = acc[aspectId].items.reduce((sum: number, evalItem: TeacherEvaluationItem) => sum + evalItem.score, 0);
+      acc[aspectId].average_score = totalScore / acc[aspectId].items.length;
       
       return acc;
     }, {} as Record<number, any>);
 
     return Object.values(grouped);
-  }
-
-  // Helper: Calculate completion percentage for teacher in period
-  calculateTeacherCompletion(evaluations: TeacherEvaluationResponse[], totalAspects: number) {
-    const completedCount = evaluations.length; // Semua evaluation yang ada berarti sudah completed
-    return {
-      completed: completedCount,
-      total: totalAspects,
-      percentage: totalAspects > 0 ? (completedCount / totalAspects) * 100 : 0
-    };
   }
 }
 

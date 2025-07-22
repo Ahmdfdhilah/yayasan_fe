@@ -5,32 +5,43 @@ import { User } from "../users/types";
 import { Period } from "../periods/types";
 import { EvaluationAspect } from "../evaluation-aspects/types";
 
-// Sesuaikan dengan backend model yang sebenarnya
+// Parent teacher evaluation (refactored backend structure)
 export interface TeacherEvaluation {
   id: number;
   teacher_id: number;
   teacher?: User;
   evaluator_id: number;
   evaluator?: User;
-  aspect_id: number; // Backend: satu evaluation per aspect
-  aspect?: EvaluationAspect;
   period_id: number;
   period?: Period;
-  grade: EvaluationGrade; // A, B, C, D
-  score: number; // Computed from grade (A=4, B=3, C=2, D=1)
-  notes?: string;
-  evaluation_date: string;
-  created_at: string;
+  
+  // Auto-calculated aggregate fields
+  total_score: number;
+  average_score: number;
+  final_grade: number; // Calculated as total_score * 1.25
+  
+  // Summary fields
+  final_notes?: string;
+  last_updated: string;
+  created_at?: string;
   updated_at?: string;
   
-  // Backend response fields
-  grade_description?: string;
-  evaluator_name?: string;
-  teacher_name?: string;
-  teacher_email?: string;
-  aspect_name?: string;
-  aspect_category?: string;
-  period_name?: string;
+  // Child relationships
+  items: TeacherEvaluationItem[];
+}
+
+// Individual aspect evaluation items (children)
+export interface TeacherEvaluationItem {
+  id: number;
+  teacher_evaluation_id: number;
+  aspect_id: number;
+  aspect?: EvaluationAspect;
+  grade: EvaluationGrade;
+  score: number; // Auto-calculated from grade
+  notes?: string;
+  evaluated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // Grade types (sesuai backend enum)
@@ -44,145 +55,125 @@ export const EVALUATION_GRADES = {
   D: { label: 'Needs Improvement', score: 1 }
 } as const;
 
-// Request Types (sesuai backend schemas)
+// Request Types (updated for parent-child structure)
 export interface TeacherEvaluationCreate {
   teacher_id: number;
   evaluator_id: number;
-  aspect_id: number;
   period_id: number;
+  final_notes?: string;
+}
+
+export interface TeacherEvaluationWithItemsCreate {
+  teacher_id: number;
+  evaluator_id: number;
+  period_id: number;
+  final_notes?: string;
+  items: TeacherEvaluationItemCreate[];
+}
+
+export interface TeacherEvaluationItemCreate {
+  aspect_id: number;
   grade: EvaluationGrade;
   notes?: string;
 }
 
 export interface TeacherEvaluationUpdate {
+  final_notes?: string;
+}
+
+export interface TeacherEvaluationItemUpdate {
   grade?: EvaluationGrade;
   notes?: string;
 }
 
-export interface TeacherEvaluationBulkCreate {
-  evaluator_id: number;
-  teacher_id: number;
-  period_id: number;
-  evaluations: Array<{
+export interface UpdateEvaluationItemGrade {
+  grade: EvaluationGrade;
+  notes?: string;
+}
+
+export interface UpdateEvaluationFinalNotes {
+  final_notes?: string;
+}
+
+export interface TeacherEvaluationBulkItemUpdate {
+  item_updates: Array<{
     aspect_id: number;
     grade: EvaluationGrade;
     notes?: string;
   }>;
 }
 
-export interface TeacherEvaluationBulkUpdate {
-  evaluations: Array<{
-    evaluation_id: number;
-    grade: EvaluationGrade;
-    notes?: string;
-  }>;
-}
-
-export interface AssignTeachersToPeriodRequest {
+export interface AssignTeachersToEvaluationPeriod {
   period_id: number;
-}
-
-export interface CompleteTeacherEvaluation {
-  teacher_id: number;
-  period_id: number;
-  evaluations: Record<number, EvaluationGrade>; // aspect_id -> grade
 }
 
 // Response Types
+export interface TeacherEvaluationItemResponse extends TeacherEvaluationItem {}
+
 export interface TeacherEvaluationResponse extends TeacherEvaluation {}
 
 export interface TeacherEvaluationListResponse extends PaginatedResponse<TeacherEvaluation> {}
 
-// Teacher summary for period stats
-
-// Period evaluation statistics
-export interface CategoryStats {
-  category: string;
-  total_evaluations: number;
-  average_score: number;
-  highest_score: number;
-  lowest_score: number;
-}
-
+// Summary and statistics types (updated to match backend)
 export interface TeacherEvaluationSummary {
   teacher_id: number;
   teacher_name: string;
-  teacher_email: string;
   period_id: number;
-  period_name: string;
   total_aspects: number;
-  completed_evaluations: number;
+  completed_aspects: number;
+  total_score: number;
   average_score: number;
-  grade_distribution: {
-    A?: number;
-    B?: number;
-    C?: number;
-    D?: number;
-  };
+  final_grade: number;
   completion_percentage: number;
+  last_updated?: string;
 }
 
 export interface PeriodEvaluationStats {
   period_id: number;
-  period_name: string;
+  total_evaluations: number;
   total_teachers: number;
-  total_aspects: number;
-  total_possible_evaluations: number;
   completed_evaluations: number;
-  completion_percentage: number;
+  total_aspects_evaluated: number;
   average_score: number;
-  grade_distribution: {
+  final_grade_distribution: {
     A?: number;
     B?: number;
     C?: number;
     D?: number;
   };
-  teacher_summaries: TeacherEvaluationSummary[];
-  category_stats?: CategoryStats[]; // Optional since it's not in current API response
+  completion_percentage: number;
+  top_performers: Array<{
+    teacher_id: number;
+    teacher_name: string;
+    final_grade: number;
+    average_score: number;
+  }>;
+  aspect_performance: Array<{
+    aspect_id: number;
+    aspect_name: string;
+    average_score: number;
+    evaluation_count: number;
+  }>;
 }
 
-// Filter Types (sesuai backend filter params)
+// Filter Types (updated to match backend)
 export interface TeacherEvaluationFilterParams {
   // Pagination
-  page?: number;
-  size?: number;
-  
-  // Search and sorting
-  q?: string; // Search query (backend pakai 'q' bukan 'search')
-  sort_by?: string;
-  sort_order?: "asc" | "desc";
-  
-  // Date filters
-  start_date?: string;
-  end_date?: string;
+  skip?: number;
+  limit?: number;
   
   // Evaluation-specific filters
   teacher_id?: number;
   evaluator_id?: number;
-  aspect_id?: number; // Backend punya ini
   period_id?: number;
-  grade?: EvaluationGrade;
+  final_grade?: number;
+  min_average_score?: number;
+  max_average_score?: number;
+  has_final_notes?: boolean;
 }
 
 // Response wrapper for operations
-export interface TeacherEvaluationMessageResponse {
+export interface MessageResponse {
   message: string;
   success?: boolean;
-  data?: TeacherEvaluation | TeacherEvaluation[];
-}
-
-// Bulk assignment response
-export interface AssignTeachersResponse {
-  created_count: number;
-  errors: string[];
-  message: string;
-}
-
-// Bulk operation response
-export interface BulkOperationResponse {
-  updated_count?: number;
-  created_count?: number;
-  total_aspects?: number;
-  errors: string[];
-  message: string;
 }
