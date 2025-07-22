@@ -415,10 +415,8 @@ export const EvaluationAspectsPage: React.FC = () => {
     }
   };
 
-  // Display all categories
-  const displayCategoriesWithAspects = categoriesWithAspects.filter(category => 
-    category.aspects.length > 0 || newAspectCategoryId === category.id
-  );
+  // Display all categories - always show all categories so users can add aspects to empty ones
+  const displayCategoriesWithAspects = categoriesWithAspects;
 
   if (!isAdmin()) {
     return (
