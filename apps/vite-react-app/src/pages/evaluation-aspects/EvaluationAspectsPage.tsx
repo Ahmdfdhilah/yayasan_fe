@@ -480,10 +480,10 @@ export const EvaluationAspectsPage: React.FC = () => {
               <Plus className="h-8 w-8 text-primary" />
             </div>
             <h3 className="text-xl font-medium mb-2">
-              Mulai membuat formulir evaluasi
+              Mulai membuat aspek evaluasi
             </h3>
             <p className="text-muted-foreground mb-6">
-              Buat bagian dan pertanyaan pertama untuk formulir evaluasi Anda
+              Buat bagian dan pertanyaan pertama untuk aspek evaluasi Anda
             </p>
             <Button onClick={handleCreateNewCategory}>
               <Plus className="h-4 w-4 mr-2" />

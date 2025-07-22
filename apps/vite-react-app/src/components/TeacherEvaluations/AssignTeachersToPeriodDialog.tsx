@@ -111,7 +111,7 @@ const AssignTeachersToPeriodDialog: React.FC<AssignTeachersToPeriodDialogProps> 
           <DialogTitle>Tetapkan Guru ke Periode</DialogTitle>
           <DialogDescription>
             Pilih periode untuk membuat evaluasi kosong untuk semua guru. 
-            Sistem akan otomatis membuat formulir evaluasi untuk semua guru aktif dalam periode tersebut.
+            Sistem akan otomatis membuat aspek evaluasi untuk semua guru aktif dalam periode tersebut.
           </DialogDescription>
         </DialogHeader>
         

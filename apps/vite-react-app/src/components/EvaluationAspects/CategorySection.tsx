@@ -285,7 +285,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                           <Edit className="h-3 w-3" />
                         </Button>
                       )}
-                      {onDeleteCategory && categoryAspects.length === 0 && (
+                      {onDeleteCategory  && (
                         <Button
                           onClick={handleDeleteCategory}
                           variant="ghost"
@@ -416,7 +416,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
             <AlertDialogTitle>Hapus Bagian</AlertDialogTitle>
             <AlertDialogDescription>
               Apakah Anda yakin ingin menghapus bagian "{category.name}"?
-              Tindakan ini tidak dapat dibatalkan.
+              Tindakan ini tidak dapat dibatalkan dan akan menghapus semua aspek penilaian di bagian ini dari seluruh evaluasi guru.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
