@@ -179,22 +179,9 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
 
         {categoryAspects.length === 0 && !isAddingToThisCategory ? (
           <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
-            <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
-              <Plus className="h-6 w-6 text-muted-foreground" />
-            </div>
-            <p className="text-muted-foreground text-sm mb-3">
+            <p className="text-muted-foreground text-sm">
               Belum ada pertanyaan dalam bagian ini
             </p>
-            {isEditMode && (
-              <Button
-                onClick={() => onAddAspect(category.id)}
-                variant="outline"
-                size="sm"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Tambah Pertanyaan Pertama
-              </Button>
-            )}
           </div>
         ) : (
           isEditMode ? (

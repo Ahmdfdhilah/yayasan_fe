@@ -31,7 +31,7 @@ import type {
   EvaluationCategoryCreate,
   CategoryWithAspectsResponse,
 } from '@/services/evaluation-aspects/types';
-import { Plus, Search } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
   DndContext,
@@ -61,7 +61,6 @@ export const EvaluationAspectsPage: React.FC = () => {
   const [categories, setCategories] = useState<EvaluationCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [editingAspectId, setEditingAspectId] = useState<number | null>(null);
   const [newAspectCategoryId, setNewAspectCategoryId] = useState<number | null>(null);
   
@@ -347,21 +346,10 @@ export const EvaluationAspectsPage: React.FC = () => {
     }
   };
 
-  // Filter categories and aspects based on search query
-  const filteredCategoriesWithAspects = categoriesWithAspects
-    .map(category => ({
-      ...category,
-      aspects: category.aspects.filter(aspect =>
-        aspect.aspect_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (aspect.description && aspect.description.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
-    }))
-    .filter(category => 
-      category.aspects.length > 0 || 
-      newAspectCategoryId === category.id ||
-      category.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+  // Display all categories
+  const displayCategoriesWithAspects = categoriesWithAspects.filter(category => 
+    category.aspects.length > 0 || newAspectCategoryId === category.id
+  );
 
   if (!isAdmin()) {
     return (
@@ -403,7 +391,7 @@ export const EvaluationAspectsPage: React.FC = () => {
               onClick={() => setIsEditMode(!isEditMode)}
               variant={isEditMode ? "default" : "outline"}
             >
-              {isEditMode ? 'Selesai Edit' : 'Edit Formulir'}
+              {isEditMode ? 'Selesai Edit' : 'Edit Aspek Evaluasi'}
             </Button>
             
             {isEditMode && (
@@ -416,21 +404,9 @@ export const EvaluationAspectsPage: React.FC = () => {
         }
       />
 
-      {/* Search */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Cari aspek evaluasi..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      </div>
 
       {/* Form Content - Google Forms style with drag & drop */}
-      {filteredCategoriesWithAspects.length === 0 ? (
+      {displayCategoriesWithAspects.length === 0 ? (
         <div className="text-center py-16">
           <div className="bg-card rounded-lg border p-12 max-w-md mx-auto">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -465,11 +441,11 @@ export const EvaluationAspectsPage: React.FC = () => {
                 </div>
               )}
               <SortableContext
-                items={filteredCategoriesWithAspects.map(cat => cat.id)}
+                items={displayCategoriesWithAspects.map(cat => cat.id)}
                 strategy={verticalListSortingStrategy}
               >
                 <div className="space-y-6">
-                  {filteredCategoriesWithAspects.map((categoryWithAspects, index) => (
+                  {displayCategoriesWithAspects.map((categoryWithAspects, index) => (
                     <motion.div
                       key={categoryWithAspects.id}
                       layout
@@ -563,7 +539,7 @@ export const EvaluationAspectsPage: React.FC = () => {
           ) : (
             /* View Mode */
             <div className="space-y-6">
-              {filteredCategoriesWithAspects.map((categoryWithAspects, index) => (
+              {displayCategoriesWithAspects.map((categoryWithAspects, index) => (
                 <motion.div
                   key={categoryWithAspects.id}
                   layout

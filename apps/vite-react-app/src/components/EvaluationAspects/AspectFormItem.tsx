@@ -64,7 +64,7 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
   isDragMode = false,
 }) => {
   const isNewAspect = !aspect;
-  
+
   // Drag and drop functionality
   const {
     attributes,
@@ -131,14 +131,14 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
 
   if (!isEditing && !isNewAspect) {
     return (
-      <div 
+      <div
         ref={setNodeRef}
         style={style}
         className="group bg-card border rounded-lg p-6 hover:shadow-md transition-shadow relative"
       >
         {/* Drag Handle for Edit Mode */}
         {isEditMode && isDragMode && (
-          <div 
+          <div
             {...attributes}
             {...listeners}
             className="absolute left-2 top-6 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
@@ -146,7 +146,7 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
             <GripVertical className="h-4 w-4 text-muted-foreground" />
           </div>
         )}
-        
+
         <div className="flex flex-col lg:flex-row items-start gap-4">
           {/* Question Number */}
           <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
@@ -154,7 +154,7 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
               {questionNumber || '?'}
             </span>
           </div>
-          
+
           {/* Question Content */}
           <div className="flex-1">
             <div className="flex items-start justify-between">
@@ -171,22 +171,22 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
                   Tipe: Pilihan Ganda (A-D)
                 </div>
               </div>
-              
+
               {/* Actions - only in edit mode */}
               {isEditMode && (
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={onEdit}
                     className="h-8 w-8 p-0"
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
                   {onDelete && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={handleDelete}
                       className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
                     >
@@ -196,7 +196,7 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
                 </div>
               )}
             </div>
-            
+
             {/* Preview Answer Area - Evaluation Options */}
             <div className="mt-4 space-y-2">
               <div className="flex items-center space-x-2 p-2 border rounded-md hover:bg-muted/30">
@@ -231,7 +231,7 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
             {questionNumber || 'N'}
           </span>
         </div>
-        
+
         {/* Form Content */}
         <div className="flex-1">
           <Form {...form}>
@@ -307,8 +307,8 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
                     <FormLabel className="text-sm font-medium">
                       Bagian
                     </FormLabel>
-                    <Select 
-                      onValueChange={(value) => field.onChange(parseInt(value))} 
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
                       value={field.value?.toString() || undefined}
                     >
                       <FormControl>
@@ -339,8 +339,8 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
                     <Check className="h-4 w-4 mr-2" />
                     {loading ? 'Menyimpan...' : 'Selesai'}
                   </Button>
-                  <Button 
-                    type="button" 
+                  <Button
+                    type="button"
                     variant="ghost"
                     onClick={onCancel}
                     disabled={loading}
@@ -348,14 +348,6 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
                     <X className="h-4 w-4 mr-2" />
                     Batal
                   </Button>
-                </div>
-                
-                {/* Additional Options */}
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-xs">Wajib diisi</span>
-                  <div className="w-8 h-4 bg-muted rounded-full relative">
-                    <div className="w-3 h-3 bg-background rounded-full absolute top-0.5 left-0.5 shadow-sm"></div>
-                  </div>
                 </div>
               </div>
             </form>
