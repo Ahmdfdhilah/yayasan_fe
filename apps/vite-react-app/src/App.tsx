@@ -26,6 +26,7 @@ import TeacherEvaluationsPage from './pages/teacher-evaluations/TeacherEvaluatio
 import TeacherEvaluationDetailPage from './pages/teacher-evaluations/TeacherEvaluationDetailPage';
 import EvaluationReportsPage from './pages/evaluation-reports/EvaluationReportsPage';
 import { MyRPPSubmissionsPage, RPPSubmissionsPage, RPPSubmissionDetailPage } from './pages/rpp-submissions';
+import { MediaFilesPage } from './pages/media-files';
 
 // Simple redirect component for My Evaluations
 const MyEvaluationsRedirect = () => {
@@ -152,6 +153,21 @@ function App() {
                     <Route path="rpp-submissions/teacher/:teacherId" element={
                       <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
                         <RPPSubmissionDetailPage />
+                      </RoleProtectedRoute>
+                    } />
+
+                    {/* Media Files Routes */}
+                    {/* My Media Files - All authenticated users can view their own files */}
+                    <Route path="media-files" element={
+                      <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
+                        <MediaFilesPage />
+                      </RoleProtectedRoute>
+                    } />
+                    
+                    {/* Specific User Media Files - Admin and Kepala Sekolah can view others' files */}
+                    <Route path="media-files/:uploaderId" element={
+                      <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
+                        <MediaFilesPage />
                       </RoleProtectedRoute>
                     } />
                   </Route>

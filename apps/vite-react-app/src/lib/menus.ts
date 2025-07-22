@@ -8,6 +8,7 @@ import {
   Building,
   ClipboardCheck,
   Upload,
+  FolderOpen,
 } from "lucide-react";
 
 // PKG System Role definitions
@@ -88,6 +89,14 @@ export const appMenuItems: SidebarItem[] = [
         allowedRoles: ['admin'],
       },
     ],
+  },
+
+  // Media Files Management - All users can view their own files
+  {
+    title: 'Media Files',
+    href: '/media-files',
+    icon: FolderOpen,
+    allowedRoles: ['admin', 'guru', 'kepala_sekolah'],
   },
 
   // Period Management - Admin only
