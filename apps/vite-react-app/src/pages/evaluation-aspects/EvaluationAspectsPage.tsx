@@ -32,7 +32,26 @@ import type {
   CategoryWithAspectsResponse,
 } from '@/services/evaluation-aspects/types';
 import { Plus, Search } from 'lucide-react';
-import { motion, Reorder } from 'framer-motion';
+import { motion } from 'framer-motion';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  restrictToVerticalAxis,
+  restrictToWindowEdges,
+} from '@dnd-kit/modifiers';
 
 export const EvaluationAspectsPage: React.FC = () => {
   const { toast } = useToast();
@@ -48,6 +67,72 @@ export const EvaluationAspectsPage: React.FC = () => {
   
   // Edit mode state
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isReordering, setIsReordering] = useState(false);
+  
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+  
+  // Handle category drag end
+  const handleCategoryDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const oldItems = categoriesWithAspects;
+      
+      // Optimistic update
+      setCategoriesWithAspects((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+      
+      try {
+        setIsReordering(true);
+        // Update category order in backend
+        const newOrder = arrayMove(oldItems, 
+          oldItems.findIndex((item) => item.id === active.id),
+          oldItems.findIndex((item) => item.id === over.id)
+        );
+        
+        // Call API for each category with new order
+        await Promise.all(
+          newOrder.map((category, index) => 
+            evaluationAspectService.updateCategoryOrder({
+              category_id: category.id,
+              new_order: index + 1
+            })
+          )
+        );
+        
+        toast({
+          title: 'Berhasil',
+          description: 'Urutan kategori berhasil diperbarui.',
+        });
+      } catch (error: any) {
+        console.error('Error updating category order:', error);
+        
+        // Rollback on error
+        setCategoriesWithAspects(oldItems);
+        
+        toast({
+          title: 'Error',
+          description: error?.message || 'Gagal memperbarui urutan kategori.',
+          variant: 'destructive'
+        });
+      } finally {
+        setIsReordering(false);
+      }
+    }
+  };
 
   // Dialog states
   const [showCreateCategoryDialog, setShowCreateCategoryDialog] = useState(false);
@@ -366,50 +451,115 @@ export const EvaluationAspectsPage: React.FC = () => {
       ) : (
         <div className="space-y-6">
           {isEditMode ? (
-            /* Drag & Drop Mode */
-            <Reorder.Group
-              axis="y"
-              values={filteredCategoriesWithAspects}
-              onReorder={(newOrder) => {
-                setCategoriesWithAspects(newOrder);
-                // Auto-save new order
-                // TODO: Implement category reordering API call
-              }}
-              className="space-y-6"
+            /* Drag & Drop Mode with @dnd-kit */
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleCategoryDragEnd}
+              modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
             >
-              {filteredCategoriesWithAspects.map((categoryWithAspects, index) => (
-                <Reorder.Item
-                  key={categoryWithAspects.id}
-                  value={categoryWithAspects}
-                  className="cursor-grab active:cursor-grabbing"
-                >
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <CategorySection
+              {isReordering && (
+                <div className="fixed top-4 right-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
+                  Menyimpan urutan...
+                </div>
+              )}
+              <SortableContext
+                items={filteredCategoriesWithAspects.map(cat => cat.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-6">
+                  {filteredCategoriesWithAspects.map((categoryWithAspects, index) => (
+                    <motion.div
                       key={categoryWithAspects.id}
-                      category={categoryWithAspects}
-                      aspects={categoryWithAspects.aspects}
-                      categories={categories}
-                      onAddAspect={handleAddAspect}
-                      onEditAspect={handleEditAspect}
-                      onSaveAspect={handleSaveAspect}
-                      onDeleteAspect={(aspect) => handleDeleteAspect(aspect)}
-                      editingAspectId={editingAspectId}
-                      newAspectCategoryId={newAspectCategoryId}
-                      onCancelEdit={handleCancelEdit}
-                      loading={saving}
-                      sectionNumber={index + 1}
-                      isEditMode={isEditMode}
-                    />
-                  </motion.div>
-                </Reorder.Item>
-              ))}
-            </Reorder.Group>
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <CategorySection
+                        key={categoryWithAspects.id}
+                        category={categoryWithAspects}
+                        aspects={categoryWithAspects.aspects}
+                        categories={categories}
+                        onAddAspect={handleAddAspect}
+                        onEditAspect={handleEditAspect}
+                        onSaveAspect={handleSaveAspect}
+                        onDeleteAspect={(aspect) => handleDeleteAspect(aspect)}
+                        editingAspectId={editingAspectId}
+                        newAspectCategoryId={newAspectCategoryId}
+                        onCancelEdit={handleCancelEdit}
+                        loading={saving}
+                        sectionNumber={index + 1}
+                        isEditMode={isEditMode}
+                        onAspectReorder={async (aspectId, newIndex) => {
+                          const oldCategoriesWithAspects = categoriesWithAspects;
+                          
+                          // Optimistic update
+                          setCategoriesWithAspects(prev =>
+                            prev.map(cat =>
+                              cat.id === categoryWithAspects.id
+                                ? {
+                                    ...cat,
+                                    aspects: arrayMove(
+                                      cat.aspects,
+                                      cat.aspects.findIndex(a => a.id === aspectId),
+                                      newIndex
+                                    )
+                                  }
+                                : cat
+                            )
+                          );
+                          
+                          try {
+                            setIsReordering(true);
+                            // Call API to update aspect order
+                            const category = categoriesWithAspects.find(cat => cat.id === categoryWithAspects.id);
+                            if (category) {
+                              const newAspectsOrder = arrayMove(
+                                category.aspects,
+                                category.aspects.findIndex(a => a.id === aspectId),
+                                newIndex
+                              );
+                              
+                              // Update aspect orders in category
+                              const aspectOrders = newAspectsOrder.reduce((acc, aspect, index) => {
+                                acc[aspect.id] = index + 1;
+                                return acc;
+                              }, {} as Record<number, number>);
+                              
+                              await evaluationAspectService.reorderAspectsInCategory({
+                                category_id: categoryWithAspects.id,
+                                aspect_orders: aspectOrders
+                              });
+                              
+                              toast({
+                                title: 'Berhasil',
+                                description: 'Urutan aspek berhasil diperbarui.',
+                              });
+                            }
+                          } catch (error: any) {
+                            console.error('Error updating aspect order:', error);
+                            
+                            // Rollback on error
+                            setCategoriesWithAspects(oldCategoriesWithAspects);
+                            
+                            toast({
+                              title: 'Error',
+                              description: error?.message || 'Gagal memperbarui urutan aspek.',
+                              variant: 'destructive'
+                            });
+                          } finally {
+                            setIsReordering(false);
+                          }
+                        }}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           ) : (
             /* View Mode */
             <div className="space-y-6">

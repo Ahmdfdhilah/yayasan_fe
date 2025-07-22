@@ -22,6 +22,8 @@ import {
 } from '@workspace/ui/components/select';
 import { Trash2, Edit, Check, X, GripVertical } from 'lucide-react';
 import { EvaluationAspect, EvaluationAspectCreate, EvaluationAspectUpdate, EvaluationCategory } from '@/services/evaluation-aspects/types';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const aspectFormSchema = z.object({
   aspect_name: z.string().min(1, 'Nama aspek wajib diisi').max(255, 'Nama aspek maksimal 255 karakter'),
@@ -44,6 +46,7 @@ interface AspectFormItemProps {
   defaultCategoryId?: number;
   questionNumber?: number;
   isEditMode?: boolean;
+  isDragMode?: boolean;
 }
 
 export const AspectFormItem: React.FC<AspectFormItemProps> = ({
@@ -58,8 +61,28 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
   defaultCategoryId,
   questionNumber,
   isEditMode = false,
+  isDragMode = false,
 }) => {
   const isNewAspect = !aspect;
+  
+  // Drag and drop functionality
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: aspect?.id || 0,
+    disabled: !isDragMode || isEditing,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
 
   const form = useForm<AspectFormData>({
     resolver: zodResolver(aspectFormSchema),
@@ -108,10 +131,18 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
 
   if (!isEditing && !isNewAspect) {
     return (
-      <div className="group bg-card border rounded-lg p-6 hover:shadow-md transition-shadow relative">
+      <div 
+        ref={setNodeRef}
+        style={style}
+        className="group bg-card border rounded-lg p-6 hover:shadow-md transition-shadow relative"
+      >
         {/* Drag Handle for Edit Mode */}
-        {isEditMode && (
-          <div className="absolute left-2 top-6 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
+        {isEditMode && isDragMode && (
+          <div 
+            {...attributes}
+            {...listeners}
+            className="absolute left-2 top-6 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+          >
             <GripVertical className="h-4 w-4 text-muted-foreground" />
           </div>
         )}

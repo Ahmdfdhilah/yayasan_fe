@@ -3,7 +3,29 @@ import { Button } from '@workspace/ui/components/button';
 import { EvaluationAspect, EvaluationAspectCreate, EvaluationAspectUpdate, EvaluationCategory, CategoryWithAspectsResponse } from '@/services/evaluation-aspects/types';
 import { AspectFormItem } from './AspectFormItem';
 import { Plus, GripVertical } from 'lucide-react';
-import { motion, Reorder } from 'framer-motion';
+import { motion } from 'framer-motion';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import {
+  CSS,
+} from '@dnd-kit/utilities';
+import {
+  restrictToVerticalAxis,
+  restrictToParentElement,
+} from '@dnd-kit/modifiers';
 
 interface CategorySectionProps {
   category: CategoryWithAspectsResponse;
@@ -19,7 +41,38 @@ interface CategorySectionProps {
   loading?: boolean;
   sectionNumber?: number;
   isEditMode?: boolean;
+  onAspectReorder?: (aspectId: number, newOrder: number) => Promise<void>;
 }
+
+// Category drag handle component
+const CategoryDragHandle: React.FC<{ categoryId: number }> = ({ categoryId }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: categoryId });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="absolute left-1 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+    >
+      <GripVertical className="h-4 w-4 text-muted-foreground" />
+    </div>
+  );
+};
 
 export const CategorySection: React.FC<CategorySectionProps> = ({
   category,
@@ -35,9 +88,33 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   loading = false,
   sectionNumber = 1,
   isEditMode = false,
+  onAspectReorder,
 }) => {
   const isAddingToThisCategory = newAspectCategoryId === category.id;
   const categoryAspects = aspects;
+  
+  // Drag and drop sensors for aspects
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+  
+  // Handle aspect drag end within category
+  const handleAspectDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id && onAspectReorder) {
+      const newIndex = categoryAspects.findIndex((aspect) => aspect.id === over.id);
+      
+      await onAspectReorder(active.id as number, newIndex);
+    }
+  };
 
   return (
     <div className="bg-card rounded-lg border overflow-hidden group">
@@ -45,9 +122,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       <div className="border-l-4 border-primary bg-muted/50 px-4 sm:px-6 py-4 relative">
         {/* Drag Handle for Edit Mode */}
         {isEditMode && (
-          <div className="absolute left-1 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
-            <GripVertical className="h-4 w-4 text-muted-foreground" />
-          </div>
+          <CategoryDragHandle categoryId={category.id} />
         )}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex-1 min-w-0">
@@ -123,29 +198,19 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
           </div>
         ) : (
           isEditMode ? (
-            /* Drag & Drop for aspects in edit mode */
-            <Reorder.Group
-              axis="y"
-              values={categoryAspects}
-              onReorder={() => {
-                // Update aspects order in parent
-                // TODO: Implement aspect reordering within category
-              }}
-              className="space-y-4"
+            /* Drag & Drop for aspects in edit mode with @dnd-kit */
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleAspectDragEnd}
+              modifiers={[restrictToVerticalAxis, restrictToParentElement]}
             >
-              {categoryAspects.map((aspect, index) => (
-                <Reorder.Item
-                  key={aspect.id}
-                  value={aspect}
-                  className="cursor-grab active:cursor-grabbing"
-                >
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                  >
+              <SortableContext
+                items={categoryAspects.map(aspect => aspect.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-4">
+                  {categoryAspects.map((aspect, index) => (
                     <AspectFormItem
                       key={aspect.id}
                       aspect={aspect}
@@ -158,11 +223,12 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                       loading={loading}
                       questionNumber={index + 1}
                       isEditMode={isEditMode}
+                      isDragMode={true}
                     />
-                  </motion.div>
-                </Reorder.Item>
-              ))}
-            </Reorder.Group>
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           ) : (
             /* Static view in view mode */
             <div className="space-y-4">
@@ -185,6 +251,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                     loading={loading}
                     questionNumber={index + 1}
                     isEditMode={isEditMode}
+                    isDragMode={false}
                   />
                 </motion.div>
               ))}
