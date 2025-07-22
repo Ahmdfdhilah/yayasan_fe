@@ -10,16 +10,8 @@ export interface RPPDashboardStats {
 
 export interface TeacherEvaluationDashboardStats {
   total_evaluations: number;
-  completed_evaluations: number;
-  pending_evaluations: number;
-  completion_rate: number;
   avg_score: number | null;
-  grade_distribution: {
-    A: number;
-    B: number;
-    C: number;
-    D: number;
-  };
+  grade_distribution: Record<string, number>;
   total_teachers: number;
   total_aspects: number;
 }
@@ -44,75 +36,52 @@ export interface QuickStats {
   my_pending_rpps: number;
   my_pending_reviews: number;
   my_pending_evaluations: number;
-  recent_activities: Array<{
-    type: string;
-    count: number;
-  }>;
+  recent_activities: Array<Record<string, any>>;
 }
 
-export interface BaseDashboard {
-  period: PeriodSummary;
+export interface DashboardResponse {
+  period: PeriodSummary | null;
   rpp_stats: RPPDashboardStats;
   evaluation_stats: TeacherEvaluationDashboardStats;
-  organizations: OrganizationSummary[];
-  user_role: "guru" | "kepala_sekolah" | "admin";
+  organizations: OrganizationSummary[] | null;
+  user_role: string;
   organization_name: string | null;
   last_updated: string;
-  quick_stats: QuickStats;
 }
 
-export interface TeacherDashboard extends BaseDashboard {
-  user_role: "guru";
+export interface TeacherDashboard extends DashboardResponse {
+  quick_stats: QuickStats;
   my_rpp_stats: RPPDashboardStats;
   my_evaluation_stats: TeacherEvaluationDashboardStats;
 }
 
-export interface TeacherSummary {
-  teacher_id: number;
-  teacher_name: string;
-  total_rpps: number;
-  approved_rpps: number;
-  completion_rate: number;
-}
 
-export interface OrganizationOverview {
+export interface OrganizationOverview extends Record<string, any> {
   organization_name: string;
   total_teachers: number;
-  active_teachers: number;
-  head_name: string;
 }
 
-export interface PrincipalDashboard extends BaseDashboard {
-  user_role: "kepala_sekolah";
-  organization_overview: OrganizationOverview;
-  teacher_summaries: TeacherSummary[];
+export interface PrincipalDashboard extends DashboardResponse {
+  quick_stats: QuickStats;
+  organization_overview: Record<string, any>;
+  teacher_summaries: Array<Record<string, any>>;
 }
 
-export interface SystemOverview {
-  total_users: number;
-  total_organizations: number;
-  system_health: string;
-}
-
-export interface SystemActivity {
-  type: string;
-  message: string;
-}
-
-export interface AdminDashboard extends BaseDashboard {
-  user_role: "admin";
-  system_overview: SystemOverview;
+export interface AdminDashboard extends DashboardResponse {
+  system_overview: Record<string, any>;
   organization_summaries: OrganizationSummary[];
-  recent_system_activities: SystemActivity[];
+  recent_system_activities: Array<Record<string, any>>;
 }
 
-export type DashboardResponse = TeacherDashboard | PrincipalDashboard | AdminDashboard;
+export type DashboardUnion = TeacherDashboard | PrincipalDashboard | AdminDashboard;
 
-export interface DashboardQueryParams {
+export interface DashboardFilters {
   period_id: number;
   organization_id?: number;
   include_inactive?: boolean;
 }
+
+export interface DashboardQueryParams extends DashboardFilters {}
 
 export interface QuickStatsQueryParams {
   period_id: number;

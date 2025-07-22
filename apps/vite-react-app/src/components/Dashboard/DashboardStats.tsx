@@ -61,22 +61,17 @@ export function StatCard({
 }
 
 interface GradeDistributionProps {
-  distribution: {
-    A: number;
-    B: number;
-    C: number;
-    D: number;
-  };
+  distribution: Record<string, number>;
 }
 
 export function GradeDistribution({ distribution }: GradeDistributionProps) {
-  const total = distribution.A + distribution.B + distribution.C + distribution.D;
+  const total = Object.values(distribution).reduce((sum, count) => sum + count, 0);
   
   const getPercentage = (value: number) => {
     return total > 0 ? Math.round((value / total) * 100) : 0;
   };
 
-  const gradeColors = {
+  const gradeColors: Record<string, string> = {
     A: '#22c55e', // green-500
     B: '#3b82f6', // blue-500
     C: '#eab308', // yellow-500
@@ -90,7 +85,7 @@ export function GradeDistribution({ distribution }: GradeDistributionProps) {
       name: `Grade ${grade}`,
       value: count,
       percentage: getPercentage(count),
-      color: gradeColors[grade as keyof typeof gradeColors]
+      color: gradeColors[grade] || '#6b7280' // Default gray color for unknown grades
     }));
 
   // Custom tooltip

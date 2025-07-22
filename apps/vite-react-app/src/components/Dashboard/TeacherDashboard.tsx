@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/componen
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import { FileText, GraduationCap } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { dashboardService, type TeacherDashboard as TeacherDashboardType } from '@/services';
 import { StatCard, GradeDistribution } from './DashboardStats';
 
@@ -54,8 +53,8 @@ export function TeacherDashboard({ periodId }: TeacherDashboardProps) {
       <Card>
         <CardContent className="p-6">
           <p className="text-red-500">Error: {error}</p>
-          <Button 
-            onClick={() => window.location.reload()} 
+          <Button
+            onClick={() => window.location.reload()}
             className="mt-4"
             variant="outline"
           >
@@ -79,28 +78,30 @@ export function TeacherDashboard({ periodId }: TeacherDashboardProps) {
   return (
     <div className="space-y-6">
       {/* Period Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Periode Aktif</span>
-            <Badge variant={data.period.is_active ? 'default' : 'secondary'}>
-              {data.period.is_active ? 'Aktif' : 'Tidak Aktif'}
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Periode</p>
-              <p className="font-medium">{data.period.period_name}</p>
+      {data.period && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Periode Aktif</span>
+              <Badge variant={data.period.is_active ? 'default' : 'secondary'}>
+                {data.period.is_active ? 'Aktif' : 'Tidak Aktif'}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Periode</p>
+                <p className="font-medium">{data.period.period_name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Organisasi</p>
+                <p className="font-medium">{data.organization_name || 'N/A'}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Organisasi</p>
-              <p className="font-medium">{data.organization_name}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* My RPP Stats */}
       <Card>
@@ -151,14 +152,6 @@ export function TeacherDashboard({ periodId }: TeacherDashboardProps) {
                 value={data.my_evaluation_stats.total_evaluations}
               />
               <StatCard
-                title="Selesai"
-                value={data.my_evaluation_stats.completed_evaluations}
-              />
-              <StatCard
-                title="Pending"
-                value={data.my_evaluation_stats.pending_evaluations}
-              />
-              <StatCard
                 title="Rata-rata Skor"
                 value={data.my_evaluation_stats.avg_score || 0}
                 formatter={(v) => v.toFixed(1)}
@@ -167,35 +160,11 @@ export function TeacherDashboard({ periodId }: TeacherDashboardProps) {
           </CardContent>
         </Card>
 
-        <GradeDistribution distribution={data.my_evaluation_stats.grade_distribution} />
+        {data.my_evaluation_stats.grade_distribution && Object.keys(data.my_evaluation_stats.grade_distribution).length > 0 && (
+          <GradeDistribution distribution={data.my_evaluation_stats.grade_distribution} />
+        )}
       </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Aksi Cepat</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-4">
-            <Button asChild variant="outline" className="h-auto p-4">
-              <Link to="/rpp-submissions/my">
-                <div className="text-left">
-                  <div className="font-medium">RPP Submissions</div>
-                  <div className="text-sm opacity-75">Kelola RPP saya</div>
-                </div>
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="h-auto p-4">
-              <Link to="/teacher-evaluations/my">
-                <div className="text-left">
-                  <div className="font-medium">Evaluasi Saya</div>
-                  <div className="text-sm opacity-75">Lihat hasil evaluasi</div>
-                </div>
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { BaseService } from "../base";
 import {
-  DashboardResponse,
+  DashboardUnion,
   TeacherDashboard,
   PrincipalDashboard,
   AdminDashboard,
@@ -14,7 +14,7 @@ class DashboardService extends BaseService {
     super("/dashboard");
   }
 
-  async getDashboard(params: DashboardQueryParams): Promise<DashboardResponse> {
+  async getDashboard(params: DashboardQueryParams): Promise<DashboardUnion> {
     const queryString = new URLSearchParams({
       period_id: params.period_id.toString(),
       ...(params.organization_id && { organization_id: params.organization_id.toString() }),

@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/componen
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import { Building, FileText, GraduationCap, HomeIcon } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { dashboardService, type AdminDashboard as AdminDashboardType } from '@/services';
 import { StatCard, GradeDistribution } from './DashboardStats';
 
@@ -83,24 +82,26 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
   return (
     <div className="space-y-6">
       {/* Period Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Periode Aktif</span>
-            <Badge variant={data.period.is_active ? 'default' : 'secondary'}>
-              {data.period.is_active ? 'Aktif' : 'Tidak Aktif'}
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Periode</p>
-              <p className="font-medium">{data.period.period_name}</p>
+      {data.period && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Periode Aktif</span>
+              <Badge variant={data.period.is_active ? 'default' : 'secondary'}>
+                {data.period.is_active ? 'Aktif' : 'Tidak Aktif'}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Periode</p>
+                <p className="font-medium">{data.period.period_name}</p>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* System Overview */}
       <Card>
@@ -111,14 +112,14 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 gap-4">
             <StatCard
               title="Total Pengguna"
-              value={data.system_overview.total_users}
+              value={data.system_overview.total_users || 0}
             />
             <StatCard
               title="Total Sekolah"
-              value={data.system_overview.total_organizations}
+              value={data.system_overview.total_organizations || 0}
             />
           </div>
         </CardContent>
@@ -172,14 +173,6 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
                 value={data.evaluation_stats.total_evaluations}
               />
               <StatCard
-                title="Selesai"
-                value={data.evaluation_stats.completed_evaluations}
-              />
-              <StatCard
-                title="Pending"
-                value={data.evaluation_stats.pending_evaluations}
-              />
-              <StatCard
                 title="Rata-rata Skor"
                 value={data.evaluation_stats.avg_score || 0}
                 formatter={(v) => v.toFixed(1)}
@@ -188,7 +181,9 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
           </CardContent>
         </Card>
 
-        <GradeDistribution distribution={data.evaluation_stats.grade_distribution} />
+        {data.evaluation_stats.grade_distribution && Object.keys(data.evaluation_stats.grade_distribution).length > 0 && (
+          <GradeDistribution distribution={data.evaluation_stats.grade_distribution} />
+        )}
       </div>
 
       {/* Organization Summaries */}
@@ -211,63 +206,18 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
                   <div key={org.organization_id} className="p-4 border rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium">{org.organization_name}</h4>
-                      <Badge variant="outline">{org.total_teachers} Guru</Badge>
+                      <Badge variant="outline">{org.total_teachers || 0} Guru</Badge>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-muted-foreground">
-                      <div>RPP: {org.rpp_stats.total_submissions}</div>
-                      <div>Approved: {org.rpp_stats.approved_submissions}</div>
-                      <div>Evaluasi: {org.evaluation_stats.total_evaluations}</div>
-                      <div>Avg Score: {(org.evaluation_stats.avg_score || 0).toFixed(1)}</div>
+                      <div>RPP: {org.rpp_stats?.total_submissions || 0}</div>
+                      <div>Approved: {org.rpp_stats?.approved_submissions || 0}</div>
+                      <div>Evaluasi: {org.evaluation_stats?.total_evaluations || 0}</div>
+                      <div>Avg Score: {(org.evaluation_stats?.avg_score || 0).toFixed(1)}</div>
                     </div>
                   </div>
                 ))}
               </div>
             )}
-          </div>
-        </CardContent>
-      </Card>
-
-
-
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Aksi Cepat</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-4 gap-4">
-            <Button asChild variant="outline" className="h-auto p-4">
-              <Link to="/users">
-                <div className="text-left">
-                  <div className="font-medium">Kelola Pengguna</div>
-                  <div className="text-sm opacity-75">Manajemen user</div>
-                </div>
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="h-auto p-4">
-              <Link to="/organizations">
-                <div className="text-left">
-                  <div className="font-medium">Kelola Organisasi</div>
-                  <div className="text-sm opacity-75">Manajemen sekolah</div>
-                </div>
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="h-auto p-4">
-              <Link to="/periods">
-                <div className="text-left">
-                  <div className="font-medium">Kelola Periode</div>
-                  <div className="text-sm opacity-75">Setup periode</div>
-                </div>
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="h-auto p-4">
-              <Link to="/evaluation-aspects">
-                <div className="text-left">
-                  <div className="font-medium">Aspek Evaluasi</div>
-                  <div className="text-sm opacity-75">Setup evaluasi</div>
-                </div>
-              </Link>
-            </Button>
           </div>
         </CardContent>
       </Card>
