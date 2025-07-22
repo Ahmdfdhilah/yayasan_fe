@@ -76,19 +76,21 @@ const RPPSubmissionDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
 
-  // Determine if this is a teacher's own submission or viewing someone else's
-  const isOwnSubmission = isGuru() && currentUser?.id?.toString() === teacherId;
-  
+  // Determine if this is user's own submission (teacher or principal)
+  const isOwnSubmission = (isGuru() || isKepalaSekolah()) && currentUser?.id?.toString() === teacherId;
+
   // Kepala sekolah can review submissions from teachers in their organization
-  const canReview = isKepalaSekolah() && 
-    submission?.status === RPPSubmissionStatus.PENDING &&
-    teacher?.profile?.organization_id === currentUser?.profile?.organization_id;
-  
-  // Admin can view all submissions but cannot review (read-only access)
+  // Admin can review submissions from principals (kepala sekolah)
+  const canReview = submission?.status === RPPSubmissionStatus.PENDING && (
+    (isKepalaSekolah() && teacher?.profile?.organization_id === currentUser?.profile?.organization_id) ||
+    (isAdmin() && teacher?.roles?.includes('kepala_sekolah'))
+  );
+
+  // Admin can view all submissions 
   const isAdminView = isAdmin();
-  
+
   // Kepala sekolah can view submissions from teachers in their organization
-  const isKepalaSekolahView = isKepalaSekolah() && 
+  const isKepalaSekolahView = isKepalaSekolah() &&
     teacher?.profile?.organization_id === currentUser?.profile?.organization_id;
 
   useEffect(() => {
@@ -96,14 +98,19 @@ const RPPSubmissionDetailPage: React.FC = () => {
     loadActivePeriod();
   }, [teacherId, periodId, filters.period_id]);
 
+  // Additional effect to load submission when periods are loaded
+  useEffect(() => {
+    if (periods.length > 0 && !periodId && teacherId) {
+      loadSubmissionDetail();
+    }
+  }, [periods, teacherId, periodId]);
+
   const loadInitialData = async () => {
     try {
       setLoading(true);
 
-      // Load periods if not using specific periodId
-      if (!periodId) {
-        await loadPeriods();
-      }
+      // Always load periods first to ensure currentPeriod can be properly set
+      await loadPeriods();
 
       // Load teacher info if teacherId is provided
       if (teacherId) {
@@ -158,7 +165,10 @@ const RPPSubmissionDetailPage: React.FC = () => {
         targetPeriodId = Number(periodId);
       } else if (teacherId) {
         // Teacher selection route - determine period from filters
-        // if (periods.length === 0) return;
+        if (periods.length === 0) {
+          console.log('Periods not loaded yet, waiting...');
+          return;
+        }
 
         if (filters.period_id === 'latest') {
           const sortedPeriods = [...periods].sort((a, b) => {
@@ -175,20 +185,10 @@ const RPPSubmissionDetailPage: React.FC = () => {
         throw new Error('No teacher or period specified');
       }
 
-      // Set current period
-      const period = periods.find(p => p.id === targetPeriodId) || {
-        id: targetPeriodId,
-        academic_year: '',
-        semester: '',
-        name: '',
-        status: 'active' as const,
-        start_date: '',
-        end_date: '',
-        is_active: false,
-        created_at: '',
-        updated_at: undefined
-      };
-      setCurrentPeriod(period);
+      // Set current period - try to find from loaded periods first
+      let period = periods.find(p => p.id === targetPeriodId);
+
+      setCurrentPeriod(period ?? null);
 
       // Load submission data
       let submissionData: RPPSubmissionResponse;
@@ -310,7 +310,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
           <p className="text-muted-foreground">
-            {isKepalaSekolah() 
+            {isKepalaSekolah()
               ? "Anda hanya dapat melihat RPP submission dari guru di Sekolah Anda."
               : "Anda tidak memiliki akses untuk melihat halaman ini."
             }
@@ -334,8 +334,8 @@ const RPPSubmissionDetailPage: React.FC = () => {
         title={
           <div className="flex items-center space-x-3">
             <span>
-              {isOwnSubmission 
-                ? "RPP Submission Saya" 
+              {isOwnSubmission
+                ? "RPP Submission Saya"
                 : `RPP Submission - ${teacher?.profile?.name || teacher?.display_name || 'Unknown'}`
               }
             </span>
@@ -353,7 +353,11 @@ const RPPSubmissionDetailPage: React.FC = () => {
         }
         description={
           <div>
-            <p>{`Detail RPP submission untuk periode ${currentPeriod?.academic_year} - ${currentPeriod?.semester}`}</p>
+            <p>
+              {currentPeriod?.academic_year && currentPeriod?.semester
+                ? `Detail RPP submission untuk periode ${currentPeriod.academic_year} - ${currentPeriod.semester}`
+                : 'Detail RPP submission'}
+            </p>
             {teacher?.profile?.organization_name && (
               <p className="text-sm text-muted-foreground mt-1">
                 Sekolah: {teacher.profile.organization_name}
@@ -417,8 +421,8 @@ const RPPSubmissionDetailPage: React.FC = () => {
         title={
           <div className="flex items-center space-x-3">
             <span>
-              {isOwnSubmission 
-                ? "RPP Submission Saya" 
+              {isOwnSubmission
+                ? "RPP Submission Saya"
                 : `RPP Submission - ${teacher?.profile?.name || teacher?.display_name || 'Unknown'}`
               }
             </span>
@@ -436,7 +440,11 @@ const RPPSubmissionDetailPage: React.FC = () => {
         }
         description={
           <div>
-            <p>{`Detail RPP submission untuk periode ${currentPeriod?.academic_year} - ${currentPeriod?.semester}`}</p>
+            <p>
+              {currentPeriod?.academic_year && currentPeriod?.semester
+                ? `Detail RPP submission untuk periode ${currentPeriod.academic_year} - ${currentPeriod.semester}`
+                : 'Detail RPP submission'}
+            </p>
             {teacher?.profile?.organization_name && (
               <p className="text-sm text-muted-foreground mt-1">
                 Sekolah: {teacher.profile.organization_name}
@@ -458,8 +466,8 @@ const RPPSubmissionDetailPage: React.FC = () => {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Konfirmasi Submit</AlertDialogTitle>
                     <AlertDialogDescription>
-                      {submission.status === RPPSubmissionStatus.REJECTED 
-                        ? 'Apakah Anda yakin ingin submit ulang RPP submission ini untuk review?' 
+                      {submission.status === RPPSubmissionStatus.REJECTED
+                        ? 'Apakah Anda yakin ingin submit ulang RPP submission ini untuk review?'
                         : 'Apakah Anda yakin ingin submit RPP submission ini untuk review? Setelah disubmit, Anda tidak dapat mengubah file RPP hingga mendapat feedback.'}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
@@ -473,15 +481,15 @@ const RPPSubmissionDetailPage: React.FC = () => {
               </AlertDialog>
             )}
             {/* Show disabled button with tooltip for non-active periods */}
-            {isOwnSubmission && 
-             (submission.status === RPPSubmissionStatus.DRAFT || submission.status === RPPSubmissionStatus.REJECTED) &&
-             rppSubmissionService.isSubmissionReady(submission) &&
-             !isActivePeriod && (
-              <Button disabled title="Upload dan submit hanya dapat dilakukan pada periode aktif">
-                <Send className="h-4 w-4 mr-2" />
-                {submission.status === RPPSubmissionStatus.REJECTED ? 'Submit Ulang' : 'Submit untuk Approval'}
-              </Button>
-            )}
+            {isOwnSubmission &&
+              (submission.status === RPPSubmissionStatus.DRAFT || submission.status === RPPSubmissionStatus.REJECTED) &&
+              rppSubmissionService.isSubmissionReady(submission) &&
+              !isActivePeriod && (
+                <Button disabled title="Upload dan submit hanya dapat dilakukan pada periode aktif">
+                  <Send className="h-4 w-4 mr-2" />
+                  {submission.status === RPPSubmissionStatus.REJECTED ? 'Submit Ulang' : 'Submit untuk Approval'}
+                </Button>
+              )}
           </div>
         }
       />
@@ -519,7 +527,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Review Section (for kepala sekolah) */}
+      {/* Review Section (for kepala sekolah and admin) */}
       {canReview && (
         <RPPReviewSection
           submission={submission}

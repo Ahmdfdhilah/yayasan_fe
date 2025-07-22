@@ -44,7 +44,7 @@ const RPPSubmissionsPage: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   
-  // Redirect guru to my-rpp-submissions
+  // Redirect guru to my-rpp-submissions (but not kepala_sekolah)
   if (currentRole === 'guru') {
     return <Navigate to="/my-rpp-submissions" replace />;
   }

@@ -40,7 +40,7 @@ export const appMenuItems: SidebarItem[] = [
   {
     title: 'RPP Submissions',
     icon: FileText,
-    allowedRoles: ['kepala_sekolah', 'admin'],
+    allowedRoles: ['kepala_sekolah', 'admin', 'guru'],
     children: [
       {
         title: 'Review RPP',
@@ -48,26 +48,32 @@ export const appMenuItems: SidebarItem[] = [
         icon: ClipboardCheck,
         allowedRoles: ['kepala_sekolah', 'admin'],
       },
+      {
+        title: 'RPP Saya',
+        href: '/my-rpp-submissions',
+        icon: Upload,
+        allowedRoles: ['guru', 'kepala_sekolah'],
+      },
     ],
-  },
-  {
-    title: 'RPP Saya',
-    href: '/my-rpp-submissions',
-    icon: Upload,
-    allowedRoles: ['guru'],
   },
 
   // Teacher Evaluations - Principals and Admin
   {
     title: 'Evaluasi Guru',
     icon: GraduationCap,
-    allowedRoles: ['kepala_sekolah', 'admin'],
+    allowedRoles: ['kepala_sekolah', 'admin', 'guru'],
     children: [
       {
         title: 'Daftar Evaluasi',
         href: '/teacher-evaluations',
         icon: ClipboardCheck,
         allowedRoles: ['kepala_sekolah', 'admin'],
+      },
+      {
+        title: 'Evaluasi Saya',
+        href: '/my-evaluations',
+        icon: ClipboardCheck,
+        allowedRoles: ['guru', 'kepala_sekolah'],
       },
       {
         title: 'Aspek Evaluasi',
@@ -82,14 +88,6 @@ export const appMenuItems: SidebarItem[] = [
         allowedRoles: ['admin'],
       },
     ],
-  },
-
-  // My Evaluations - Teachers and Principals
-  {
-    title: 'Evaluasi Saya',
-    href: '/my-evaluations',
-    icon: ClipboardCheck,
-    allowedRoles: ['guru', 'kepala_sekolah'],
   },
 
   // Period Management - Admin only

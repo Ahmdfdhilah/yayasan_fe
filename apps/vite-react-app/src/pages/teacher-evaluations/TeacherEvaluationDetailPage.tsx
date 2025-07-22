@@ -405,11 +405,30 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   // Get teacher info from first evaluation or use teacherId
   const teacherInfo = evaluations[0] || { teacher_name: `Teacher ${teacherId}`, teacher_id: Number(teacherId) };
 
+  // Check if user is viewing their own evaluation
+  const isOwnEvaluation = user?.id === Number(teacherId);
+
+  // Generate conditional title and description
+  const getPageTitle = () => {
+    if (isOwnEvaluation) {
+      return "Evaluasi Saya";
+    }
+    return "Detail Evaluasi Guru";
+  };
+
+  const getPageDescription = () => {
+    if (isOwnEvaluation) {
+      const role = isKepalaSekolah() ? "Kepala Sekolah" : "Guru";
+      return `Detail evaluasi untuk periode ${currentPeriod?.academic_year || ''} - ${currentPeriod?.semester || ''}`;
+    }
+    return `Evaluasi kinerja ${teacherInfo.teacher?.display_name || 'N/A'}`;
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Detail Evaluasi Guru"
-        description={`Evaluasi kinerja ${teacherInfo.teacher?.display_name || 'N/A'}`}
+        title={getPageTitle()}
+        description={getPageDescription()}
         actions={
           <div className="flex items-center gap-2">
             {/* PDF Actions - only show when evaluations exist */}

@@ -128,7 +128,7 @@ function App() {
 
                     {/* My Evaluations - Guru only - Redirect to detail page */}
                     <Route path="my-evaluations" element={
-                      <RoleProtectedRoute allowedRoles={['guru']}>
+                      <RoleProtectedRoute allowedRoles={['guru', 'kepala_sekolah']}>
                         <MyEvaluationsRedirect />
                       </RoleProtectedRoute>
                     } />
@@ -136,7 +136,7 @@ function App() {
                     {/* RPP Submissions Routes */}
                     {/* My RPP Submissions - Guru only */}
                     <Route path="my-rpp-submissions" element={
-                      <RoleProtectedRoute allowedRoles={['guru']}>
+                      <RoleProtectedRoute allowedRoles={['guru', 'kepala_sekolah']}>
                         <MyRPPSubmissionsPage />
                       </RoleProtectedRoute>
                     } />

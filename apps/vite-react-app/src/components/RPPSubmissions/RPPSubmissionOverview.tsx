@@ -61,10 +61,7 @@ export const RPPSubmissionOverview: React.FC<RPPSubmissionOverviewProps> = ({
             </div>
             <div className="flex justify-between items-center">
               <p className="text-sm">
-                {submission.completion_percentage.toFixed(1)}% Complete
-              </p>
-              <p className="text-xs">
-                {submission.completion_percentage === 100 ? 'Siap untuk submit' : 'Masih dalam progress'}
+                {submission.completion_percentage.toFixed(1)}% Selesai
               </p>
             </div>
           </div>
