@@ -1,6 +1,7 @@
 // apps/vite-react-app/src/components/Auth/AuthProvider.tsx
 import React, { createContext, useContext, useEffect, ReactNode } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { persistor } from '@/redux/store';
 import {
   loginAsync,
   logoutAsync,
@@ -8,6 +9,7 @@ import {
   changePasswordAsync,
   getCurrentUserAsync,
   clearAuth,
+  clearPersistAndAuth,
   clearError
 } from '@/redux/features/authSlice';
 import type { User } from '@/services/users/types';
@@ -35,6 +37,7 @@ interface AuthContextType {
   checkAuth: () => Promise<void>;
   changeUserPassword: (passwordData: PasswordChangeData) => Promise<void>;
   clearAuthError: () => void;
+  clearPersistentAuth: () => Promise<void>;
 
   // Token management
   isTokenValid: () => boolean;
@@ -88,24 +91,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (refreshToken) {
           try {
             await dispatch(refreshTokenAsync(refreshToken)).unwrap();
-            // Don't fetch user data here - it's already persisted
+            // After successful refresh, try to get current user
+            if (!user) {
+              await dispatch(getCurrentUserAsync()).unwrap();
+            }
           } catch (refreshError) {
             console.error('Token refresh failed:', refreshError);
-            dispatch(clearAuth());
+            // Both tokens are invalid, clear persistent storage
+            await clearPersistentAuth();
           }
         } else {
-          dispatch(clearAuth());
+          // No refresh token, clear persistent storage
+          await clearPersistentAuth();
         }
         return;
       }
 
-      // Fetch user data if not available or if we just refreshed
+      // Fetch user data if not available
       if (!user) {
-        await dispatch(getCurrentUserAsync()).unwrap();
+        try {
+          await dispatch(getCurrentUserAsync()).unwrap();
+        } catch (getCurrentUserError: any) {
+          console.error('Get current user failed:', getCurrentUserError);
+          // If getting user fails with token-related error, clear persistent storage
+          const errorMsg = getCurrentUserError?.message || '';
+          if (errorMsg.includes('401') || errorMsg.includes('403') || 
+              errorMsg.includes('Unauthorized') || errorMsg.includes('Forbidden') ||
+              errorMsg.includes('Invalid token') || errorMsg.includes('Token expired')) {
+            await clearPersistentAuth();
+          }
+        }
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      dispatch(clearAuth());
+      await clearPersistentAuth();
     }
   };
 
@@ -119,6 +138,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const clearAuthError = () => {
     dispatch(clearError());
+  };
+
+  const clearPersistentAuth = async (): Promise<void> => {
+    try {
+      // Clear Redux state
+      dispatch(clearPersistAndAuth());
+      // Clear persistent storage
+      await persistor.purge();
+      // Clear localStorage items that might contain auth data
+      localStorage.removeItem('rememberMe');
+      console.log('Persistent auth data cleared due to invalid tokens');
+    } catch (error) {
+      console.error('Error clearing persistent auth:', error);
+      // Fallback to just clearing Redux state
+      dispatch(clearAuth());
+    }
   };
 
   const isTokenValid = (): boolean => {
@@ -187,6 +222,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth,
     changeUserPassword,
     clearAuthError,
+    clearPersistentAuth,
 
     // Token management
     isTokenValid,

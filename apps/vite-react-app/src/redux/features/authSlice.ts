@@ -27,7 +27,8 @@ export const updateProfileAsync = createAsyncThunk(
       const response = await userService.updateCurrentUser(profileData);
       return response;
     } catch (error: any) {
-      const errorMessage = error?.message || error?.response?.data?.detail || 'Profile update failed';
+      // BaseService already handles error.response?.data?.detail extraction
+      const errorMessage = error?.message || 'Profile update failed';
       return rejectWithValue(errorMessage);
     }
   }
@@ -59,7 +60,8 @@ export const loginAsync = createAsyncThunk(
         user: response.user
       };
     } catch (error: any) {
-      const errorMessage = error?.message || error?.response?.data?.detail || 'Login failed';
+      // BaseService already handles error.response?.data?.detail extraction
+      const errorMessage = error?.message || 'Login failed';
       return rejectWithValue(errorMessage);
     }
   }
@@ -72,7 +74,8 @@ export const logoutAsync = createAsyncThunk(
       await authService.logout();
       return;
     } catch (error: any) {
-      const errorMessage = error?.message || error?.response?.data?.detail || 'Logout failed';
+      // BaseService already handles error.response?.data?.detail extraction
+      const errorMessage = error?.message || 'Logout failed';
       return rejectWithValue(errorMessage);
     }
   }
@@ -91,7 +94,8 @@ export const refreshTokenAsync = createAsyncThunk(
         tokenExpiry
       };
     } catch (error: any) {
-      const errorMessage = error?.message || error?.response?.data?.detail || 'Token refresh failed';
+      // BaseService already handles error.response?.data?.detail extraction
+      const errorMessage = error?.message || 'Token refresh failed';
       return rejectWithValue(errorMessage);
     }
   }
@@ -104,7 +108,8 @@ export const getCurrentUserAsync = createAsyncThunk(
       const response = await authService.getCurrentUser();
       return response;
     } catch (error: any) {
-      const errorMessage = error?.message || error?.response?.data?.detail || 'Failed to get current user';
+      // BaseService already handles error.response?.data?.detail extraction
+      const errorMessage = error?.message || 'Failed to get current user';
       return rejectWithValue(errorMessage);
     }
   }
@@ -117,7 +122,8 @@ export const requestPasswordResetAsync = createAsyncThunk(
       const response = await authService.requestPasswordReset(resetData);
       return response.message;
     } catch (error: any) {
-      const errorMessage = error?.message || error?.response?.data?.detail || 'Password reset request failed';
+      // BaseService already handles error.response?.data?.detail extraction
+      const errorMessage = error?.message || 'Password reset request failed';
       return rejectWithValue(errorMessage);
     }
   }
@@ -130,7 +136,8 @@ export const confirmPasswordResetAsync = createAsyncThunk(
       const response = await authService.confirmPasswordReset(resetData);
       return response.message;
     } catch (error: any) {
-      const errorMessage = error?.message || error?.response?.data?.detail || 'Password reset confirmation failed';
+      // BaseService already handles error.response?.data?.detail extraction
+      const errorMessage = error?.message || 'Password reset confirmation failed';
       return rejectWithValue(errorMessage);
     }
   }
@@ -143,7 +150,8 @@ export const changePasswordAsync = createAsyncThunk(
       const response = await authService.changePassword(passwordData);
       return response.message;
     } catch (error: any) {
-      const errorMessage = error?.message || error?.response?.data?.detail || 'Password change failed';
+      // BaseService already handles error.response?.data?.detail extraction
+      const errorMessage = error?.message || 'Password change failed';
       return rejectWithValue(errorMessage);
     }
   }
@@ -166,6 +174,15 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
     },
     clearAuth: (state) => {
+      state.isAuthenticated = false;
+      state.user = null;
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.tokenExpiry = null;
+      state.error = null;
+    },
+    clearPersistAndAuth: (state) => {
+      // This action will be handled by the AuthProvider to purge persist storage
       state.isAuthenticated = false;
       state.user = null;
       state.accessToken = null;
@@ -292,7 +309,15 @@ const authSlice = createSlice({
       .addCase(getCurrentUserAsync.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
-        // Don't clear auth on getCurrentUser failure - token might still be valid
+        // Clear auth if token is invalid (401/403 errors typically mean token issues)
+        const errorMsg = action.payload as string;
+        if (errorMsg.includes('401') || errorMsg.includes('403') || errorMsg.includes('Unauthorized') || errorMsg.includes('Forbidden')) {
+          state.isAuthenticated = false;
+          state.user = null;
+          state.accessToken = null;
+          state.refreshToken = null;
+          state.tokenExpiry = null;
+        }
       })
       .addCase(updateProfileAsync.pending, (state) => {
         state.isLoading = true;
@@ -310,7 +335,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, setTokens, clearAuth, setUser, updateUser } = authSlice.actions;
+export const { clearError, setTokens, clearAuth, clearPersistAndAuth, setUser, updateUser } = authSlice.actions;
 
 export const selectAuth = (state: { auth: AuthState }) => state.auth;
 export const selectIsAuthenticated = (state: { auth: AuthState }) => state.auth.isAuthenticated;

@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useToast } from '@workspace/ui/components/sonner';
 
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
@@ -29,6 +30,7 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
+  const { toast } = useToast();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,19 +45,24 @@ export function LoginPage() {
     }
   }, [isAuthenticated, navigate, from]);
 
-  // Update local error state when auth error changes
+  // Update local error state when auth error changes (toast handled in onSubmit)
   useEffect(() => {
     if (error) {
       setLoginError(error);
     }
   }, [error]);
 
-  // Set success message if provided
+  // Set success message if provided and show toast
   useEffect(() => {
     if (message) {
       setSuccessMessage(message);
+      toast({
+        title: 'Informasi',
+        description: message,
+        variant: 'default'
+      });
     }
-  }, [message]);
+  }, [message, toast]);
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -93,8 +100,17 @@ export function LoginPage() {
       
       // Navigation will be handled by useEffect when isAuthenticated becomes true
     } catch (error: any) {
-      // Error is already handled by auth provider
+      // Redux Toolkit unwrap() throws the rejectWithValue directly as string
       console.error('Login failed:', error);
+      
+      // Error from unwrap() is the string from rejectWithValue
+      const errorMessage = typeof error === 'string' ? error : (error?.message || 'Terjadi kesalahan saat login');
+      
+      toast({
+        title: 'Login Gagal',
+        description: errorMessage,
+        variant: 'destructive'
+      });
     }
   };
 
