@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRole } from '@/hooks/useRole';
 import { useURLFilters } from '@/hooks/useURLFilters';
+import { useAuth } from '@/components/Auth/AuthProvider';
 import { useToast } from '@workspace/ui/components/sonner';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
@@ -42,6 +43,7 @@ interface DetailPageFilters {
 const TeacherEvaluationDetailPage: React.FC = () => {
   const { teacherId } = useParams<{ teacherId: string }>();
   const { isAdmin, isKepalaSekolah } = useRole();
+  const { user } = useAuth();
   const { toast } = useToast();
 
   // URL Filters configuration
@@ -126,26 +128,65 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       setCurrentPeriod(selectedPeriod);
 
       // Get teacher evaluations for the selected period
-      const response = await teacherEvaluationService.getTeacherEvaluationsInPeriod(
-        Number(teacherId),
+      const response = await teacherEvaluationService.getEvaluationsByPeriod(
         selectedPeriod.id
       );
+      
+      // Check if response has items property (paginated response)
+      let evaluationsArray;
+      if (response && typeof response === 'object' && 'items' in response) {
+        evaluationsArray = response.items;
+      } else if (Array.isArray(response)) {
+        evaluationsArray = response;
+      } else {
+        evaluationsArray = [];
+      }
+      
+      // Filter for the specific teacher
+      const teacherEvaluations = Array.isArray(evaluationsArray)
+        ? evaluationsArray.filter(evaluation => evaluation.teacher_id === Number(teacherId))
+        : [];
 
-      // Handle both array response and object with items property
-      const evaluationsData = Array.isArray(response) ? response : (response.items || []);
+      // Store final evaluations result for form initialization
+      let finalEvaluations = teacherEvaluations;
+      
+      // If no evaluations found, try alternative approach
+      if (teacherEvaluations.length === 0) {
+        try {
+          const alternativeResponse = await teacherEvaluationService.getEvaluationsByTeacher(
+            Number(teacherId),
+            { period_id: selectedPeriod.id }
+          );
+          
+          if (alternativeResponse && alternativeResponse.items && alternativeResponse.items.length > 0) {
+            finalEvaluations = alternativeResponse.items;
+            setEvaluations(alternativeResponse.items);
+          } else {
+            setEvaluations(teacherEvaluations);
+          }
+        } catch (altError) {
+          console.error('Alternative approach failed:', altError);
+          setEvaluations(teacherEvaluations);
+        }
+      } else {
+        setEvaluations(teacherEvaluations);
+      }
 
-      setEvaluations(evaluationsData);
-
-      // Set form values from evaluation data
+      // Set form values from evaluation items
+      // Create a map of aspect_id -> grade from all evaluation items
       const evaluationData: Record<string, string> = {};
-      evaluationsData.forEach(evaluation => {
-        evaluationData[evaluation.aspect_id.toString()] = evaluation.grade;
+      finalEvaluations.forEach(evaluation => {
+        evaluation.items?.forEach((item: { aspect_id: { toString: () => string | number; }; grade: string; }) => {
+          evaluationData[item.aspect_id.toString()] = item.grade;
+        });
       });
 
       form.reset({
         aspects: evaluationData,
-        notes: evaluationsData[0]?.notes || '',
+        notes: finalEvaluations[0]?.final_notes || '',
       });
+      
+      setEvaluations(finalEvaluations);
 
       // Always start in view mode
       setMode('view');
@@ -164,7 +205,9 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   const loadEvaluationAspects = async () => {
     try {
       const response = await evaluationAspectService.getEvaluationAspects({
-        is_active: true
+        is_active: true,
+        sort_by: 'display_order',
+        sort_order: 'asc'
       });
       setAspects(response.items || []);
     } catch (error) {
@@ -187,16 +230,53 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     try {
       setSaving(true);
 
-      // Prepare bulk update data
-      const bulkUpdateData = {
-        evaluations: evaluations.map(evaluation => ({
-          evaluation_id: evaluation.id,
-          grade: data.aspects[evaluation.aspect_id.toString()] as 'A' | 'B' | 'C' | 'D',
-          notes: data.notes,
-        })).filter(update => update.grade) // Only include evaluations with grades
+      // Prepare bulk update data for evaluation items
+      const bulkUpdateData: {
+        item_updates: Array<{
+          aspect_id: number;
+          grade: 'A' | 'B' | 'C' | 'D';
+          notes: string | undefined;
+        }>
+      } = {
+        item_updates: []
       };
+      
+      // Collect all aspect IDs that have grades
+      Object.entries(data.aspects).forEach(([aspectId, grade]) => {
+        if (grade) {
+          bulkUpdateData.item_updates.push({
+            aspect_id: Number(aspectId),
+            grade: grade as 'A' | 'B' | 'C' | 'D',
+            notes: data.notes
+          });
+        }
+      });
 
-      await teacherEvaluationService.bulkUpdateGrades(bulkUpdateData);
+      // Update evaluation items if we have an evaluation, otherwise create new evaluation
+      if (evaluations.length > 0) {
+        await teacherEvaluationService.bulkUpdateEvaluationItems(
+          evaluations[0].id,
+          bulkUpdateData
+        );
+      } else {
+        // Create new evaluation with items
+        // Convert item_updates format to items format
+        const items = bulkUpdateData.item_updates.map(update => ({
+          aspect_id: update.aspect_id,
+          grade: update.grade,
+          notes: update.notes
+        }));
+
+        const createData = {
+          teacher_id: Number(teacherId),
+          evaluator_id: user?.id || 1, // Get current user ID from auth context
+          period_id: currentPeriod.id,
+          final_notes: data.notes,
+          items: items
+        };
+        
+        await teacherEvaluationService.createEvaluationWithItems(createData);
+      }
 
       toast({
         title: 'Berhasil',
@@ -220,7 +300,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
 
   const toggleMode = () => {
     const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
-    const canEdit = (isAdmin() || isKepalaSekolah()) && evaluations.length > 0 && isActivePeriod;
+    const canEdit = (isAdmin() || isKepalaSekolah()) && aspects.length > 0 && isActivePeriod;
 
     if (canEdit) {
       setMode(mode === 'view' ? 'edit' : 'view');
@@ -240,33 +320,32 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     try {
       // Prepare data for PDF
       const reportData: EvaluationReportData = {
-        teacherName: teacherInfo.teacher_name || 'N/A',
+        teacherName: teacherInfo.teacher?.display_name  || 'N/A',
         teacherNip: '', // Add NIP if available in data
-        evaluatorName: evaluations[0]?.evaluator_name || 'N/A',
+        evaluatorName: evaluations[0]?.evaluator?.full_name || evaluations[0]?.evaluator?.display_name || 'N/A',
         periodAcademicYear: currentPeriod.academic_year,
         periodSemester: currentPeriod.semester,
-        evaluationDate: evaluations[0]?.evaluation_date
-          ? new Date(evaluations[0].evaluation_date).toLocaleDateString('id-ID')
+        evaluationDate: evaluations[0]?.last_updated
+          ? new Date(evaluations[0].last_updated).toLocaleDateString('id-ID')
           : new Date().toLocaleDateString('id-ID'),
         organizationName: '', // Add organization name if available
-        evaluationResults: categories.map(category => ({
-          category,
-          aspects: aspects
-            .filter(aspect => aspect.category === category)
-            .map(aspect => {
-              const evaluation = evaluations.find(evaluation => evaluation.aspect_id === aspect.id);
-              return {
-                aspectName: aspect.aspect_name,
-                description: aspect.description,
-                grade: evaluation?.grade || 'N/A',
-                score: evaluation?.score || 0,
-              };
-            })
+        evaluationResults: sortedCategories.map(categoryData => ({
+          category: categoryData.name,
+          aspects: categoryData.aspects.map(aspect => {
+            // Find evaluation item for this aspect
+            const evaluationItem = evaluations
+              .flatMap(evaluation => evaluation.items || [])
+              .find(item => item.aspect_id === aspect.id);
+            return {
+              aspectName: aspect.aspect_name,
+              description: aspect.description,
+              grade: evaluationItem?.grade || 'N/A',
+              score: evaluationItem?.score || 0,
+            };
+          })
         })),
-        averageScore: evaluations.length > 0
-          ? evaluations.reduce((sum, evaluation) => sum + evaluation.score, 0) / evaluations.length
-          : 0,
-        notes: evaluations[0]?.notes || '',
+        averageScore: evaluations.length > 0 ? evaluations[0].average_score : 0,
+        notes: evaluations[0]?.final_notes || '',
       };
 
       generateEvaluationPDF(reportData);
@@ -299,14 +378,39 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     updateURL({ period_id });
   };
 
-  const categories = [...new Set(aspects.map(aspect => aspect.category))];
+  // Group aspects by category and sort both categories and aspects by display_order
+  const categoriesMap = new Map<string, { name: string; display_order: number; aspects: EvaluationAspect[] }>();
+  
+  aspects.forEach(aspect => {
+    const categoryName = aspect.category_name  || 'Uncategorized';
+    if (!categoriesMap.has(categoryName)) {
+      categoriesMap.set(categoryName, {
+        name: categoryName,
+        display_order: aspect.display_order || 0,
+        aspects: []
+      });
+    }
+    categoriesMap.get(categoryName)!.aspects.push(aspect);
+  });
+
+  // Sort aspects within each category by display_order
+  categoriesMap.forEach(category => {
+    category.aspects.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+  });
+
+  // Get sorted categories by display_order
+  const sortedCategories = Array.from(categoriesMap.values())
+    .sort((a, b) => a.display_order - b.display_order);
+
   const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
   const canEdit = (isAdmin() || isKepalaSekolah()) && isActivePeriod;
 
   // Create evaluation data mapping for display
   const evaluationData: Record<string, string> = {};
   evaluations.forEach(evaluation => {
-    evaluationData[evaluation.aspect_id.toString()] = evaluation.grade;
+    evaluation.items?.forEach(item => {
+      evaluationData[item.aspect_id.toString()] = item.grade;
+    });
   });
 
   // Get teacher info from first evaluation or use teacherId
@@ -316,7 +420,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Detail Evaluasi Guru"
-        description={`Evaluasi kinerja ${teacherInfo.teacher_name || 'N/A'}`}
+        description={`Evaluasi kinerja ${teacherInfo.teacher?.display_name || 'N/A'}`}
         actions={
           <div className="flex items-center gap-2">
             {/* PDF Actions - only show when evaluations exist */}
@@ -327,7 +431,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
               </Button>
             )}
 
-            {canEdit && evaluations.length > 0 && (
+            {canEdit && aspects.length > 0 && (
               <Button variant="outline" onClick={toggleMode}>
                 {mode === 'view' ? (
                   <>
@@ -343,7 +447,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
               </Button>
             )}
             {/* Show disabled edit button for non-active periods */}
-            {(isAdmin() || isKepalaSekolah()) && evaluations.length > 0 && !isActivePeriod && (
+            {(isAdmin() || isKepalaSekolah()) && aspects.length > 0 && !isActivePeriod && (
               <Button variant="outline" disabled title="Edit evaluasi hanya dapat dilakukan pada periode aktif">
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
@@ -372,25 +476,25 @@ const TeacherEvaluationDetailPage: React.FC = () => {
         </div>
       </Filtering>
 
-      {/* No evaluations found message */}
-      {!loading && evaluations.length === 0 && (
+      {/* No evaluation aspects found message */}
+      {!loading && aspects.length === 0 && (
         <Card>
           <CardContent className="py-12">
             <div className="text-center">
-              <h3 className="text-lg font-medium mb-2">Evaluasi Tidak Ditemukan</h3>
+              <h3 className="text-lg font-medium mb-2">Aspek Evaluasi Tidak Ditemukan</h3>
               <p className="text-muted-foreground mb-4">
-                Tidak ada evaluasi untuk guru ini pada periode yang dipilih.
+                Tidak ada aspek evaluasi yang aktif dalam sistem.
               </p>
               <p className="text-sm text-muted-foreground">
-                Coba pilih periode lain atau hubungi administrator untuk informasi lebih lanjut.
+                Hubungi administrator untuk mengatur aspek evaluasi.
               </p>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Evaluation Info Card */}
-      {evaluations.length > 0 && (
+      {/* Evaluation Info Card - Show basic info even without evaluations */}
+      {aspects.length > 0 && (
         <Card>
         <CardHeader>
           <CardTitle>Informasi Evaluasi</CardTitle>
@@ -399,11 +503,16 @@ const TeacherEvaluationDetailPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">Guru</h4>
-              <p className="text-sm">{teacherInfo.teacher_name || 'N/A'}</p>
+              <p className="text-sm">
+                {evaluations.length > 0 
+                  ? (teacherInfo.teacher?.display_name || `Teacher ${teacherId}`)
+                  : `Teacher ${teacherId}`
+                }
+              </p>
             </div>
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">Evaluator</h4>
-              <p className="text-sm">{evaluations[0]?.evaluator_name || '-'}</p>
+              <p className="text-sm">{evaluations[0]?.evaluator?.full_name  || '-'}</p>
             </div>
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">Periode</h4>
@@ -413,41 +522,47 @@ const TeacherEvaluationDetailPage: React.FC = () => {
             </div>
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">Total Aspek</h4>
-              <p className="text-sm">{evaluations.length} aspek</p>
+              <p className="text-sm">{aspects.length} aspek</p>
             </div>
             {evaluations.length > 0 && (
-              <div>
-                <h4 className="font-medium text-sm text-muted-foreground mb-1">Rata-rata Skor</h4>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-medium">
-                    {(evaluations.reduce((sum, evaluation) => sum + evaluation.score, 0) / evaluations.length).toFixed(1)}
-                  </span>
-                  <span className="text-sm text-muted-foreground">/ 4.0</span>
+              <>
+                <div>
+                  <h4 className="font-medium text-sm text-muted-foreground mb-1">Aspek Dinilai</h4>
+                  <p className="text-sm">{evaluations.reduce((total, evaluation) => total + (evaluation.items?.length || 0), 0)} aspek</p>
                 </div>
-              </div>
-            )}
-            {evaluations[0]?.evaluation_date && (
-              <div>
-                <h4 className="font-medium text-sm text-muted-foreground mb-1">Tanggal Evaluasi</h4>
-                <p className="text-sm">
-                  {new Date(evaluations[0].evaluation_date).toLocaleDateString('id-ID')}
-                </p>
-              </div>
+                <div>
+                  <h4 className="font-medium text-sm text-muted-foreground mb-1">Rata-rata Skor</h4>
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-medium">
+                      {evaluations[0].average_score.toFixed(1)}
+                    </span>
+                    <span className="text-sm text-muted-foreground">/ 4.0</span>
+                  </div>
+                </div>
+                {evaluations[0]?.last_updated && (
+                  <div>
+                    <h4 className="font-medium text-sm text-muted-foreground mb-1">Tanggal Evaluasi</h4>
+                    <p className="text-sm">
+                      {new Date(evaluations[0].last_updated).toLocaleDateString('id-ID')}
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </CardContent>
         </Card>
       )}
 
-      {/* Evaluation Form */}
-      {evaluations.length > 0 && (
+      {/* Evaluation Form - Show form based on aspects, not evaluations */}
+      {aspects.length > 0 && (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {categories.map((category, index) => (
+          {sortedCategories.map((categoryData, index) => (
             <EvaluationCategorySection
-              key={category}
-              category={category}
-              aspects={aspects}
+              key={categoryData.name}
+              category={categoryData.name}
+              aspects={categoryData.aspects}
               control={mode === 'edit' ? form.control : undefined}
               sectionNumber={index + 1}
               disabled={mode === 'view'}
@@ -456,7 +571,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
           ))}
 
           {/* Notes Section */}
-          {(evaluations[0]?.notes || mode === 'edit') && (
+          {(evaluations[0]?.final_notes || mode === 'edit') && (
             <Card>
               <CardHeader>
                 <CardTitle>Catatan Evaluasi</CardTitle>
@@ -470,7 +585,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
                   />
                 ) : (
                   <p className="text-sm whitespace-pre-wrap">
-                    {evaluations[0]?.notes || 'Tidak ada catatan'}
+                    {evaluations[0]?.final_notes || 'Tidak ada catatan'}
                   </p>
                 )}
               </CardContent>
