@@ -18,7 +18,6 @@ import { Plus } from 'lucide-react';
 import { PeriodTable } from '@/components/Periods/PeriodTable';
 import { PeriodCards } from '@/components/Periods/PeriodCards';
 import { PeriodDialog } from '@/components/Periods/PeriodDialog';
-import AssignTeachersDialog from '@/components/TeacherEvaluations/AssignTeachersDialog';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import SearchContainer from '@/components/common/SearchContainer';
@@ -54,7 +53,7 @@ interface PeriodPageFilters {
 const PeriodsPage: React.FC = () => {
   const { isAdmin } = useRole();
   const { toast } = useToast();
-  
+
   // URL Filters configuration
   const { updateURL, getCurrentFilters } = useURLFilters<PeriodPageFilters>({
     defaults: {
@@ -70,7 +69,7 @@ const PeriodsPage: React.FC = () => {
 
   // Get current filters from URL
   const filters = getCurrentFilters();
-  
+
   const [periods, setPeriods] = useState<Period[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
@@ -79,8 +78,6 @@ const PeriodsPage: React.FC = () => {
   const [editingPeriod, setEditingPeriod] = useState<Period | null>(null);
   const [viewingPeriod, setViewingPeriod] = useState<Period | null>(null);
   const [periodToDelete, setPeriodToDelete] = useState<Period | null>(null);
-  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
-  const [selectedPeriodForAssign, setSelectedPeriodForAssign] = useState<Period | null>(null);
 
   // Calculate access control
   const hasAccess = isAdmin();
@@ -100,17 +97,17 @@ const PeriodsPage: React.FC = () => {
 
       // Add search functionality (not in API but we can filter client-side or extend API)
       const response = await periodService.getPeriods(params);
-      
+
       // Client-side search if q is provided
       let filteredPeriods = response.items;
       if (filters.q) {
-        filteredPeriods = response.items.filter(period => 
+        filteredPeriods = response.items.filter(period =>
           period.academic_year.toLowerCase().includes(filters.q.toLowerCase()) ||
           period.semester.toLowerCase().includes(filters.q.toLowerCase()) ||
           (period.description && period.description.toLowerCase().includes(filters.q.toLowerCase()))
         );
       }
-      
+
       setPeriods(filteredPeriods);
       setTotalItems(filteredPeriods.length || response.total);
     } catch (error) {
@@ -149,15 +146,6 @@ const PeriodsPage: React.FC = () => {
     setPeriodToDelete(period);
   };
 
-  const handleAssignTeachers = (period: Period) => {
-    setSelectedPeriodForAssign(period);
-    setIsAssignDialogOpen(true);
-  };
-
-  const handleAssignSuccess = () => {
-    // Could refresh periods or evaluations if needed
-  };
-
 
   const confirmDeletePeriod = async () => {
     if (periodToDelete) {
@@ -191,11 +179,11 @@ const PeriodsPage: React.FC = () => {
       if (editingPeriod) {
         // Check if status has changed and handle activate/deactivate separately
         const statusChanged = editingPeriod.is_active !== periodData.is_active;
-        
+
         // First update the period data (excluding status)
         const { is_active, ...updateData } = periodData;
         await periodService.updatePeriod(editingPeriod.id, updateData);
-        
+
         // Then handle status change if needed
         if (statusChanged) {
           if (periodData.is_active) {
@@ -204,7 +192,7 @@ const PeriodsPage: React.FC = () => {
             await periodService.deactivatePeriod(editingPeriod.id);
           }
         }
-        
+
         toast({
           title: 'Periode berhasil diperbarui',
           description: `Periode ${periodData.academic_year} ${periodData.semester} telah diperbarui.`,
@@ -260,23 +248,23 @@ const PeriodsPage: React.FC = () => {
   const getCompositeTitle = () => {
     let title = "Daftar Periode";
     const activeFilters = [];
-    
+
     if (filters.academic_year !== 'all') {
       activeFilters.push(`TA ${filters.academic_year}`);
     }
-    
+
     if (filters.semester !== 'all') {
       activeFilters.push(`Semester ${filters.semester}`);
     }
-    
+
     if (filters.is_active !== 'all') {
       activeFilters.push(filters.is_active === 'true' ? 'Aktif' : 'Tidak Aktif');
     }
-    
+
     if (activeFilters.length > 0) {
       title += " - " + activeFilters.join(" - ");
     }
-    
+
     return title;
   };
 
@@ -284,10 +272,10 @@ const PeriodsPage: React.FC = () => {
   const getAcademicYearOptions = () => {
     const currentYear = new Date().getFullYear();
     const years = new Set<string>();
-    
+
     // Add years from existing periods
     periods.forEach(period => years.add(period.academic_year));
-    
+
     // Add current and nearby years if no periods exist
     if (years.size === 0) {
       for (let i = -5; i <= 5; i++) {
@@ -295,7 +283,7 @@ const PeriodsPage: React.FC = () => {
         years.add(`${year}/${year + 1}`);
       }
     }
-    
+
     return Array.from(years).sort();
   };
 
@@ -393,9 +381,8 @@ const PeriodsPage: React.FC = () => {
                 periods={periods}
                 loading={loading}
                 onView={handleView}
-                onEdit={canManage ? handleEdit : () => {}}
-                onDelete={canManage ? handleDelete : () => {}}
-                onAssignTeachers={canManage ? handleAssignTeachers : undefined}
+                onEdit={canManage ? handleEdit : () => { }}
+                onDelete={canManage ? handleDelete : () => { }}
               />
             </div>
 
@@ -405,9 +392,8 @@ const PeriodsPage: React.FC = () => {
                 periods={periods}
                 loading={loading}
                 onView={handleView}
-                onEdit={canManage ? handleEdit : () => {}}
-                onDelete={canManage ? handleDelete : () => {}}
-                onAssignTeachers={canManage ? handleAssignTeachers : undefined}
+                onEdit={canManage ? handleEdit : () => { }}
+                onDelete={canManage ? handleDelete : () => { }}
               />
             </div>
 
@@ -526,12 +512,6 @@ const PeriodsPage: React.FC = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Assign Teachers Dialog */}
-      <AssignTeachersDialog
-        open={isAssignDialogOpen}
-        onOpenChange={setIsAssignDialogOpen}
-        onSuccess={handleAssignSuccess}
-      />
     </div>
   );
 };

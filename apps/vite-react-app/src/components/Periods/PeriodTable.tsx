@@ -18,7 +18,6 @@ interface PeriodTableProps {
   onEdit: (period: Period) => void;
   onDelete: (period: Period) => void;
   onView: (period: Period) => void;
-  onAssignTeachers?: (period: Period) => void;
 }
 
 export const PeriodTable: React.FC<PeriodTableProps> = ({
@@ -27,7 +26,6 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
   onEdit,
   onDelete,
   onView,
-  onAssignTeachers
 }) => {
 
   const formatDate = (dateString: string) => {
@@ -44,16 +42,6 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
       showEdit: true,
       showDelete: true,
     };
-
-    if (onAssignTeachers && period.is_active) {
-      props.customActions = [
-        {
-          label: 'Assign Teachers',
-          onClick: () => onAssignTeachers(period),
-          icon: 'Users',
-        }
-      ];
-    }
 
     return props;
   };

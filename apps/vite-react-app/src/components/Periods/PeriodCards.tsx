@@ -17,7 +17,6 @@ interface PeriodCardsProps {
   onEdit: (period: Period) => void;
   onDelete: (period: Period) => void;
   onView: (period: Period) => void;
-  onAssignTeachers?: (period: Period) => void;
 }
 
 export const PeriodCards: React.FC<PeriodCardsProps> = ({
@@ -26,7 +25,6 @@ export const PeriodCards: React.FC<PeriodCardsProps> = ({
   onEdit,
   onDelete,
   onView,
-  onAssignTeachers
 }) => {
   
   const formatDate = (dateString: string) => {
@@ -44,16 +42,6 @@ export const PeriodCards: React.FC<PeriodCardsProps> = ({
       showEdit: true,
       showDelete: true,
     };
-
-    if (onAssignTeachers && period.is_active) {
-      props.customActions = [
-        {
-          label: 'Assign Teachers',
-          onClick: () => onAssignTeachers(period),
-          icon: 'Users',
-        }
-      ];
-    }
 
     return props;
   };

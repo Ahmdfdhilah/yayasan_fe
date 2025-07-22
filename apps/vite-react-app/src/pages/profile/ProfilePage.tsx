@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/componen
 import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import { PageHeader } from '@/components/common/PageHeader';
-import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
-import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
+import { EditProfileDialog } from '@/components/Profile/EditProfileDialog';
+import { ChangePasswordDialog } from '@/components/Profile/ChangePasswordDialog';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { UserUpdate } from '@/services/users/types';
