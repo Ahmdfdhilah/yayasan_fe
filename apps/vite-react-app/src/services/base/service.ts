@@ -44,9 +44,11 @@ export abstract class BaseService {
     );
   }
 
-  protected async delete<T>(endpoint: string): Promise<T> {
+  protected async delete<T>(endpoint: string, data?: any): Promise<T> {
     return this.handleRequest(
-      () => api.delete(`${this.baseEndpoint}${endpoint}`)
+      () => data 
+        ? api.delete(`${this.baseEndpoint}${endpoint}`, { data })
+        : api.delete(`${this.baseEndpoint}${endpoint}`)
     );
   }
 }

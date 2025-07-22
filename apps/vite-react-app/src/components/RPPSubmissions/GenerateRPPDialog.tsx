@@ -55,7 +55,7 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
       });
 
       toast({
-        title: 'Berhasil Generate RPP Submissions',
+        title: 'Berhasil Membuat RPP Submissions',
         description: `${result.generated_count} submissions berhasil dibuat, ${result.skipped_count} sudah ada sebelumnya. Total guru: ${result.total_teachers}`,
       });
 
@@ -71,7 +71,7 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
       console.error('Error generating RPP submissions:', error);
       toast({
         title: 'Error',
-        description: error?.message || 'Gagal generate RPP submissions. Silakan coba lagi.',
+        description: error?.message || 'Gagal membuat RPP submissions. Silakan coba lagi.',
         variant: 'destructive'
       });
     } finally {
@@ -89,7 +89,7 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
   const defaultTriggerButton = (
     <Button>
       <Plus className="h-4 w-4 mr-2" />
-      Generate RPP untuk Periode
+      Buat RPP untuk Periode
     </Button>
   );
 
@@ -100,10 +100,10 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Generate RPP Submissions</DialogTitle>
+          <DialogTitle>Buat RPP Submissions</DialogTitle>
           <DialogDescription>
-            Pilih periode untuk generate RPP submissions untuk semua guru. 
-            Sistem akan membuat submissions kosong yang bisa diisi oleh masing-masing guru.
+            Pilih periode untuk membuat RPP submissions untuk semua guru. 
+            Sistem akan membuat template RPP kosong yang dapat diisi oleh masing-masing guru.
           </DialogDescription>
         </DialogHeader>
         
@@ -115,7 +115,7 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
               onValueChange={setSelectedPeriod}
             >
               <SelectTrigger id="period-generate">
-                <SelectValue placeholder="Pilih periode untuk generate RPP submissions" />
+                <SelectValue placeholder="Pilih periode untuk membuat RPP submissions" />
               </SelectTrigger>
               <SelectContent>
                 {periods.map((period) => (
@@ -143,12 +143,12 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
             {isGenerating ? (
               <>
                 <RotateCcw className="h-4 w-4 mr-2 animate-spin" />
-                Generating...
+                Membuat...
               </>
             ) : (
               <>
                 <Plus className="h-4 w-4 mr-2" />
-                Generate
+                Buat Submissions
               </>
             )}
           </Button>

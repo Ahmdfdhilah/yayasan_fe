@@ -31,7 +31,7 @@ export const appMenuItems: SidebarItem[] = [
   // Dashboard - All roles
   {
     title: 'Dashboard',
-    href: '/',
+    href: '/dashboard',
     icon: BarChart3,
     allowedRoles: ['admin', 'guru', 'kepala_sekolah'],
   },
@@ -43,7 +43,7 @@ export const appMenuItems: SidebarItem[] = [
     allowedRoles: ['kepala_sekolah', 'admin'],
     children: [
       {
-        title: 'Review Submissions',
+        title: 'Review RPP',
         href: '/rpp-submissions',
         icon: ClipboardCheck,
         allowedRoles: ['kepala_sekolah', 'admin'],
@@ -110,7 +110,7 @@ export const appMenuItems: SidebarItem[] = [
 
   // User Management - Admin only
   {
-    title: 'Manajemen User',
+    title: 'Manajemen Pengguna',
     href: '/users',
     icon: Users,
     allowedRoles: ['admin'],

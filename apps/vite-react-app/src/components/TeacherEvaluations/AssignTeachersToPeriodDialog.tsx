@@ -56,13 +56,13 @@ const AssignTeachersToPeriodDialog: React.FC<AssignTeachersToPeriodDialogProps> 
 
       if (result.errors && result.errors.length > 0) {
         toast({
-          title: 'Assign Teachers Selesai dengan Warning',
+          title: 'Penetapan Guru Selesai dengan Peringatan',
           description: `${result.created_count} evaluasi berhasil dibuat. ${result.errors.length} error: ${result.errors.join(', ')}`,
           variant: 'default'
         });
       } else {
         toast({
-          title: 'Berhasil Assign Teachers',
+          title: 'Berhasil Menetapkan Guru',
           description: `${result.created_count} evaluasi guru berhasil dibuat untuk periode ini.`,
         });
       }
@@ -79,7 +79,7 @@ const AssignTeachersToPeriodDialog: React.FC<AssignTeachersToPeriodDialogProps> 
       console.error('Error assigning teachers to period:', error);
       toast({
         title: 'Error',
-        description: error?.message || 'Gagal assign teachers ke periode. Silakan coba lagi.',
+        description: error?.message || 'Gagal menetapkan guru ke periode. Silakan coba lagi.',
         variant: 'destructive'
       });
     } finally {
@@ -97,7 +97,7 @@ const AssignTeachersToPeriodDialog: React.FC<AssignTeachersToPeriodDialogProps> 
   const defaultTriggerButton = (
     <Button>
       <Users className="h-4 w-4 mr-2" />
-      Assign Teachers to Period
+      Tetapkan Guru ke Periode
     </Button>
   );
 
@@ -108,10 +108,10 @@ const AssignTeachersToPeriodDialog: React.FC<AssignTeachersToPeriodDialogProps> 
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Assign Teachers to Period</DialogTitle>
+          <DialogTitle>Tetapkan Guru ke Periode</DialogTitle>
           <DialogDescription>
             Pilih periode untuk membuat evaluasi kosong untuk semua guru. 
-            Sistem akan otomatis membuat evaluasi untuk semua guru aktif dalam periode tersebut.
+            Sistem akan otomatis membuat formulir evaluasi untuk semua guru aktif dalam periode tersebut.
           </DialogDescription>
         </DialogHeader>
         
@@ -123,7 +123,7 @@ const AssignTeachersToPeriodDialog: React.FC<AssignTeachersToPeriodDialogProps> 
               onValueChange={setSelectedPeriod}
             >
               <SelectTrigger id="period-assign">
-                <SelectValue placeholder="Pilih periode untuk assign teachers" />
+                <SelectValue placeholder="Pilih periode untuk tetapkan guru" />
               </SelectTrigger>
               <SelectContent>
                 {periods.map((period) => (
@@ -152,12 +152,12 @@ const AssignTeachersToPeriodDialog: React.FC<AssignTeachersToPeriodDialogProps> 
             {isAssigning ? (
               <>
                 <RotateCcw className="h-4 w-4 mr-2 animate-spin" />
-                Assigning...
+                Menetapkan...
               </>
             ) : (
               <>
                 <Users className="h-4 w-4 mr-2" />
-                Assign Teachers
+                Tetapkan Guru
               </>
             )}
           </Button>

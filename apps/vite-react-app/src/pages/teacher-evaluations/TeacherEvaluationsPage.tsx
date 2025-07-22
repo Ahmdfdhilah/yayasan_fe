@@ -10,7 +10,6 @@ import { userService, organizationService, periodService } from '@/services';
 import { Period } from '@/services/periods/types';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import {
   Select,
@@ -20,7 +19,6 @@ import {
   SelectValue
 } from '@workspace/ui/components/select';
 import { Label } from '@workspace/ui/components/label';
-import { Plus } from 'lucide-react';
 import { UserTable } from '@/components/Users/UserTable';
 import { UserCards } from '@/components/Users/UserCards';
 import { AssignTeachersToPeriodDialog } from '@/components/TeacherEvaluations';
