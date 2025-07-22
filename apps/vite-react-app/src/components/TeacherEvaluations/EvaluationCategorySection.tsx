@@ -22,7 +22,7 @@ export const EvaluationCategorySection: React.FC<EvaluationCategorySectionProps>
 }) => {
   // Sort aspects by display_order if not already sorted  
   const categoryAspects = aspects
-    .filter(aspect => (aspect.category_name || aspect.category) === category)
+    .filter(aspect => (aspect.category_name) === category)
     .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
   
   return (

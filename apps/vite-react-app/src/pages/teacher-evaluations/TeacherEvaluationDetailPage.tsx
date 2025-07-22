@@ -23,7 +23,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { EvaluationCategorySection } from '@/components/TeacherEvaluations';
 import Filtering from '@/components/common/Filtering';
 import { TeacherEvaluation } from '@/services/teacher-evaluations/types';
-import { EvaluationAspect } from '@/services/evaluation-aspects/types';
+import { CategoryWithAspectsResponse } from '@/services/evaluation-aspects/types';
 import { Period } from '@/services/periods/types';
 import { teacherEvaluationService, evaluationAspectService, periodService } from '@/services';
 import { generateEvaluationPDF, EvaluationReportData } from '@/utils/pdfReportUtils';
@@ -58,7 +58,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   const filters = getCurrentFilters();
 
   const [evaluations, setEvaluations] = useState<TeacherEvaluation[]>([]);
-  const [aspects, setAspects] = useState<EvaluationAspect[]>([]);
+  const [categoriesWithAspects, setCategoriesWithAspects] = useState<CategoryWithAspectsResponse[]>([]);
   const [periods, setPeriods] = useState<Period[]>([]);
   const [currentPeriod, setCurrentPeriod] = useState<Period | null>(null);
   const [activePeriod, setActivePeriod] = useState<Period | null>(null);
@@ -77,7 +77,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   useEffect(() => {
     if (teacherId) {
       loadPeriods();
-      loadEvaluationAspects();
+      loadCategoriesWithAspects();
       loadActivePeriod();
     }
   }, [teacherId]);
@@ -202,16 +202,37 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     }
   };
 
-  const loadEvaluationAspects = async () => {
+  const loadCategoriesWithAspects = async () => {
     try {
-      const response = await evaluationAspectService.getEvaluationAspects({
-        is_active: true,
-        sort_by: 'display_order',
-        sort_order: 'asc'
-      });
-      setAspects(response.items || []);
+      // First, get all categories
+      const categoriesResponse = await evaluationAspectService.getCategories();
+      const categories = categoriesResponse || [];
+      
+      // Then, for each category, get its aspects
+      const categoriesWithAspectsPromises = categories
+        .filter(category => category.is_active) // Only active categories
+        .map(async (category) => {
+          try {
+            const categoryWithAspects = await evaluationAspectService.getCategoryWithAspects(category.id);
+            // Filter only active aspects
+            return {
+              ...categoryWithAspects,
+              aspects: categoryWithAspects.aspects.filter(aspect => aspect.is_active)
+            };
+          } catch (error) {
+            console.error(`Error loading aspects for category ${category.id}:`, error);
+            return null;
+          }
+        });
+      
+      const results = await Promise.all(categoriesWithAspectsPromises);
+      const validCategories = results
+        .filter(category => category !== null && category.aspects.length > 0) // Only categories with aspects
+        .sort((a, b) => a!.display_order - b!.display_order); // Sort by display_order
+      
+      setCategoriesWithAspects(validCategories as CategoryWithAspectsResponse[]);
     } catch (error) {
-      console.error('Error loading evaluation aspects:', error);
+      console.error('Error loading categories with aspects:', error);
     }
   };
 
@@ -300,7 +321,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
 
   const toggleMode = () => {
     const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
-    const canEdit = (isAdmin() || isKepalaSekolah()) && aspects.length > 0 && isActivePeriod;
+    const canEdit = (isAdmin() || isKepalaSekolah()) && categoriesWithAspects.length > 0 && isActivePeriod;
 
     if (canEdit) {
       setMode(mode === 'view' ? 'edit' : 'view');
@@ -378,29 +399,8 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     updateURL({ period_id });
   };
 
-  // Group aspects by category and sort both categories and aspects by display_order
-  const categoriesMap = new Map<string, { name: string; display_order: number; aspects: EvaluationAspect[] }>();
-  
-  aspects.forEach(aspect => {
-    const categoryName = aspect.category_name  || 'Uncategorized';
-    if (!categoriesMap.has(categoryName)) {
-      categoriesMap.set(categoryName, {
-        name: categoryName,
-        display_order: aspect.display_order || 0,
-        aspects: []
-      });
-    }
-    categoriesMap.get(categoryName)!.aspects.push(aspect);
-  });
-
-  // Sort aspects within each category by display_order
-  categoriesMap.forEach(category => {
-    category.aspects.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-  });
-
-  // Get sorted categories by display_order
-  const sortedCategories = Array.from(categoriesMap.values())
-    .sort((a, b) => a.display_order - b.display_order);
+  // Categories with aspects are already sorted from the API
+  const sortedCategories = categoriesWithAspects;
 
   const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
   const canEdit = (isAdmin() || isKepalaSekolah()) && isActivePeriod;
@@ -431,12 +431,12 @@ const TeacherEvaluationDetailPage: React.FC = () => {
               </Button>
             )}
 
-            {canEdit && aspects.length > 0 && (
+            {canEdit && categoriesWithAspects.length > 0 && (
               <Button variant="outline" onClick={toggleMode}>
                 {mode === 'view' ? (
                   <>
                     <Edit className="h-4 w-4 mr-2" />
-                    Edit
+                    Ubah Nilai
                   </>
                 ) : (
                   <>
@@ -447,7 +447,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
               </Button>
             )}
             {/* Show disabled edit button for non-active periods */}
-            {(isAdmin() || isKepalaSekolah()) && aspects.length > 0 && !isActivePeriod && (
+            {(isAdmin() || isKepalaSekolah()) && categoriesWithAspects.length > 0 && !isActivePeriod && (
               <Button variant="outline" disabled title="Edit evaluasi hanya dapat dilakukan pada periode aktif">
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
@@ -477,7 +477,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       </Filtering>
 
       {/* No evaluation aspects found message */}
-      {!loading && aspects.length === 0 && (
+      {!loading && categoriesWithAspects.length === 0 && (
         <Card>
           <CardContent className="py-12">
             <div className="text-center">
@@ -494,7 +494,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       )}
 
       {/* Evaluation Info Card - Show basic info even without evaluations */}
-      {aspects.length > 0 && (
+      {categoriesWithAspects.length > 0 && (
         <Card>
         <CardHeader>
           <CardTitle>Informasi Evaluasi</CardTitle>
@@ -522,7 +522,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
             </div>
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">Total Aspek</h4>
-              <p className="text-sm">{aspects.length} aspek</p>
+              <p className="text-sm">{categoriesWithAspects.reduce((total, cat) => total + cat.aspects.length, 0)} aspek</p>
             </div>
             {evaluations.length > 0 && (
               <>
@@ -555,7 +555,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       )}
 
       {/* Evaluation Form - Show form based on aspects, not evaluations */}
-      {aspects.length > 0 && (
+      {categoriesWithAspects.length > 0 && (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {sortedCategories.map((categoryData, index) => (

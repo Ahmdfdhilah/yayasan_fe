@@ -6,9 +6,9 @@ import { useToast } from '@workspace/ui/components/sonner';
 import { Organization } from '@/services/organizations/types';
 import { organizationService, periodService, teacherEvaluationService } from '@/services';
 import { Period } from '@/services/periods/types';
-import { 
-  TeacherEvaluationResponse, 
-  TeacherEvaluationFilterParams 
+import {
+  TeacherEvaluationResponse,
+  TeacherEvaluationFilterParams
 } from '@/services/teacher-evaluations/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import {
@@ -19,7 +19,7 @@ import {
   SelectValue
 } from '@workspace/ui/components/select';
 import { Label } from '@workspace/ui/components/label';
-import { 
+import {
   AssignTeachersToPeriodDialog,
   TeacherEvaluationTable,
   TeacherEvaluationCards
@@ -43,7 +43,7 @@ const TeacherEvaluationsPage: React.FC = () => {
   const { currentRole, isAdmin, isKepalaSekolah } = useRole();
   const { toast } = useToast();
   const navigate = useNavigate();
-  
+
   // Redirect guru to my-evaluations
   if (currentRole === 'guru') {
     return <Navigate to="/my-evaluations" replace />;
@@ -66,7 +66,7 @@ const TeacherEvaluationsPage: React.FC = () => {
 
   // Get current filters from URL
   const filters = getCurrentFilters();
-  
+
   const [evaluations, setEvaluations] = useState<TeacherEvaluationResponse[]>([]);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [periods, setPeriods] = useState<Period[]>([]);
@@ -178,29 +178,6 @@ const TeacherEvaluationsPage: React.FC = () => {
     navigate(`/teacher-evaluations/${evaluation.id}`);
   };
 
-  const handleEditEvaluation = (evaluation: TeacherEvaluationResponse) => {
-    // Only allow editing if there's an active period and it matches the evaluation period
-    if (!activePeriod) {
-      toast({
-        title: 'Periode Tidak Aktif',
-        description: 'Edit evaluasi hanya dapat dilakukan pada periode aktif.',
-        variant: 'destructive'
-      });
-      return;
-    }
-    
-    if (evaluation.period_id !== activePeriod.id) {
-      toast({
-        title: 'Periode Tidak Sesuai',
-        description: 'Evaluasi hanya dapat diedit pada periode yang sesuai.',
-        variant: 'destructive'
-      });
-      return;
-    }
-    
-    // Navigate to edit evaluation page
-    navigate(`/teacher-evaluations/${evaluation.id}/edit`);
-  };
 
   const handleAssignSuccess = () => {
     fetchEvaluations(); // Refresh the evaluations list
@@ -232,7 +209,7 @@ const TeacherEvaluationsPage: React.FC = () => {
   const getCompositeTitle = () => {
     let title = "Evaluasi Guru";
     const activeFilters = [];
-    
+
     // Period filter
     if (filters.period_id === 'active') {
       activeFilters.push("Periode Aktif");
@@ -242,7 +219,7 @@ const TeacherEvaluationsPage: React.FC = () => {
         activeFilters.push(`${period.academic_year} - ${period.semester}`);
       }
     }
-    
+
     // Organization filter (admin only)
     if (isAdmin() && filters.organization_id !== 'all') {
       const org = organizations.find(o => o.id === Number(filters.organization_id));
@@ -252,11 +229,11 @@ const TeacherEvaluationsPage: React.FC = () => {
     } else if (isKepalaSekolah()) {
       activeFilters.push("Organisasi Saya");
     }
-    
+
     if (activeFilters.length > 0) {
       title += " - " + activeFilters.join(" - ");
     }
-    
+
     return title;
   };
 
@@ -351,7 +328,6 @@ const TeacherEvaluationsPage: React.FC = () => {
                 evaluations={evaluations}
                 loading={loading}
                 onView={handleViewEvaluation}
-                onEvaluate={handleEditEvaluation}
                 userRole={currentRole as any}
               />
             </div>
@@ -362,7 +338,6 @@ const TeacherEvaluationsPage: React.FC = () => {
                 evaluations={evaluations}
                 loading={loading}
                 onView={handleViewEvaluation}
-                onEvaluate={handleEditEvaluation}
                 userRole={currentRole as any}
               />
             </div>
