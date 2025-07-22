@@ -109,6 +109,7 @@ export interface EvaluationCategorySummary {
 export interface CategoryWithAspectsResponse {
   id: number;
   name: string;
+  description?: string;
   display_order: number;
   is_active: boolean;
   aspects: EvaluationAspectResponse[];

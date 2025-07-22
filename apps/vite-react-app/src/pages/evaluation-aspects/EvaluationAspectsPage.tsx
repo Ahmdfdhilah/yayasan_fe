@@ -27,6 +27,9 @@ import type {
   EvaluationAspect,
   EvaluationAspectCreate,
   EvaluationAspectUpdate,
+  EvaluationCategory,
+  EvaluationCategoryCreate,
+  CategoryWithAspectsResponse,
 } from '@/services/evaluation-aspects/types';
 import { Plus, Search } from 'lucide-react';
 
@@ -34,17 +37,20 @@ export const EvaluationAspectsPage: React.FC = () => {
   const { toast } = useToast();
   const { isAdmin } = useRole();
 
-  const [aspects, setAspects] = useState<EvaluationAspect[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categoriesWithAspects, setCategoriesWithAspects] = useState<CategoryWithAspectsResponse[]>([]);
+  const [categories, setCategories] = useState<EvaluationCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingAspectId, setEditingAspectId] = useState<number | null>(null);
-  const [newAspectCategory, setNewAspectCategory] = useState<string | null>(null);
+  const [newAspectCategoryId, setNewAspectCategoryId] = useState<number | null>(null);
 
   // Dialog states
   const [showCreateCategoryDialog, setShowCreateCategoryDialog] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryData, setNewCategoryData] = useState<EvaluationCategoryCreate>({
+    name: '',
+    description: '',
+  });
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [aspectToDelete, setAspectToDelete] = useState<EvaluationAspect | null>(null);
 
@@ -65,13 +71,18 @@ export const EvaluationAspectsPage: React.FC = () => {
     try {
       setLoading(true);
 
-      const [aspectsResponse, categoriesData] = await Promise.all([
-        evaluationAspectService.getEvaluationAspects(),
-        evaluationAspectService.getCategories(),
-      ]);
-
-      setAspects(aspectsResponse.items);
+      // Get all categories
+      const categoriesData = await evaluationAspectService.getCategories();
       setCategories(categoriesData);
+
+      // Get each category with its aspects
+      const categoriesWithAspectsData = await Promise.all(
+        categoriesData.map(category => 
+          evaluationAspectService.getCategoryWithAspects(category.id)
+        )
+      );
+
+      setCategoriesWithAspects(categoriesWithAspectsData);
     } catch (error: any) {
       console.error('Error loading evaluation aspects:', error);
       const errorMessage = error?.message || 'Gagal memuat data aspek evaluasi. Silakan coba lagi.';
@@ -85,19 +96,19 @@ export const EvaluationAspectsPage: React.FC = () => {
     }
   };
 
-  const handleAddAspect = (categoryName: string) => {
+  const handleAddAspect = (categoryId: number) => {
     setEditingAspectId(null);
-    setNewAspectCategory(categoryName);
+    setNewAspectCategoryId(categoryId);
   };
 
   const handleEditAspect = (aspect: EvaluationAspect) => {
-    setNewAspectCategory(null);
+    setNewAspectCategoryId(null);
     setEditingAspectId(aspect.id);
   };
 
   const handleCancelEdit = () => {
     setEditingAspectId(null);
-    setNewAspectCategory(null);
+    setNewAspectCategoryId(null);
   };
 
   const handleSaveAspect = async (
@@ -114,10 +125,14 @@ export const EvaluationAspectsPage: React.FC = () => {
           data as EvaluationAspectUpdate
         );
 
-        setAspects(prev =>
-          prev.map(aspect =>
-            aspect.id === aspectId ? updatedAspect : aspect
-          )
+        // Update aspect in the category's aspects list
+        setCategoriesWithAspects(prev =>
+          prev.map(cat => ({
+            ...cat,
+            aspects: cat.aspects.map(aspect =>
+              aspect.id === aspectId ? updatedAspect : aspect
+            )
+          }))
         );
 
         toast({
@@ -130,12 +145,16 @@ export const EvaluationAspectsPage: React.FC = () => {
           data as EvaluationAspectCreate
         );
 
-        setAspects(prev => [...prev, newAspect]);
+        // This case is handled above in the category update
 
-        // Update categories if new category was added
-        if (!categories.includes(newAspect.category)) {
-          setCategories(prev => [...prev, newAspect.category].sort());
-        }
+        // Update the category's aspects list
+        setCategoriesWithAspects(prev =>
+          prev.map(cat =>
+            cat.id === newAspect.category_id
+              ? { ...cat, aspects: [...cat.aspects, newAspect] }
+              : cat
+          )
+        );
 
         toast({
           title: 'Berhasil',
@@ -170,7 +189,13 @@ export const EvaluationAspectsPage: React.FC = () => {
 
       await evaluationAspectService.deleteEvaluationAspect(aspectToDelete.id);
 
-      setAspects(prev => prev.filter(aspect => aspect.id !== aspectToDelete.id));
+      // Remove aspect from the category's aspects list
+      setCategoriesWithAspects(prev =>
+        prev.map(cat => ({
+          ...cat,
+          aspects: cat.aspects.filter(aspect => aspect.id !== aspectToDelete.id)
+        }))
+      );
 
       toast({
         title: 'Aspek evaluasi berhasil dihapus',
@@ -192,52 +217,62 @@ export const EvaluationAspectsPage: React.FC = () => {
   };
 
   const handleCreateNewCategory = () => {
-    setNewCategoryName('');
+    setNewCategoryData({ name: '', description: '' });
     setShowCreateCategoryDialog(true);
   };
 
-  const confirmCreateCategory = () => {
-    if (newCategoryName && newCategoryName.trim()) {
-      const trimmedName = newCategoryName.trim();
-      if (!categories.includes(trimmedName)) {
-        setCategories(prev => [...prev, trimmedName].sort());
-        handleAddAspect(trimmedName);
+  const confirmCreateCategory = async () => {
+    if (newCategoryData.name && newCategoryData.name.trim()) {
+      try {
+        setSaving(true);
+        
+        const createdCategory = await evaluationAspectService.createCategory({
+          ...newCategoryData,
+          name: newCategoryData.name.trim()
+        });
+        
+        setCategories(prev => [...prev, createdCategory]);
+        setCategoriesWithAspects(prev => [...prev, {
+          ...createdCategory,
+          aspects: []
+        }]);
+        
+        handleAddAspect(createdCategory.id);
         setShowCreateCategoryDialog(false);
-        setNewCategoryName('');
+        setNewCategoryData({ name: '', description: '' });
+        
         toast({
           title: 'Berhasil',
           description: 'Kategori baru berhasil dibuat.',
         });
-      } else {
+      } catch (error: any) {
+        console.error('Error creating category:', error);
         toast({
-          title: 'Kategori Sudah Ada',
-          description: 'Kategori tersebut sudah ada.',
+          title: 'Error',
+          description: error?.message || 'Gagal membuat kategori baru.',
           variant: 'destructive'
         });
+      } finally {
+        setSaving(false);
       }
     }
   };
 
-  // Filter aspects based on search query
-  const filteredAspects = aspects.filter(aspect =>
-    aspect.aspect_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    aspect.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (aspect.description && aspect.description.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-
-  // Group aspects by category
-  const aspectsByCategory = filteredAspects.reduce((acc, aspect) => {
-    if (!acc[aspect.category]) {
-      acc[aspect.category] = [];
-    }
-    acc[aspect.category].push(aspect);
-    return acc;
-  }, {} as Record<string, EvaluationAspect[]>);
-
-  // Get all categories that have aspects or are being edited
-  const displayCategories = categories.filter(category =>
-    aspectsByCategory[category]?.length > 0 || newAspectCategory === category
-  );
+  // Filter categories and aspects based on search query
+  const filteredCategoriesWithAspects = categoriesWithAspects
+    .map(category => ({
+      ...category,
+      aspects: category.aspects.filter(aspect =>
+        aspect.aspect_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (aspect.description && aspect.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+    }))
+    .filter(category => 
+      category.aspects.length > 0 || 
+      newAspectCategoryId === category.id ||
+      category.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   if (!isAdmin()) {
     return (
@@ -295,7 +330,7 @@ export const EvaluationAspectsPage: React.FC = () => {
       </div>
 
       {/* Form Content - Google Forms style */}
-      {displayCategories.length === 0 ? (
+      {filteredCategoriesWithAspects.length === 0 ? (
         <div className="text-center py-16">
           <div className="bg-card rounded-lg border p-12 max-w-md mx-auto">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -315,18 +350,18 @@ export const EvaluationAspectsPage: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {displayCategories.map((category, index) => (
+          {filteredCategoriesWithAspects.map((categoryWithAspects, index) => (
             <CategorySection
-              key={category}
-              category={category}
-              aspects={aspectsByCategory[category] || []}
+              key={categoryWithAspects.id}
+              category={categoryWithAspects}
+              aspects={categoryWithAspects.aspects}
               categories={categories}
               onAddAspect={handleAddAspect}
               onEditAspect={handleEditAspect}
               onSaveAspect={handleSaveAspect}
               onDeleteAspect={(aspect) => handleDeleteAspect(aspect)}
               editingAspectId={editingAspectId}
-              newAspectCategory={newAspectCategory}
+              newAspectCategoryId={newAspectCategoryId}
               onCancelEdit={handleCancelEdit}
               loading={saving}
               sectionNumber={index + 1}
@@ -355,33 +390,41 @@ export const EvaluationAspectsPage: React.FC = () => {
             <DialogTitle>Buat Bagian Baru</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <Input
-              placeholder="Nama bagian (contoh: Kompetensi Pedagogik)"
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  confirmCreateCategory();
-                }
-              }}
-              autoFocus
-            />
+            <div className="space-y-4">
+              <Input
+                placeholder="Nama bagian (contoh: Kompetensi Pedagogik)"
+                value={newCategoryData.name}
+                onChange={(e) => setNewCategoryData(prev => ({ ...prev, name: e.target.value }))}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    confirmCreateCategory();
+                  }
+                }}
+                autoFocus
+              />
+              <Input
+                placeholder="Deskripsi bagian (opsional)"
+                value={newCategoryData.description || ''}
+                onChange={(e) => setNewCategoryData(prev => ({ ...prev, description: e.target.value }))}
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => {
                 setShowCreateCategoryDialog(false);
-                setNewCategoryName('');
+                setNewCategoryData({ name: '', description: '' });
               }}
+              disabled={saving}
             >
               Batal
             </Button>
             <Button
               onClick={confirmCreateCategory}
-              disabled={!newCategoryName.trim()}
+              disabled={!newCategoryData.name.trim() || saving}
             >
-              Buat Bagian
+              {saving ? 'Membuat...' : 'Buat Bagian'}
             </Button>
           </DialogFooter>
         </DialogContent>

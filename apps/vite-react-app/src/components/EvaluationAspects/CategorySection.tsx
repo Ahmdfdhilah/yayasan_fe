@@ -1,19 +1,19 @@
 import React from 'react';
 import { Button } from '@workspace/ui/components/button';
-import { EvaluationAspect, EvaluationAspectCreate, EvaluationAspectUpdate } from '@/services/evaluation-aspects/types';
+import { EvaluationAspect, EvaluationAspectCreate, EvaluationAspectUpdate, EvaluationCategory, CategoryWithAspectsResponse } from '@/services/evaluation-aspects/types';
 import { AspectFormItem } from './AspectFormItem';
 import { Plus } from 'lucide-react';
 
 interface CategorySectionProps {
-  category: string;
+  category: CategoryWithAspectsResponse;
   aspects: EvaluationAspect[];
-  categories: string[];
-  onAddAspect: (categoryName: string) => void;
+  categories: EvaluationCategory[];
+  onAddAspect: (categoryId: number) => void;
   onEditAspect: (aspect: EvaluationAspect) => void;
   onSaveAspect: (aspectId: number | null, data: EvaluationAspectCreate | EvaluationAspectUpdate) => void;
   onDeleteAspect: (aspect: EvaluationAspect) => void;
   editingAspectId: number | null;
-  newAspectCategory: string | null;
+  newAspectCategoryId: number | null;
   onCancelEdit: () => void;
   loading?: boolean;
   sectionNumber?: number;
@@ -28,13 +28,13 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   onSaveAspect,
   onDeleteAspect,
   editingAspectId,
-  newAspectCategory,
+  newAspectCategoryId,
   onCancelEdit,
   loading = false,
   sectionNumber = 1,
 }) => {
-  const isAddingToThisCategory = newAspectCategory === category;
-  const categoryAspects = aspects.filter(aspect => aspect.category === category);
+  const isAddingToThisCategory = newAspectCategoryId === category.id;
+  const categoryAspects = aspects;
 
   return (
     <div className="bg-card rounded-lg border overflow-hidden">
@@ -52,12 +52,17 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               </span>
             </div>
             <h2 className="text-lg sm:text-xl font-medium mt-1 break-words">
-              {category}
+              {category.name}
             </h2>
+            {category.description && (
+              <p className="text-sm text-muted-foreground mt-1">
+                {category.description}
+              </p>
+            )}
           </div>
           <div className="flex-shrink-0">
             <Button
-              onClick={() => onAddAspect(category)}
+              onClick={() => onAddAspect(category.id)}
               disabled={loading || isAddingToThisCategory}
               variant="outline"
               size="sm"
@@ -80,7 +85,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               onCancel={onCancelEdit}
               onSave={(data) => onSaveAspect(null, data)}
               loading={loading}
-              defaultCategory={category}
+              defaultCategoryId={category.id}
             />
           </div>
         )}
@@ -94,7 +99,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               Belum ada pertanyaan dalam bagian ini
             </p>
             <Button
-              onClick={() => onAddAspect(category)}
+              onClick={() => onAddAspect(category.id)}
               variant="outline"
               size="sm"
             >

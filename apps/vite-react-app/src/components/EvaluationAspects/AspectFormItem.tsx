@@ -21,26 +21,27 @@ import {
   SelectValue,
 } from '@workspace/ui/components/select';
 import { Trash2, Edit, Check, X } from 'lucide-react';
-import { EvaluationAspect, EvaluationAspectCreate, EvaluationAspectUpdate } from '@/services/evaluation-aspects/types';
+import { EvaluationAspect, EvaluationAspectCreate, EvaluationAspectUpdate, EvaluationCategory } from '@/services/evaluation-aspects/types';
 
 const aspectFormSchema = z.object({
   aspect_name: z.string().min(1, 'Nama aspek wajib diisi').max(255, 'Nama aspek maksimal 255 karakter'),
-  category: z.string().min(1, 'Kategori wajib diisi').max(100, 'Kategori maksimal 100 karakter'),
+  category_id: z.number().min(1, 'Kategori wajib dipilih'),
   description: z.string().optional().or(z.literal('')),
+  display_order: z.number().optional(),
 });
 
 type AspectFormData = z.infer<typeof aspectFormSchema>;
 
 interface AspectFormItemProps {
   aspect?: EvaluationAspect;
-  categories: string[];
+  categories: EvaluationCategory[];
   isEditing: boolean;
   onEdit: () => void;
   onCancel: () => void;
   onSave: (data: EvaluationAspectCreate | EvaluationAspectUpdate) => void;
   onDelete?: (aspect: EvaluationAspect) => void;
   loading?: boolean;
-  defaultCategory?: string;
+  defaultCategoryId?: number;
   questionNumber?: number;
 }
 
@@ -53,7 +54,7 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
   onSave,
   onDelete,
   loading = false,
-  defaultCategory,
+  defaultCategoryId,
   questionNumber,
 }) => {
   const isNewAspect = !aspect;
@@ -62,8 +63,9 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
     resolver: zodResolver(aspectFormSchema),
     defaultValues: {
       aspect_name: aspect?.aspect_name || '',
-      category: aspect?.category || defaultCategory || '',
+      category_id: aspect?.category_id || defaultCategoryId || 0,
       description: aspect?.description || '',
+      display_order: aspect?.display_order || 1,
     },
   });
 
@@ -71,23 +73,26 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
     if (aspect && isEditing) {
       form.reset({
         aspect_name: aspect.aspect_name,
-        category: aspect.category,
+        category_id: aspect.category_id,
         description: aspect.description || '',
+        display_order: aspect.display_order || 1,
       });
-    } else if (isNewAspect && defaultCategory) {
+    } else if (isNewAspect && defaultCategoryId) {
       form.reset({
         aspect_name: '',
-        category: defaultCategory,
+        category_id: defaultCategoryId,
         description: '',
+        display_order: 1,
       });
     }
-  }, [aspect, isEditing, isNewAspect, defaultCategory, form]);
+  }, [aspect, isEditing, isNewAspect, defaultCategoryId, form]);
 
   const onSubmit = (data: AspectFormData) => {
     const submitData = {
       aspect_name: data.aspect_name,
-      category: data.category,
+      category_id: data.category_id,
       description: data.description || undefined,
+      display_order: data.display_order || 1,
       is_active: true,
     };
     onSave(submitData);
@@ -254,13 +259,16 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
               {/* Category Selection */}
               <FormField
                 control={form.control}
-                name="category"
+                name="category_id"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-medium">
                       Bagian
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || undefined}>
+                    <Select 
+                      onValueChange={(value) => field.onChange(parseInt(value))} 
+                      value={field.value?.toString() || undefined}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Pilih bagian" />
@@ -268,8 +276,8 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
                       </FormControl>
                       <SelectContent>
                         {categories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
+                          <SelectItem key={category.id} value={category.id.toString()}>
+                            {category.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
