@@ -174,8 +174,9 @@ const TeacherEvaluationsPage: React.FC = () => {
   const totalPages = Math.ceil(totalItems / filters.limit);
 
   const handleViewEvaluation = (evaluation: TeacherEvaluationResponse) => {
-    // Navigate to evaluation detail page
-    navigate(`/teacher-evaluations/${evaluation.id}`);
+    // Navigate to evaluation detail page with period_id from current filters
+    const currentPeriodId = filters.period_id === 'active' && activePeriod ? activePeriod.id : filters.period_id;
+    navigate(`/teacher-evaluations/${evaluation.id}?period_id=${currentPeriodId}`);
   };
 
 

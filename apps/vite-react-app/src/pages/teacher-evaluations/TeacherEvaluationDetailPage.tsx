@@ -18,7 +18,7 @@ import {
   SelectValue
 } from '@workspace/ui/components/select';
 import { Label } from '@workspace/ui/components/label';
-import {  Eye, Edit, CheckCircle, Download } from 'lucide-react';
+import { Eye, Edit, CheckCircle, Download } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { EvaluationCategorySection } from '@/components/TeacherEvaluations';
 import Filtering from '@/components/common/Filtering';
@@ -131,7 +131,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       const response = await teacherEvaluationService.getEvaluationsByPeriod(
         selectedPeriod.id
       );
-      
+
       // Check if response has items property (paginated response)
       let evaluationsArray;
       if (response && typeof response === 'object' && 'items' in response) {
@@ -141,7 +141,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       } else {
         evaluationsArray = [];
       }
-      
+
       // Filter for the specific teacher
       const teacherEvaluations = Array.isArray(evaluationsArray)
         ? evaluationsArray.filter(evaluation => evaluation.teacher_id === Number(teacherId))
@@ -149,7 +149,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
 
       // Store final evaluations result for form initialization
       let finalEvaluations = teacherEvaluations;
-      
+
       // If no evaluations found, try alternative approach
       if (teacherEvaluations.length === 0) {
         try {
@@ -157,7 +157,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
             Number(teacherId),
             { period_id: selectedPeriod.id }
           );
-          
+
           if (alternativeResponse && alternativeResponse.items && alternativeResponse.items.length > 0) {
             finalEvaluations = alternativeResponse.items;
             setEvaluations(alternativeResponse.items);
@@ -185,7 +185,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
         aspects: evaluationData,
         notes: finalEvaluations[0]?.final_notes || '',
       });
-      
+
       setEvaluations(finalEvaluations);
 
       // Always start in view mode
@@ -207,7 +207,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       // First, get all categories
       const categoriesResponse = await evaluationAspectService.getCategories();
       const categories = categoriesResponse || [];
-      
+
       // Then, for each category, get its aspects
       const categoriesWithAspectsPromises = categories
         .filter(category => category.is_active) // Only active categories
@@ -224,12 +224,12 @@ const TeacherEvaluationDetailPage: React.FC = () => {
             return null;
           }
         });
-      
+
       const results = await Promise.all(categoriesWithAspectsPromises);
       const validCategories = results
         .filter(category => category !== null && category.aspects.length > 0) // Only categories with aspects
         .sort((a, b) => a!.display_order - b!.display_order); // Sort by display_order
-      
+
       setCategoriesWithAspects(validCategories as CategoryWithAspectsResponse[]);
     } catch (error) {
       console.error('Error loading categories with aspects:', error);
@@ -261,7 +261,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       } = {
         item_updates: []
       };
-      
+
       // Collect all aspect IDs that have grades
       Object.entries(data.aspects).forEach(([aspectId, grade]) => {
         if (grade) {
@@ -295,7 +295,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
           final_notes: data.notes,
           items: items
         };
-        
+
         await teacherEvaluationService.createEvaluationWithItems(createData);
       }
 
@@ -341,7 +341,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     try {
       // Prepare data for PDF
       const reportData: EvaluationReportData = {
-        teacherName: teacherInfo.teacher?.display_name  || 'N/A',
+        teacherName: teacherInfo.teacher?.display_name || 'N/A',
         teacherNip: '', // Add NIP if available in data
         evaluatorName: evaluations[0]?.evaluator?.full_name || evaluations[0]?.evaluator?.display_name || 'N/A',
         periodAcademicYear: currentPeriod.academic_year,
@@ -446,13 +446,6 @@ const TeacherEvaluationDetailPage: React.FC = () => {
                 )}
               </Button>
             )}
-            {/* Show disabled edit button for non-active periods */}
-            {(isAdmin() || isKepalaSekolah()) && categoriesWithAspects.length > 0 && !isActivePeriod && (
-              <Button variant="outline" disabled title="Edit evaluasi hanya dapat dilakukan pada periode aktif">
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-            )}
           </div>
         }
       />
@@ -496,61 +489,61 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       {/* Evaluation Info Card - Show basic info even without evaluations */}
       {categoriesWithAspects.length > 0 && (
         <Card>
-        <CardHeader>
-          <CardTitle>Informasi Evaluasi</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Guru</h4>
-              <p className="text-sm">
-                {evaluations.length > 0 
-                  ? (teacherInfo.teacher?.display_name || `Teacher ${teacherId}`)
-                  : `Teacher ${teacherId}`
-                }
-              </p>
-            </div>
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Evaluator</h4>
-              <p className="text-sm">{evaluations[0]?.evaluator?.full_name  || '-'}</p>
-            </div>
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Periode</h4>
-              <p className="text-sm">
-                {currentPeriod ? `${currentPeriod.academic_year} - ${currentPeriod.semester}` : 'N/A'}
-              </p>
-            </div>
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Total Aspek</h4>
-              <p className="text-sm">{categoriesWithAspects.reduce((total, cat) => total + cat.aspects.length, 0)} aspek</p>
-            </div>
-            {evaluations.length > 0 && (
-              <>
-                <div>
-                  <h4 className="font-medium text-sm text-muted-foreground mb-1">Aspek Dinilai</h4>
-                  <p className="text-sm">{evaluations.reduce((total, evaluation) => total + (evaluation.items?.length || 0), 0)} aspek</p>
-                </div>
-                <div>
-                  <h4 className="font-medium text-sm text-muted-foreground mb-1">Rata-rata Skor</h4>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-medium">
-                      {evaluations[0].average_score.toFixed(1)}
-                    </span>
-                    <span className="text-sm text-muted-foreground">/ 4.0</span>
-                  </div>
-                </div>
-                {evaluations[0]?.last_updated && (
+          <CardHeader>
+            <CardTitle>Informasi Evaluasi</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">Guru</h4>
+                <p className="text-sm">
+                  {evaluations.length > 0
+                    ? (teacherInfo.teacher?.display_name || `Teacher ${teacherId}`)
+                    : `Teacher ${teacherId}`
+                  }
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">Evaluator</h4>
+                <p className="text-sm">{evaluations[0]?.evaluator?.full_name || '-'}</p>
+              </div>
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">Periode</h4>
+                <p className="text-sm">
+                  {currentPeriod ? `${currentPeriod.academic_year} - ${currentPeriod.semester}` : 'N/A'}
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">Total Aspek</h4>
+                <p className="text-sm">{categoriesWithAspects.reduce((total, cat) => total + cat.aspects.length, 0)} aspek</p>
+              </div>
+              {evaluations.length > 0 && (
+                <>
                   <div>
-                    <h4 className="font-medium text-sm text-muted-foreground mb-1">Tanggal Evaluasi</h4>
-                    <p className="text-sm">
-                      {new Date(evaluations[0].last_updated).toLocaleDateString('id-ID')}
-                    </p>
+                    <h4 className="font-medium text-sm text-muted-foreground mb-1">Aspek Dinilai</h4>
+                    <p className="text-sm">{evaluations.reduce((total, evaluation) => total + (evaluation.items?.length || 0), 0)} aspek</p>
                   </div>
-                )}
-              </>
-            )}
-          </div>
-        </CardContent>
+                  <div>
+                    <h4 className="font-medium text-sm text-muted-foreground mb-1">Rata-rata Skor</h4>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-medium">
+                        {evaluations[0].average_score.toFixed(1)}
+                      </span>
+                      <span className="text-sm text-muted-foreground">/ 4.0</span>
+                    </div>
+                  </div>
+                  {evaluations[0]?.last_updated && (
+                    <div>
+                      <h4 className="font-medium text-sm text-muted-foreground mb-1">Tanggal Evaluasi</h4>
+                      <p className="text-sm">
+                        {new Date(evaluations[0].last_updated).toLocaleDateString('id-ID')}
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </CardContent>
         </Card>
       )}
 
@@ -558,60 +551,60 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       {categoriesWithAspects.length > 0 && (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {sortedCategories.map((categoryData, index) => (
-            <EvaluationCategorySection
-              key={categoryData.name}
-              category={categoryData.name}
-              aspects={categoryData.aspects}
-              control={mode === 'edit' ? form.control : undefined}
-              sectionNumber={index + 1}
-              disabled={mode === 'view'}
-              evaluationData={evaluationData}
-            />
-          ))}
+            {sortedCategories.map((categoryData, index) => (
+              <EvaluationCategorySection
+                key={categoryData.name}
+                category={categoryData.name}
+                aspects={categoryData.aspects}
+                control={mode === 'edit' ? form.control : undefined}
+                sectionNumber={index + 1}
+                disabled={mode === 'view'}
+                evaluationData={evaluationData}
+              />
+            ))}
 
-          {/* Notes Section */}
-          {(evaluations[0]?.final_notes || mode === 'edit') && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Catatan Evaluasi</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {mode === 'edit' ? (
-                  <textarea
-                    {...form.register('notes')}
-                    placeholder="Tambahkan catatan untuk evaluasi ini..."
-                    className="w-full min-h-[100px] p-3 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                ) : (
-                  <p className="text-sm whitespace-pre-wrap">
-                    {evaluations[0]?.final_notes || 'Tidak ada catatan'}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          )}
+            {/* Notes Section */}
+            {(evaluations[0]?.final_notes || mode === 'edit') && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Catatan Evaluasi</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {mode === 'edit' ? (
+                    <textarea
+                      {...form.register('notes')}
+                      placeholder="Tambahkan catatan untuk evaluasi ini..."
+                      className="w-full min-h-[100px] p-3 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  ) : (
+                    <p className="text-sm whitespace-pre-wrap">
+                      {evaluations[0]?.final_notes || 'Tidak ada catatan'}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
-          {/* Save Button */}
-          {mode === 'edit' && (
-            <div className="flex justify-end">
-              <Button type="submit" disabled={saving}>
-                {saving ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Menyimpan...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Simpan Nilai Evaluasi
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
-        </form>
-      </Form>
+            {/* Save Button */}
+            {mode === 'edit' && (
+              <div className="flex justify-end">
+                <Button type="submit" disabled={saving}>
+                  {saving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Menyimpan...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Simpan Nilai Evaluasi
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+          </form>
+        </Form>
       )}
     </div>
   );
