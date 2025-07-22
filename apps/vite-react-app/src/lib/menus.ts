@@ -84,12 +84,12 @@ export const appMenuItems: SidebarItem[] = [
     ],
   },
 
-  // My Evaluations - Teachers only
+  // My Evaluations - Teachers and Principals
   {
     title: 'Evaluasi Saya',
     href: '/my-evaluations',
     icon: ClipboardCheck,
-    allowedRoles: ['guru'],
+    allowedRoles: ['guru', 'kepala_sekolah'],
   },
 
   // Period Management - Admin only

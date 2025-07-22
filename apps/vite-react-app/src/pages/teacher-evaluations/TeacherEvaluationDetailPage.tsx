@@ -299,9 +299,15 @@ const TeacherEvaluationDetailPage: React.FC = () => {
 
   const toggleMode = () => {
     const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
-    const canEdit = (isAdmin() || isKepalaSekolah()) && categoriesWithAspects.length > 0 && isActivePeriod;
+    
+    // Check if this is a principal's own evaluation (teacher_id matches user_id)
+    const isPrincipalOwnEvaluation = isKepalaSekolah() && user?.id === Number(teacherId);
+    
+    // Only admin can edit, or principal can edit others but not their own evaluation
+    const canEdit = isAdmin() || (isKepalaSekolah() && !isPrincipalOwnEvaluation);
+    const finalCanEdit = canEdit && categoriesWithAspects.length > 0 && isActivePeriod;
 
-    if (canEdit) {
+    if (finalCanEdit) {
       setMode(mode === 'view' ? 'edit' : 'view');
     }
   };
@@ -381,7 +387,12 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   const sortedCategories = categoriesWithAspects;
 
   const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
-  const canEdit = (isAdmin() || isKepalaSekolah()) && isActivePeriod;
+  
+  // Check if this is a principal's own evaluation (teacher_id matches user_id)
+  const isPrincipalOwnEvaluation = isKepalaSekolah() && user?.id === Number(teacherId);
+  
+  // Only admin can edit, or principal can edit others but not their own evaluation
+  const canEdit = (isAdmin() || (isKepalaSekolah() && !isPrincipalOwnEvaluation)) && isActivePeriod;
 
   // Create evaluation data mapping for display
   const evaluationData: Record<string, string> = {};

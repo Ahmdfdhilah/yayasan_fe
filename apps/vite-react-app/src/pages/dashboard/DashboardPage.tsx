@@ -157,7 +157,7 @@ export function DashboardPage() {
               <p className="text-lg">{user?.email || 'N/A'}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Peran Aktif</p>
+              <p className="text-sm font-medium text-muted-foreground">Peran</p>
               {getRoleDisplayName(currentRole)}
             </div>
           </div>

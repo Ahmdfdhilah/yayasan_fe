@@ -15,7 +15,7 @@ import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { EmailSentSuccessPage } from './pages/auth/EmailSentSuccessPage';
 import { ResetPasswordPage } from './pages/auth/ResetPasswordPage';
 import ProfilePage from './pages/profile/ProfilePage';
-import { DashboardPage } from './pages/DashboardPage';
+import { DashboardPage } from './pages/dashboard/DashboardPage';
 import UsersPage from './pages/users/UsersPage';
 import OrganizationsPage from './pages/organizations/OrganizationsPage';
 import { PublicRoute, AuthGuard } from './components/Auth/AuthGuard';
