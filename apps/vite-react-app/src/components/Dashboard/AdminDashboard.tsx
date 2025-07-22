@@ -163,7 +163,7 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <GraduationCap className="h-5 w-5" />
-              Statistik Evaluasi Sistem
+              {organizationId ? 'Statistik Evaluasi Organisasi' : 'Statistik Evaluasi Sistem'}
             </CardTitle>
           </CardHeader>
           <CardContent>

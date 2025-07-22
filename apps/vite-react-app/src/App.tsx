@@ -74,6 +74,8 @@ function App() {
                     </AuthGuard>
                   }>
                     {/* Dashboard - All authenticated users */}
+                    <Route index element={<DashboardPage />} />
+
                     <Route path="dashboard" element={<DashboardPage />} />
 
                     {/* Profile - All authenticated users */}

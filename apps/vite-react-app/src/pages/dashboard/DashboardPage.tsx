@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { useRole } from '@/hooks/useRole';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
 import { Calendar, Users, User } from 'lucide-react';
@@ -13,7 +12,7 @@ import { periodService, type Period } from '@/services';
 
 export function DashboardPage() {
   const { user, logout } = useAuth();
-  const { currentRole, allRoles, isAdmin, isGuru, isKepalaSekolah } = useRole();
+  const { currentRole, isAdmin, isGuru, isKepalaSekolah } = useRole();
 
   const [selectedPeriodId, setSelectedPeriodId] = useState<number | null>(null);
   const [periods, setPeriods] = useState<Period[]>([]);
@@ -159,24 +158,9 @@ export function DashboardPage() {
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Peran Aktif</p>
-              <Badge variant="outline">
-                {getRoleDisplayName(currentRole)}
-              </Badge>
+              {getRoleDisplayName(currentRole)}
             </div>
           </div>
-
-          {allRoles.length > 1 && (
-            <div>
-              <p className="text-sm font-medium text-muted-foreground mb-2">Semua Peran</p>
-              <div className="flex flex-wrap gap-2">
-                {allRoles.map((role) => (
-                  <Badge key={role} variant={role === currentRole ? 'default' : 'secondary'}>
-                    {getRoleDisplayName(role)}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
 

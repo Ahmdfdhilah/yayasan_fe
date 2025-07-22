@@ -241,7 +241,7 @@ export function PrincipalDashboard({ periodId }: PrincipalDashboardProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <GraduationCap className="h-5 w-5" />
-              Statistik Evaluasi
+              Statistik Evaluasi Organisasi
             </CardTitle>
           </CardHeader>
           <CardContent>

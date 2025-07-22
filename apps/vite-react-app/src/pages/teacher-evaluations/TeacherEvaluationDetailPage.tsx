@@ -138,50 +138,17 @@ const TeacherEvaluationDetailPage: React.FC = () => {
 
       setCurrentPeriod(selectedPeriod);
 
-      // Get teacher evaluations for the selected period
-      const response = await teacherEvaluationService.getEvaluationsByPeriod(
-        selectedPeriod.id
+      // Get teacher evaluations using filtered endpoint - this respects access control
+      const response = await teacherEvaluationService.getEvaluationsByTeacher(
+        Number(teacherId),
+        { period_id: selectedPeriod.id }
       );
 
-      // Check if response has items property (paginated response)
-      let evaluationsArray;
-      if (response && typeof response === 'object' && 'items' in response) {
-        evaluationsArray = response.items;
-      } else if (Array.isArray(response)) {
-        evaluationsArray = response;
-      } else {
-        evaluationsArray = [];
-      }
-
-      // Filter for the specific teacher
-      const teacherEvaluations = Array.isArray(evaluationsArray)
-        ? evaluationsArray.filter(evaluation => evaluation.teacher_id === Number(teacherId))
-        : [];
-
-      // Store final evaluations result for form initialization
-      let finalEvaluations = teacherEvaluations;
-
-      // If no evaluations found, try alternative approach
-      if (teacherEvaluations.length === 0) {
-        try {
-          const alternativeResponse = await teacherEvaluationService.getEvaluationsByTeacher(
-            Number(teacherId),
-            { period_id: selectedPeriod.id }
-          );
-
-          if (alternativeResponse && alternativeResponse.items && alternativeResponse.items.length > 0) {
-            finalEvaluations = alternativeResponse.items;
-            setEvaluations(alternativeResponse.items);
-          } else {
-            setEvaluations(teacherEvaluations);
-          }
-        } catch (altError) {
-          console.error('Alternative approach failed:', altError);
-          setEvaluations(teacherEvaluations);
-        }
-      } else {
-        setEvaluations(teacherEvaluations);
-      }
+      // Extract evaluations from response
+      const teacherEvaluations = response?.items || [];
+      
+      // Store final evaluations result
+      const finalEvaluations = teacherEvaluations;
 
       // Set form values from evaluation items
       // Create a map of aspect_id -> grade from all evaluation items
