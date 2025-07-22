@@ -1,5 +1,5 @@
 import React from 'react';
-import { TeacherEvaluation } from '@/services/teacher-evaluations/types';
+import { TeacherEvaluationResponse } from '@/services/teacher-evaluations/types';
 import { UserRole } from '@/lib/constants';
 import {
   Table,
@@ -9,16 +9,13 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
-import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 
 interface TeacherEvaluationTableProps {
-  evaluations: TeacherEvaluation[];
+  evaluations: TeacherEvaluationResponse[];
   loading?: boolean;
-  onView: (evaluation: TeacherEvaluation) => void;
-  onEvaluate?: (evaluation: TeacherEvaluation) => void;
+  onView: (evaluation: TeacherEvaluationResponse) => void;
+  onEvaluate?: (evaluation: TeacherEvaluationResponse) => void;
   userRole: UserRole;
 }
 
@@ -30,45 +27,7 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
   userRole
 }) => {
 
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'dd MMM yyyy', { locale: id });
-  };
-
-  const getStatusBadge = (grade?: string) => {
-    if (!grade) {
-      return (
-        <Badge variant="secondary">
-          Belum Dinilai
-        </Badge>
-      );
-    }
-    
-    return (
-      <Badge variant="outline">
-        Selesai
-      </Badge>
-    );
-  };
-
-  const getGradeBadge = (grade?: string) => {
-    if (!grade) return null;
-    
-    const gradeConfig = {
-      A: { variant: 'default' as const, className: 'bg-green-100 text-green-800' },
-      B: { variant: 'secondary' as const, className: 'bg-blue-100 text-blue-800' },
-      C: { variant: 'outline' as const, className: 'bg-yellow-100 text-yellow-800' },
-      D: { variant: 'destructive' as const, className: 'bg-red-100 text-red-800' }
-    };
-
-    const config = gradeConfig[grade as keyof typeof gradeConfig];
-    return (
-      <Badge variant={config?.variant || 'outline'} className={config?.className}>
-        {grade}
-      </Badge>
-    );
-  };
-
-  const getActionProps = (evaluation: TeacherEvaluation) => {
+  const getActionProps = (evaluation: TeacherEvaluationResponse) => {
     const canEvaluate = userRole !== 'guru' && !!onEvaluate;
 
     return {
@@ -87,20 +46,18 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
           <TableHeader>
             <TableRow>
               <TableHead>Guru</TableHead>
-              <TableHead>Aspek</TableHead>
-              <TableHead>Periode</TableHead>
               <TableHead>Evaluator</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Grade</TableHead>
-              <TableHead>Skor</TableHead>
-              <TableHead>Tanggal Evaluasi</TableHead>
+              <TableHead>Periode</TableHead>
+              <TableHead>Total Aspek</TableHead>
+              <TableHead>Rata-rata Skor</TableHead>
+              <TableHead>Nilai Final</TableHead>
               <TableHead className="w-[100px]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {[1, 2, 3, 4, 5].map((i) => (
               <TableRow key={i}>
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((j) => (
+                {[1, 2, 3, 4, 5, 6, 7].map((j) => (
                   <TableCell key={j}>
                     <div className="h-4 bg-muted animate-pulse rounded"></div>
                   </TableCell>
@@ -119,21 +76,19 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>Guru</TableHead>
-            <TableHead>Aspek</TableHead>
+            <TableHead>Evaluator</TableHead>
             <TableHead>Periode</TableHead>
-            {userRole === 'admin' && <TableHead>Evaluator</TableHead>}
-            <TableHead>Status</TableHead>
-            <TableHead>Grade</TableHead>
-            <TableHead>Skor</TableHead>
-            <TableHead>Tanggal Evaluasi</TableHead>
+            <TableHead>Total Aspek</TableHead>
+            <TableHead>Rata-rata Skor</TableHead>
+            <TableHead>Nilai Final</TableHead>
             <TableHead className="w-[100px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {evaluations.length === 0 ? (
             <TableRow>
-              <TableCell 
-                colSpan={userRole === 'admin' ? 9 : 8} 
+              <TableCell
+                colSpan={7}
                 className="h-24 text-center text-muted-foreground"
               >
                 Tidak ada data evaluasi guru.
@@ -143,46 +98,25 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
             evaluations.map((evaluation) => (
               <TableRow key={evaluation.id}>
                 <TableCell>
-                  <div>
-                    <div className="font-medium">{evaluation.teacher_name || 'N/A'}</div>
-                    <div className="text-sm text-muted-foreground">{evaluation.teacher_email || ''}</div>
-                  </div>
+                  {evaluation.teacher?.full_name || 'N/A'}
                 </TableCell>
                 <TableCell>
-                  <div>
-                    <div className="font-medium">{evaluation.aspect_name || 'N/A'}</div>
-                    <div className="text-sm text-muted-foreground">{evaluation.aspect_category || ''}</div>
-                  </div>
+                  {evaluation.evaluator?.full_name || 'N/A'}
                 </TableCell>
                 <TableCell>
-                  <div>
-                    <div className="font-medium">{evaluation.period_name || 'N/A'}</div>
-                  </div>
-                </TableCell>
-                {userRole === 'admin' && (
-                  <TableCell>
-                    <div className="font-medium">{evaluation.evaluator_name || 'N/A'}</div>
-                  </TableCell>
-                )}
-                <TableCell>
-                  {getStatusBadge(evaluation.grade)}
+                  {evaluation.period ?
+                    `${evaluation.period.academic_year} - ${evaluation.period.semester}` :
+                    'N/A'
+                  }
                 </TableCell>
                 <TableCell>
-                  {getGradeBadge(evaluation.grade)}
+                  <div className="text-center">{evaluation.items?.length || 0}</div>
                 </TableCell>
                 <TableCell>
-                  {evaluation.score ? (
-                    <span className="font-medium">{evaluation.score}</span>
-                  ) : (
-                    <span className="text-muted-foreground">-</span>
-                  )}
+                  <div className="text-center">{evaluation.average_score.toFixed(2)}</div>
                 </TableCell>
                 <TableCell>
-                  {evaluation.evaluation_date ? (
-                    formatDate(evaluation.evaluation_date)
-                  ) : (
-                    <span className="text-muted-foreground">-</span>
-                  )}
+                  <div className="text-center">{evaluation.final_grade.toFixed(1)}</div>
                 </TableCell>
                 <TableCell>
                   <ActionDropdown {...getActionProps(evaluation)} />

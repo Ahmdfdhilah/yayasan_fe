@@ -10,6 +10,7 @@ import {
   AssignTeachersToEvaluationPeriod,
   TeacherEvaluationResponse,
   TeacherEvaluationItemResponse,
+  TeacherEvaluationListResponse,
   TeacherEvaluationFilterParams,
   TeacherEvaluationSummary,
   TeacherEvaluationItem,
@@ -100,7 +101,7 @@ class TeacherEvaluationService extends BaseService {
   // Get filtered teacher evaluations
   async getTeacherEvaluationsFiltered(
     params?: TeacherEvaluationFilterParams
-  ): Promise<{ data: TeacherEvaluationResponse[]; total: number; skip: number; limit: number }> {
+  ): Promise<TeacherEvaluationListResponse> {
     const queryParams = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
@@ -162,7 +163,7 @@ class TeacherEvaluationService extends BaseService {
   async getEvaluationsByTeacher(
     teacherId: number,
     params?: Omit<TeacherEvaluationFilterParams, 'teacher_id'>
-  ): Promise<{ data: TeacherEvaluationResponse[]; total: number; skip: number; limit: number }> {
+  ): Promise<TeacherEvaluationListResponse> {
     return this.getTeacherEvaluationsFiltered({
       ...params,
       teacher_id: teacherId
@@ -173,7 +174,7 @@ class TeacherEvaluationService extends BaseService {
   async getEvaluationsByEvaluator(
     evaluatorId: number,
     params?: Omit<TeacherEvaluationFilterParams, 'evaluator_id'>
-  ): Promise<{ data: TeacherEvaluationResponse[]; total: number; skip: number; limit: number }> {
+  ): Promise<TeacherEvaluationListResponse> {
     return this.getTeacherEvaluationsFiltered({
       ...params,
       evaluator_id: evaluatorId

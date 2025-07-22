@@ -4,7 +4,7 @@ import { PaginatedResponse } from "../base/types";
 
 // PKG Period Types
 export interface Period {
-  status: ReactNode;
+  status: any;
   id: number;
   academic_year: string;
   semester: string;

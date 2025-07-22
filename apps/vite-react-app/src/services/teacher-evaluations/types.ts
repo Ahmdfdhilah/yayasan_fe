@@ -166,10 +166,13 @@ export interface TeacherEvaluationFilterParams {
   teacher_id?: number;
   evaluator_id?: number;
   period_id?: number;
+  search?: string;
   final_grade?: number;
   min_average_score?: number;
   max_average_score?: number;
   has_final_notes?: boolean;
+  from_date?: string;
+  to_date?: string;
 }
 
 // Response wrapper for operations
