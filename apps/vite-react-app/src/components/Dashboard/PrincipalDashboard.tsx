@@ -179,6 +179,20 @@ export function PrincipalDashboard({ periodId }: PrincipalDashboardProps) {
                 value={data.evaluation_stats.avg_score || 0}
                 formatter={(v) => v.toFixed(1)}
               />
+              {data.evaluation_stats.avg_total_score !== null && (
+                <StatCard
+                  title="Rata-rata Total"
+                  value={data.evaluation_stats.avg_total_score}
+                  formatter={(v) => v.toFixed(1)}
+                />
+              )}
+              {data.evaluation_stats.avg_final_score !== null && (
+                <StatCard
+                  title="Rata-rata Final"
+                  value={data.evaluation_stats.avg_final_score}
+                  formatter={(v) => v.toFixed(1)}
+                />
+              )}
             </div>
           </CardContent>
         </Card>

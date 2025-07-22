@@ -11,6 +11,8 @@ export interface RPPDashboardStats {
 export interface TeacherEvaluationDashboardStats {
   total_evaluations: number;
   avg_score: number | null;
+  avg_total_score: number | null;
+  avg_final_score: number | null;
   grade_distribution: Record<string, number>;
   total_teachers: number;
   total_aspects: number;
@@ -32,12 +34,6 @@ export interface PeriodSummary {
   is_active: boolean;
 }
 
-export interface QuickStats {
-  my_pending_rpps: number;
-  my_pending_reviews: number;
-  my_pending_evaluations: number;
-  recent_activities: Array<Record<string, any>>;
-}
 
 export interface DashboardResponse {
   period: PeriodSummary | null;
@@ -50,7 +46,6 @@ export interface DashboardResponse {
 }
 
 export interface TeacherDashboard extends DashboardResponse {
-  quick_stats: QuickStats;
   my_rpp_stats: RPPDashboardStats;
   my_evaluation_stats: TeacherEvaluationDashboardStats;
 }
@@ -62,7 +57,6 @@ export interface OrganizationOverview extends Record<string, any> {
 }
 
 export interface PrincipalDashboard extends DashboardResponse {
-  quick_stats: QuickStats;
   organization_overview: Record<string, any>;
   teacher_summaries: Array<Record<string, any>>;
 }
@@ -70,6 +64,7 @@ export interface PrincipalDashboard extends DashboardResponse {
 export interface AdminDashboard extends DashboardResponse {
   system_overview: Record<string, any>;
   organization_summaries: OrganizationSummary[];
+  organization_distribution: Record<string, Record<string, number>>;
   recent_system_activities: Array<Record<string, any>>;
 }
 

@@ -156,6 +156,20 @@ export function TeacherDashboard({ periodId }: TeacherDashboardProps) {
                 value={data.my_evaluation_stats.avg_score || 0}
                 formatter={(v) => v.toFixed(1)}
               />
+              {data.my_evaluation_stats.avg_total_score !== null && (
+                <StatCard
+                  title="Rata-rata Total"
+                  value={data.my_evaluation_stats.avg_total_score}
+                  formatter={(v) => v.toFixed(1)}
+                />
+              )}
+              {data.my_evaluation_stats.avg_final_score !== null && (
+                <StatCard
+                  title="Rata-rata Final"
+                  value={data.my_evaluation_stats.avg_final_score}
+                  formatter={(v) => v.toFixed(1)}
+                />
+              )}
             </div>
           </CardContent>
         </Card>
