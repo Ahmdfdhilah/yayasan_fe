@@ -11,6 +11,17 @@ import {
   SelectValue
 } from '@workspace/ui/components/select';
 import { Label } from '@workspace/ui/components/label';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@workspace/ui/components/alert-dialog';
 import { BarChart3, Download, Users, FileText, TrendingUp, Clock } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
 import Filtering from '@/components/common/Filtering';
@@ -168,10 +179,28 @@ const EvaluationReportsPage: React.FC = () => {
         description="Statistik dan laporan evaluasi kinerja guru berdasarkan periode"
         actions={
           stats && (
-            <Button onClick={handleExportExcel} disabled={exportingExcel}>
-              <Download className="h-4 w-4 mr-2" />
-              {exportingExcel ? 'Mengunduh...' : 'Unduh Excel'}
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button disabled={exportingExcel}>
+                  <Download className="h-4 w-4 mr-2" />
+                  {exportingExcel ? 'Mengunduh...' : 'Unduh Excel'}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Konfirmasi Unduh Excel</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Apakah Anda yakin ingin mengunduh laporan evaluasi periode {currentPeriod?.academic_year} - {currentPeriod?.semester} dalam format Excel?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Batal</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleExportExcel}>
+                    Ya, Unduh Excel
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )
         }
       />
@@ -319,8 +348,9 @@ const EvaluationReportsPage: React.FC = () => {
                         <div className="text-lg font-bold text-primary">#{index + 1}</div>
                         <div>
                           <h4 className="font-medium">{teacher.teacher_name}</h4>
+                          <p className="text-sm text-muted-foreground">{teacher.organization_name}</p>
                           <div className="text-sm text-muted-foreground">
-                            Skor Akhir: {teacher.final_grade.toFixed(2)} | Rata-rata: {teacher.average_score.toFixed(2)}
+                            Nilai Akhir: {teacher.final_grade.toFixed(2)} ({teacher.final_grade_letter}) | Rata-rata: {teacher.average_score.toFixed(2)}
                           </div>
                         </div>
                       </div>
@@ -339,8 +369,8 @@ const EvaluationReportsPage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {stats.aspect_performance.map((aspect) => (
-                    <div key={aspect.aspect_id} className="border rounded-lg p-4">
+                  {stats.aspect_performance.map((aspect, index) => (
+                    <div key={index} className="border rounded-lg p-4">
                       <h4 className="font-medium mb-2">{aspect.aspect_name}</h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                         <div>
@@ -349,12 +379,12 @@ const EvaluationReportsPage: React.FC = () => {
                         </div>
                         <div>
                           <span className="text-muted-foreground">Jumlah Evaluasi:</span>
-                          <span className="ml-2 font-medium">{aspect.evaluation_count}</span>
+                          <span className="ml-2 font-medium">{aspect.total_evaluations}</span>
                         </div>
                         <div className="md:col-span-1">
                           <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-blue-600 h-2 rounded-full" 
+                            <div
+                              className="bg-blue-600 h-2 rounded-full"
                               style={{ width: `${(aspect.average_score / 4) * 100}%` }}
                             ></div>
                           </div>

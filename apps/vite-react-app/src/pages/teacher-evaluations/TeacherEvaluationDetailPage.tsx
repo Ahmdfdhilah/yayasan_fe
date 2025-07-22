@@ -18,6 +18,17 @@ import {
   SelectValue
 } from '@workspace/ui/components/select';
 import { Label } from '@workspace/ui/components/label';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@workspace/ui/components/alert-dialog';
 import { Eye, Edit, CheckCircle, Download } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { EvaluationCategorySection } from '@/components/TeacherEvaluations';
@@ -425,10 +436,28 @@ const TeacherEvaluationDetailPage: React.FC = () => {
           <div className="flex items-center gap-2">
             {/* PDF Actions - only show when evaluations exist */}
             {evaluations.length > 0 && (
-              <Button variant="outline" onClick={generatePDFReport}>
-                <Download className="h-4 w-4 mr-2" />
-                Unduh PDF
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="default">
+                    <Download className="h-4 w-4 mr-2" />
+                    Unduh PDF
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Konfirmasi Unduh PDF</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Apakah Anda yakin ingin mengunduh laporan evaluasi untuk <strong>{teacherInfo.teacher?.display_name || 'N/A'}</strong> periode {currentPeriod?.academic_year} - {currentPeriod?.semester} dalam format PDF?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogAction onClick={generatePDFReport}>
+                      Ya, Unduh PDF
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
 
             {canEdit && categoriesWithAspects.length > 0 && (

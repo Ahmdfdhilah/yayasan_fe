@@ -145,14 +145,16 @@ export interface PeriodEvaluationStats {
   top_performers: Array<{
     teacher_id: number;
     teacher_name: string;
-    final_grade: number;
+    total_score: number;
     average_score: number;
+    final_grade: number;
+    final_grade_letter: string;
+    organization_name: string;
   }>;
   aspect_performance: Array<{
-    aspect_id: number;
     aspect_name: string;
     average_score: number;
-    evaluation_count: number;
+    total_evaluations: number;
   }>;
 }
 

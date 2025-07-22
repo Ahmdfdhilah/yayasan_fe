@@ -280,8 +280,11 @@ export const exportEvaluationReportToExcel = async (
   const teacherData = stats.top_performers?.map((teacher: any, index: number) => ({
     no: index + 1,
     teacher_name: teacher.teacher_name,
+    organization_name: teacher.organization_name,
+    total_score: teacher.total_score,
+    average_score: teacher.average_score.toFixed(2),
     final_grade: teacher.final_grade.toFixed(2),
-    average_score: teacher.average_score.toFixed(2)
+    final_grade_letter: teacher.final_grade_letter
   })) || [];
 
   // Prepare grade distribution data
@@ -302,8 +305,11 @@ export const exportEvaluationReportToExcel = async (
     columns: [
       { width: 5, header: 'No' },
       { width: 30, header: 'Nama Guru', key: 'teacher_name' },
-      { width: 18, header: 'Jumlah Total Nilai', key: 'final_grade' },
-      { width: 18, header: 'Rata-rata Skor', key: 'average_score' }
+      { width: 25, header: 'Organisasi', key: 'organization_name' },
+      { width: 15, header: 'Total Skor', key: 'total_score' },
+      { width: 18, header: 'Rata-rata Skor', key: 'average_score' },
+      { width: 18, header: 'Nilai Akhir', key: 'final_grade' },
+      { width: 15, header: 'Index', key: 'final_grade_letter' }
     ],
     headerInfo: [
       { label: 'Yayasan', value: 'Yayasan Baitul Muslim Lampung Timur' },
