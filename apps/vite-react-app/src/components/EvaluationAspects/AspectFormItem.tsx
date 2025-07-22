@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@workspace/ui/components/select';
-import { Trash2, Edit, Check, X } from 'lucide-react';
+import { Trash2, Edit, Check, X, GripVertical } from 'lucide-react';
 import { EvaluationAspect, EvaluationAspectCreate, EvaluationAspectUpdate, EvaluationCategory } from '@/services/evaluation-aspects/types';
 
 const aspectFormSchema = z.object({
@@ -43,6 +43,7 @@ interface AspectFormItemProps {
   loading?: boolean;
   defaultCategoryId?: number;
   questionNumber?: number;
+  isEditMode?: boolean;
 }
 
 export const AspectFormItem: React.FC<AspectFormItemProps> = ({
@@ -56,6 +57,7 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
   loading = false,
   defaultCategoryId,
   questionNumber,
+  isEditMode = false,
 }) => {
   const isNewAspect = !aspect;
 
@@ -106,7 +108,14 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
 
   if (!isEditing && !isNewAspect) {
     return (
-      <div className="group bg-card border rounded-lg p-6 hover:shadow-md transition-shadow">
+      <div className="group bg-card border rounded-lg p-6 hover:shadow-md transition-shadow relative">
+        {/* Drag Handle for Edit Mode */}
+        {isEditMode && (
+          <div className="absolute left-2 top-6 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
+            <GripVertical className="h-4 w-4 text-muted-foreground" />
+          </div>
+        )}
+        
         <div className="flex flex-col lg:flex-row items-start gap-4">
           {/* Question Number */}
           <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
@@ -132,27 +141,29 @@ export const AspectFormItem: React.FC<AspectFormItemProps> = ({
                 </div>
               </div>
               
-              {/* Actions */}
-              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={onEdit}
-                  className="h-8 w-8 p-0"
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-                {onDelete && (
+              {/* Actions - only in edit mode */}
+              {isEditMode && (
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    onClick={handleDelete}
-                    className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                    onClick={onEdit}
+                    className="h-8 w-8 p-0"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Edit className="h-4 w-4" />
                   </Button>
-                )}
-              </div>
+                  {onDelete && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={handleDelete}
+                      className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
             
             {/* Preview Answer Area - Evaluation Options */}

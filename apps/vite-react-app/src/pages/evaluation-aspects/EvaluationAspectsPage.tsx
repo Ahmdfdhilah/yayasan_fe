@@ -32,6 +32,7 @@ import type {
   CategoryWithAspectsResponse,
 } from '@/services/evaluation-aspects/types';
 import { Plus, Search } from 'lucide-react';
+import { motion, Reorder } from 'framer-motion';
 
 export const EvaluationAspectsPage: React.FC = () => {
   const { toast } = useToast();
@@ -44,6 +45,9 @@ export const EvaluationAspectsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingAspectId, setEditingAspectId] = useState<number | null>(null);
   const [newAspectCategoryId, setNewAspectCategoryId] = useState<number | null>(null);
+  
+  // Edit mode state
+  const [isEditMode, setIsEditMode] = useState(false);
 
   // Dialog states
   const [showCreateCategoryDialog, setShowCreateCategoryDialog] = useState(false);
@@ -309,10 +313,21 @@ export const EvaluationAspectsPage: React.FC = () => {
         title="Manajemen Aspek Evaluasi"
         description="Kelola aspek-aspek yang digunakan dalam evaluasi kinerja guru"
         actions={
-          <Button onClick={handleCreateNewCategory} disabled={saving}>
-            <Plus className="h-4 w-4 mr-2" />
-            Tambah Bagian Baru
-          </Button>
+          <div className="flex items-center gap-4">
+            <Button 
+              onClick={() => setIsEditMode(!isEditMode)}
+              variant={isEditMode ? "default" : "outline"}
+            >
+              {isEditMode ? 'Selesai Edit' : 'Edit Formulir'}
+            </Button>
+            
+            {isEditMode && (
+              <Button onClick={handleCreateNewCategory} disabled={saving}>
+                <Plus className="h-4 w-4 mr-2" />
+                Tambah Bagian Baru
+              </Button>
+            )}
+          </div>
         }
       />
 
@@ -329,7 +344,7 @@ export const EvaluationAspectsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Form Content - Google Forms style */}
+      {/* Form Content - Google Forms style with drag & drop */}
       {filteredCategoriesWithAspects.length === 0 ? (
         <div className="text-center py-16">
           <div className="bg-card rounded-lg border p-12 max-w-md mx-auto">
@@ -350,36 +365,102 @@ export const EvaluationAspectsPage: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {filteredCategoriesWithAspects.map((categoryWithAspects, index) => (
-            <CategorySection
-              key={categoryWithAspects.id}
-              category={categoryWithAspects}
-              aspects={categoryWithAspects.aspects}
-              categories={categories}
-              onAddAspect={handleAddAspect}
-              onEditAspect={handleEditAspect}
-              onSaveAspect={handleSaveAspect}
-              onDeleteAspect={(aspect) => handleDeleteAspect(aspect)}
-              editingAspectId={editingAspectId}
-              newAspectCategoryId={newAspectCategoryId}
-              onCancelEdit={handleCancelEdit}
-              loading={saving}
-              sectionNumber={index + 1}
-            />
-          ))}
-
-          {/* Add Section Button */}
-          <div className="flex justify-center mt-8">
-            <Button
-              onClick={handleCreateNewCategory}
-              disabled={saving}
-              variant="outline"
-              className="border-dashed border-2 hover:border-primary hover:bg-primary/5 py-3 px-6"
+          {isEditMode ? (
+            /* Drag & Drop Mode */
+            <Reorder.Group
+              axis="y"
+              values={filteredCategoriesWithAspects}
+              onReorder={(newOrder) => {
+                setCategoriesWithAspects(newOrder);
+                // Auto-save new order
+                // TODO: Implement category reordering API call
+              }}
+              className="space-y-6"
             >
-              <Plus className="h-5 w-5 mr-2" />
-              Tambah Bagian
-            </Button>
-          </div>
+              {filteredCategoriesWithAspects.map((categoryWithAspects, index) => (
+                <Reorder.Item
+                  key={categoryWithAspects.id}
+                  value={categoryWithAspects}
+                  className="cursor-grab active:cursor-grabbing"
+                >
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <CategorySection
+                      key={categoryWithAspects.id}
+                      category={categoryWithAspects}
+                      aspects={categoryWithAspects.aspects}
+                      categories={categories}
+                      onAddAspect={handleAddAspect}
+                      onEditAspect={handleEditAspect}
+                      onSaveAspect={handleSaveAspect}
+                      onDeleteAspect={(aspect) => handleDeleteAspect(aspect)}
+                      editingAspectId={editingAspectId}
+                      newAspectCategoryId={newAspectCategoryId}
+                      onCancelEdit={handleCancelEdit}
+                      loading={saving}
+                      sectionNumber={index + 1}
+                      isEditMode={isEditMode}
+                    />
+                  </motion.div>
+                </Reorder.Item>
+              ))}
+            </Reorder.Group>
+          ) : (
+            /* View Mode */
+            <div className="space-y-6">
+              {filteredCategoriesWithAspects.map((categoryWithAspects, index) => (
+                <motion.div
+                  key={categoryWithAspects.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: index * 0.1 }}
+                >
+                  <CategorySection
+                    key={categoryWithAspects.id}
+                    category={categoryWithAspects}
+                    aspects={categoryWithAspects.aspects}
+                    categories={categories}
+                    onAddAspect={handleAddAspect}
+                    onEditAspect={handleEditAspect}
+                    onSaveAspect={handleSaveAspect}
+                    onDeleteAspect={(aspect) => handleDeleteAspect(aspect)}
+                    editingAspectId={editingAspectId}
+                    newAspectCategoryId={newAspectCategoryId}
+                    onCancelEdit={handleCancelEdit}
+                    loading={saving}
+                    sectionNumber={index + 1}
+                    isEditMode={isEditMode}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {/* Add Section Button - only in edit mode */}
+          {isEditMode && (
+            <motion.div 
+              className="flex justify-center mt-8"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Button
+                onClick={handleCreateNewCategory}
+                disabled={saving}
+                variant="outline"
+                className="border-dashed border-2 hover:border-primary hover:bg-primary/5 py-3 px-6"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Tambah Bagian
+              </Button>
+            </motion.div>
+          )}
         </div>
       )}
 

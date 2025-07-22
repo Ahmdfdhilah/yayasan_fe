@@ -2,7 +2,8 @@ import React from 'react';
 import { Button } from '@workspace/ui/components/button';
 import { EvaluationAspect, EvaluationAspectCreate, EvaluationAspectUpdate, EvaluationCategory, CategoryWithAspectsResponse } from '@/services/evaluation-aspects/types';
 import { AspectFormItem } from './AspectFormItem';
-import { Plus } from 'lucide-react';
+import { Plus, GripVertical } from 'lucide-react';
+import { motion, Reorder } from 'framer-motion';
 
 interface CategorySectionProps {
   category: CategoryWithAspectsResponse;
@@ -17,6 +18,7 @@ interface CategorySectionProps {
   onCancelEdit: () => void;
   loading?: boolean;
   sectionNumber?: number;
+  isEditMode?: boolean;
 }
 
 export const CategorySection: React.FC<CategorySectionProps> = ({
@@ -32,14 +34,21 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   onCancelEdit,
   loading = false,
   sectionNumber = 1,
+  isEditMode = false,
 }) => {
   const isAddingToThisCategory = newAspectCategoryId === category.id;
   const categoryAspects = aspects;
 
   return (
-    <div className="bg-card rounded-lg border overflow-hidden">
+    <div className="bg-card rounded-lg border overflow-hidden group">
       {/* Section Header - Google Forms style */}
-      <div className="border-l-4 border-primary bg-muted/50 px-4 sm:px-6 py-4">
+      <div className="border-l-4 border-primary bg-muted/50 px-4 sm:px-6 py-4 relative">
+        {/* Drag Handle for Edit Mode */}
+        {isEditMode && (
+          <div className="absolute left-1 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
+            <GripVertical className="h-4 w-4 text-muted-foreground" />
+          </div>
+        )}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
@@ -60,17 +69,20 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               </p>
             )}
           </div>
-          <div className="flex-shrink-0">
-            <Button
-              onClick={() => onAddAspect(category.id)}
-              disabled={loading || isAddingToThisCategory}
-              variant="outline"
-              size="sm"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Tambah Pertanyaan
-            </Button>
-          </div>
+          {/* Only show add button in edit mode */}
+          {isEditMode && (
+            <div className="flex-shrink-0">
+              <Button
+                onClick={() => onAddAspect(category.id)}
+                disabled={loading || isAddingToThisCategory}
+                variant="outline"
+                size="sm"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Tambah Pertanyaan
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -81,7 +93,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
             <AspectFormItem
               categories={categories}
               isEditing={true}
-              onEdit={() => {}}
+              onEdit={() => { }}
               onCancel={onCancelEdit}
               onSave={(data) => onSaveAspect(null, data)}
               loading={loading}
@@ -98,32 +110,86 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
             <p className="text-muted-foreground text-sm mb-3">
               Belum ada pertanyaan dalam bagian ini
             </p>
-            <Button
-              onClick={() => onAddAspect(category.id)}
-              variant="outline"
-              size="sm"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Tambah Pertanyaan Pertama
-            </Button>
+            {isEditMode && (
+              <Button
+                onClick={() => onAddAspect(category.id)}
+                variant="outline"
+                size="sm"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Tambah Pertanyaan Pertama
+              </Button>
+            )}
           </div>
         ) : (
-          <div className="space-y-4">
-            {categoryAspects.map((aspect, index) => (
-              <AspectFormItem
-                key={aspect.id}
-                aspect={aspect}
-                categories={categories}
-                isEditing={editingAspectId === aspect.id}
-                onEdit={() => onEditAspect(aspect)}
-                onCancel={onCancelEdit}
-                onSave={(data) => onSaveAspect(aspect.id, data)}
-                onDelete={onDeleteAspect}
-                loading={loading}
-                questionNumber={index + 1}
-              />
-            ))}
-          </div>
+          isEditMode ? (
+            /* Drag & Drop for aspects in edit mode */
+            <Reorder.Group
+              axis="y"
+              values={categoryAspects}
+              onReorder={() => {
+                // Update aspects order in parent
+                // TODO: Implement aspect reordering within category
+              }}
+              className="space-y-4"
+            >
+              {categoryAspects.map((aspect, index) => (
+                <Reorder.Item
+                  key={aspect.id}
+                  value={aspect}
+                  className="cursor-grab active:cursor-grabbing"
+                >
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <AspectFormItem
+                      key={aspect.id}
+                      aspect={aspect}
+                      categories={categories}
+                      isEditing={editingAspectId === aspect.id}
+                      onEdit={() => onEditAspect(aspect)}
+                      onCancel={onCancelEdit}
+                      onSave={(data) => onSaveAspect(aspect.id, data)}
+                      onDelete={onDeleteAspect}
+                      loading={loading}
+                      questionNumber={index + 1}
+                      isEditMode={isEditMode}
+                    />
+                  </motion.div>
+                </Reorder.Item>
+              ))}
+            </Reorder.Group>
+          ) : (
+            /* Static view in view mode */
+            <div className="space-y-4">
+              {categoryAspects.map((aspect, index) => (
+                <motion.div
+                  key={aspect.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: index * 0.05 }}
+                >
+                  <AspectFormItem
+                    key={aspect.id}
+                    aspect={aspect}
+                    categories={categories}
+                    isEditing={false}
+                    onEdit={() => onEditAspect(aspect)}
+                    onCancel={onCancelEdit}
+                    onSave={(data) => onSaveAspect(aspect.id, data)}
+                    onDelete={onDeleteAspect}
+                    loading={loading}
+                    questionNumber={index + 1}
+                    isEditMode={isEditMode}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          )
         )}
       </div>
     </div>
