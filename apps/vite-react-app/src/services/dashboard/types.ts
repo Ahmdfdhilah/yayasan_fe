@@ -57,6 +57,8 @@ export interface OrganizationOverview extends Record<string, any> {
 }
 
 export interface PrincipalDashboard extends DashboardResponse {
+  my_rpp_stats: RPPDashboardStats;
+  my_evaluation_stats: TeacherEvaluationDashboardStats;
   organization_overview: Record<string, any>;
   teacher_summaries: Array<Record<string, any>>;
 }

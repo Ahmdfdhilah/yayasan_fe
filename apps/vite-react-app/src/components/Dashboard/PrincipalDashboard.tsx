@@ -103,6 +103,82 @@ export function PrincipalDashboard({ periodId }: PrincipalDashboardProps) {
         </Card>
       )}
 
+      {/* My RPP Stats */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Statistik RPP Saya
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StatCard
+              title="Total RPP"
+              value={data.my_rpp_stats.total_submissions}
+            />
+            <StatCard
+              title="Disetujui"
+              value={data.my_rpp_stats.approved_submissions}
+              subtitle="RPP approved"
+            />
+            <StatCard
+              title="Pending"
+              value={data.my_rpp_stats.pending_submissions}
+              subtitle="Menunggu review"
+            />
+            <StatCard
+              title="Tingkat Completion"
+              value={Math.round(data.my_rpp_stats.submission_rate)}
+              formatter={(v) => `${v}%`}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* My Evaluation Stats */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <GraduationCap className="h-5 w-5" />
+              Statistik Evaluasi Saya
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <StatCard
+                title="Total Evaluasi"
+                value={data.my_evaluation_stats.total_evaluations}
+              />
+              <StatCard
+                title="Rata-rata Skor"
+                value={data.my_evaluation_stats.avg_score || 0}
+                formatter={(v) => v.toFixed(1)}
+              />
+              {data.my_evaluation_stats.avg_total_score !== null && (
+                <StatCard
+                  title="Rata-rata Total"
+                  value={data.my_evaluation_stats.avg_total_score}
+                  formatter={(v) => v.toFixed(1)}
+                />
+              )}
+              {data.my_evaluation_stats.avg_final_score !== null && (
+                <StatCard
+                  title="Rata-rata Final"
+                  value={data.my_evaluation_stats.avg_final_score}
+                  formatter={(v) => v.toFixed(1)}
+                />
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {data.my_evaluation_stats.grade_distribution && Object.keys(data.my_evaluation_stats.grade_distribution).length > 0 && (
+          <GradeDistribution distribution={data.my_evaluation_stats.grade_distribution} />
+        )}
+      </div>
+
       {/* Organization Overview */}
       <Card>
         <CardHeader>
