@@ -27,6 +27,10 @@ import TeacherEvaluationDetailPage from './pages/teacher-evaluations/TeacherEval
 import EvaluationReportsPage from './pages/evaluation-reports/EvaluationReportsPage';
 import { MyRPPSubmissionsPage, RPPSubmissionsPage, RPPSubmissionDetailPage } from './pages/rpp-submissions';
 import { MediaFilesPage } from './pages/media-files';
+import BoardMembersPage from './pages/board-members/BoardMembersPage';
+import ArticlesPage from './pages/articles/ArticlesPage';
+import GalleriesPage from './pages/galleries/GalleriesPage';
+import MessagesPage from './pages/messages/MessagesPage';
 
 // Simple redirect component for My Evaluations
 const MyEvaluationsRedirect = () => {
@@ -168,6 +172,31 @@ function App() {
                     <Route path="media-files/:uploaderId" element={
                       <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
                         <MediaFilesPage />
+                      </RoleProtectedRoute>
+                    } />
+
+                    {/* Content Management Routes - Admin only */}
+                    <Route path="board-members" element={
+                      <RoleProtectedRoute allowedRoles={['admin']}>
+                        <BoardMembersPage />
+                      </RoleProtectedRoute>
+                    } />
+
+                    <Route path="articles" element={
+                      <RoleProtectedRoute allowedRoles={['admin']}>
+                        <ArticlesPage/>
+                      </RoleProtectedRoute>
+                    } />
+
+                    <Route path="galleries" element={
+                      <RoleProtectedRoute allowedRoles={['admin']}>
+                        <GalleriesPage />
+                      </RoleProtectedRoute>
+                    } />
+
+                    <Route path="messages" element={
+                      <RoleProtectedRoute allowedRoles={['admin']}>
+                        <MessagesPage />
                       </RoleProtectedRoute>
                     } />
                   </Route>

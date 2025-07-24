@@ -9,6 +9,10 @@ import {
   ClipboardCheck,
   Upload,
   FolderOpen,
+  UserCheck,
+  Newspaper,
+  Image,
+  MessageSquare,
 } from "lucide-react";
 
 // PKG System Role definitions
@@ -91,6 +95,38 @@ export const appMenuItems: SidebarItem[] = [
     ],
   },
 
+  // Content Management - Admin only
+  {
+    title: 'Manajemen Konten',
+    icon: Building,
+    allowedRoles: ['admin'],
+    children: [
+      {
+        title: 'Pengurus',
+        href: '/board-members',
+        icon: UserCheck,
+        allowedRoles: ['admin'],
+      },
+      {
+        title: 'Artikel',
+        href: '/articles',
+        icon: Newspaper,
+        allowedRoles: ['admin'],
+      },
+      {
+        title: 'Galeri',
+        href: '/galleries',
+        icon: Image,
+        allowedRoles: ['admin'],
+      },
+      {
+        title: 'Pesan',
+        href: '/messages',
+        icon: MessageSquare,
+        allowedRoles: ['admin'],
+      },
+    ],
+  },
 
   // Period Management - Admin only
   {
