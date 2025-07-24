@@ -94,19 +94,19 @@ export function LoginPage() {
         email: data.email,
         password: data.password
       });
-      
+
       if (data.rememberMe) {
         localStorage.setItem('rememberMe', 'true');
       }
-      
+
       // Navigation will be handled by useEffect when isAuthenticated becomes true
     } catch (error: any) {
       // Redux Toolkit unwrap() throws the rejectWithValue directly as string
       console.error('Login failed:', error);
-      
+
       // Error from unwrap() is the string from rejectWithValue
       const errorMessage = typeof error === 'string' ? error : (error?.message || 'Terjadi kesalahan saat login');
-      
+
       toast({
         title: 'Login Gagal',
         description: errorMessage,
@@ -129,12 +129,16 @@ export function LoginPage() {
         <div className="w-[70%] relative bg-gray-100 dark:bg-gray-900">
           <img src={bgImage} alt="Background" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/10" />
+          {/* Gradient overlays at edges */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
           <div className="absolute top-8 left-8 text-white flex items-center space-x-4">
             <img src={logo} alt="Logo" className="w-16 h-16 object-contain" />
             <div>
-              <h2 className="text-2xl font-bold mb-2">Sistem PKG Yayasan</h2>
+              <h2 className="text-2xl font-bold mb-2">Yayasan Baitul Muslim Lampung Timur</h2>
               <p className="text-white/90 max-w-md">
-                Platform terpadu untuk manajemen evaluasi kinerja guru dan administrasi pendidikan di lingkungan Yayasan
+                Yayasan pendidikan dan dakwah Islam yang menyelenggarakan pendidikan terpadu berkualitas sejak 1993
               </p>
             </div>
           </div>
@@ -151,7 +155,7 @@ export function LoginPage() {
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">Selamat Datang</h1>
                 <p className="text-muted-foreground">
-                  Login dengan Email untuk masuk ke sistem
+                  Login dengan Email yang terdaftar untuk masuk ke sistem PKG Yayasan
                 </p>
               </div>
             </div>
@@ -311,7 +315,7 @@ export function LoginPage() {
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Selamat Datang</h1>
               <p className="text-muted-foreground">
-                Login dengan Email untuk masuk ke sistem PKG Yayasan
+                Login dengan Email yang terdaftar untuk masuk ke sistem PKG Yayasan
               </p>
             </div>
           </div>
