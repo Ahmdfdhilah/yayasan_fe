@@ -176,7 +176,7 @@ const GalleriesPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Manajemen Galeri"
-        description="Kelola galeri foto, atur urutan tampilan, dan status aktif"
+        description="Kelola galeri foto dan atur urutan tampilan"
         actions={
           <Button onClick={handleCreate}>
             <Plus className="w-4 h-4 mr-2" />

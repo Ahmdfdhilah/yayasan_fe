@@ -53,10 +53,7 @@ export const GalleryCards: React.FC<GalleryCardsProps> = ({
                 <img src={getThumbnailUrl(gallery.img_url, 64)} alt={gallery.title} className="w-16 h-16 rounded object-cover" />
                 <div className="flex-1">
                   <h3 className="font-medium text-sm">{gallery.title}</h3>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <Badge variant={gallery.is_active ? 'default' : 'secondary'} className="text-xs">
-                      {gallery.is_active ? 'Aktif' : 'Tidak Aktif'}
-                    </Badge>
+                  <div className="mt-1">
                     <span className="text-xs text-muted-foreground">Urutan: {gallery.display_order}</span>
                   </div>
                 </div>

@@ -37,7 +37,6 @@ export const BoardMemberTable: React.FC<BoardMemberTableProps> = ({
           <TableRow>
             <TableHead>Nama</TableHead>
             <TableHead>Posisi</TableHead>
-            <TableHead>Status</TableHead>
             <TableHead>Urutan</TableHead>
             <TableHead>Dibuat</TableHead>
             <TableHead className="text-right">Aksi</TableHead>
@@ -46,13 +45,13 @@ export const BoardMemberTable: React.FC<BoardMemberTableProps> = ({
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                 Memuat Anggota Dewan...
               </TableCell>
             </TableRow>
           ) : boardMembers.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                 Tidak ada Anggota Dewan ditemukan
               </TableCell>
             </TableRow>
@@ -73,11 +72,6 @@ export const BoardMemberTable: React.FC<BoardMemberTableProps> = ({
                 </TableCell>
                 <TableCell>
                   {boardMember.position}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={boardMember.is_active ? 'default' : 'secondary'}>
-                    {boardMember.is_active ? 'Aktif' : 'Tidak Aktif'}
-                  </Badge>
                 </TableCell>
                 <TableCell>
                   {boardMember.display_order}

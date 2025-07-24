@@ -220,7 +220,7 @@ const BoardMembersPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Manajemen Anggota Dewan"
-        description="Kelola anggota dewan, atur urutan tampilan, dan status aktif"
+        description="Kelola anggota dewan dan atur urutan tampilan"
         actions={
           <Button onClick={handleCreate}>
             <Plus className="w-4 h-4 mr-2" />

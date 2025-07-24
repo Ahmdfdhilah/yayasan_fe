@@ -25,7 +25,6 @@ export const GalleryTable: React.FC<GalleryTableProps> = ({
           <TableRow>
             <TableHead>Gambar</TableHead>
             <TableHead>Judul</TableHead>
-            <TableHead>Status</TableHead>
             <TableHead>Urutan</TableHead>
             <TableHead>Dibuat</TableHead>
             <TableHead className="text-right">Aksi</TableHead>
@@ -34,13 +33,13 @@ export const GalleryTable: React.FC<GalleryTableProps> = ({
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                 Memuat Galeri...
               </TableCell>
             </TableRow>
           ) : galleries.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                 Tidak ada Galeri ditemukan
               </TableCell>
             </TableRow>
@@ -57,11 +56,6 @@ export const GalleryTable: React.FC<GalleryTableProps> = ({
                       {gallery.short_excerpt}
                     </div>
                   )}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={gallery.is_active ? 'default' : 'secondary'}>
-                    {gallery.is_active ? 'Aktif' : 'Tidak Aktif'}
-                  </Badge>
                 </TableCell>
                 <TableCell>{gallery.display_order}</TableCell>
                 <TableCell>

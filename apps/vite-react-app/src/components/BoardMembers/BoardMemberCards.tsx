@@ -71,14 +71,7 @@ export const BoardMemberCards: React.FC<BoardMemberCardsProps> = ({
                   </div>
                 </div>
                 
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">Status:</span>
-                    <Badge variant={boardMember.is_active ? 'default' : 'secondary'} className="text-xs">
-                      {boardMember.is_active ? 'Aktif' : 'Tidak Aktif'}
-                    </Badge>
-                  </div>
-                  
+                <div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Urutan:</span>
                     <span>{boardMember.display_order}</span>
