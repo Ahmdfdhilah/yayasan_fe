@@ -123,19 +123,27 @@ const GalleriesPage: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSave = async (galleryData: any) => {
+  const handleSave = async (data: any, image?: File) => {
     try {
       if (editingGallery) {
-        await galleryService.updateGallery(editingGallery.id, galleryData);
+        await galleryService.updateGallery(editingGallery.id, data, image);
         toast({
           title: 'Galeri berhasil diperbarui',
-          description: `Galeri ${galleryData.title} telah diperbarui.`,
+          description: `Galeri ${data.title} telah diperbarui.`,
         });
       } else {
-        await galleryService.createGallery(galleryData);
+        if (!image) {
+          toast({
+            title: 'Gambar wajib diupload',
+            description: 'Silakan pilih gambar untuk galeri baru.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        await galleryService.createGallery(data, image);
         toast({
           title: 'Galeri berhasil dibuat',
-          description: `Galeri ${galleryData.title} telah ditambahkan ke sistem.`,
+          description: `Galeri ${data.title} telah ditambahkan ke sistem.`,
         });
       }
       setIsDialogOpen(false);

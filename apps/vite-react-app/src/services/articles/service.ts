@@ -1,8 +1,6 @@
 // apps/vite-react-app/src/services/articles/service.ts
 import { BaseService } from "../base";
 import {
-  ArticleCreate,
-  ArticleUpdate,
   ArticlePublish,
   ArticleResponse,
   ArticleListResponse,
@@ -127,11 +125,20 @@ class ArticleService extends BaseService {
     return this.get(endpoint);
   }
 
-  // Create new article (requires auth)
+  // Create new article with multipart form data (requires auth)
   async createArticle(
-    articleData: ArticleCreate
+    data: ArticleCreate,
+    image: File
   ): Promise<ArticleResponse> {
-    return this.post("/", articleData);
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(data));
+    formData.append('image', image);
+    
+    return this.post("/", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 
   // Get article by ID
@@ -148,12 +155,23 @@ class ArticleService extends BaseService {
     return this.get(`/slug/${encodeURIComponent(slug)}`);
   }
 
-  // Update article (requires auth)
+  // Update article with optional image upload (requires auth)
   async updateArticle(
     articleId: number,
-    articleData: ArticleUpdate
+    data: ArticleUpdate,
+    image?: File
   ): Promise<ArticleResponse> {
-    return this.put(`/${articleId}`, articleData);
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(data));
+    if (image) {
+      formData.append('image', image);
+    }
+    
+    return this.put(`/${articleId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 
   // Delete article (requires auth)

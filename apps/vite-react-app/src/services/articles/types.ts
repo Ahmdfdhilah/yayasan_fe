@@ -27,7 +27,6 @@ export interface ArticleCreate {
   description: string;
   slug: string;
   excerpt?: string;
-  img_url?: string;
   category: string;
   is_published?: boolean;
   published_at?: string;
@@ -38,7 +37,6 @@ export interface ArticleUpdate {
   description?: string;
   slug?: string;
   excerpt?: string;
-  img_url?: string;
   category?: string;
   is_published?: boolean;
   published_at?: string;

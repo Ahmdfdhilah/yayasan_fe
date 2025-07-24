@@ -2,16 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@workspace/ui/components/dialog';
+import { useToast } from '@workspace/ui/components/sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Textarea } from '@workspace/ui/components/textarea';
 import { Switch } from '@workspace/ui/components/switch';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@workspace/ui/components/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from '@workspace/ui/components/form';
+import FileUpload from '@/components/common/FileUpload';
 import { Gallery, GalleryCreate, GalleryUpdate } from '@/services/galleries/types';
 
 const galleryFormSchema = z.object({
-  img_url: z.string().min(1, 'URL gambar wajib diisi').url('URL gambar tidak valid'),
   title: z.string().min(1, 'Judul wajib diisi').max(255, 'Judul maksimal 255 karakter'),
   excerpt: z.string().optional().or(z.literal('')),
   is_active: z.boolean(),
@@ -24,19 +39,23 @@ interface GalleryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editingGallery: Gallery | null;
-  onSave: (data: GalleryCreate | GalleryUpdate) => void;
+  onSave: (data: GalleryCreate | GalleryUpdate, image?: File) => void;
 }
 
 export const GalleryDialog: React.FC<GalleryDialogProps> = ({
-  open, onOpenChange, editingGallery, onSave
+  open,
+  onOpenChange,
+  editingGallery,
+  onSave
 }) => {
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const isEdit = !!editingGallery;
 
   const form = useForm<GalleryFormData>({
     resolver: zodResolver(galleryFormSchema),
     defaultValues: {
-      img_url: '',
       title: '',
       excerpt: '',
       is_active: true,
@@ -48,7 +67,6 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
     if (open) {
       if (editingGallery) {
         form.reset({
-          img_url: editingGallery.img_url,
           title: editingGallery.title,
           excerpt: editingGallery.excerpt || '',
           is_active: editingGallery.is_active,
@@ -56,38 +74,66 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
         });
       } else {
         form.reset({
-          img_url: '',
           title: '',
           excerpt: '',
           is_active: true,
           display_order: 0,
         });
       }
+      setSelectedFiles([]);
     }
   }, [open, editingGallery, form]);
 
   const onSubmit = async (data: GalleryFormData) => {
+    // Validasi file upload untuk create
+    if (!isEdit && selectedFiles.length === 0) {
+      toast.error({ title: 'Gambar wajib diupload untuk galeri baru' });
+      return;
+    }
+
     setLoading(true);
+
     try {
       const submitData = {
-        img_url: data.img_url,
         title: data.title,
         excerpt: data.excerpt || undefined,
         is_active: data.is_active,
         display_order: data.display_order,
       };
-      onSave(submitData);
+
+      const imageFile = selectedFiles.length > 0 ? selectedFiles[0] : undefined;
+      await onSave(submitData, imageFile);
+      
       onOpenChange(false);
-    } catch (error) {
+      form.reset();
+      setSelectedFiles([]);
+      
+      toast.success({ title: isEdit ? 'Galeri berhasil diperbarui' : 'Galeri berhasil ditambahkan' });
+    } catch (error: any) {
       console.error('Error saving gallery:', error);
+      toast.error({ title: error.message || 'Gagal menyimpan galeri' });
     } finally {
       setLoading(false);
     }
   };
 
+  const handleFilesChange = (files: File[]) => {
+    setSelectedFiles(files);
+  };
+
+  const handleFileError = (error: string) => {
+    toast.error({ title: error });
+  };
+
+  const existingFiles = editingGallery?.img_url ? [{
+    name: `Current Image - ${editingGallery.title}`,
+    url: editingGallery.img_url,
+    viewUrl: editingGallery.img_url,
+  }] : [];
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isEdit ? 'Edit Galeri' : 'Tambah Galeri Baru'}
@@ -96,19 +142,21 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="img_url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL Gambar</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://example.com/image.jpg" disabled={loading} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Image Upload */}
+            <div>
+              <FileUpload
+                label="Gambar Galeri"
+                description="Upload gambar galeri (JPG, PNG, WebP, max 5MB)"
+                accept="image/*"
+                maxSize={5 * 1024 * 1024} // 5MB
+                maxFiles={1}
+                files={selectedFiles}
+                existingFiles={existingFiles}
+                onFilesChange={handleFilesChange}
+                onError={handleFileError}
+                disabled={loading}
+              />
+            </div>
 
             <FormField
               control={form.control}

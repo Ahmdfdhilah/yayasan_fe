@@ -22,7 +22,6 @@ export interface BoardMember {
 export interface BoardMemberCreate {
   name: string;
   position: string;
-  img_url?: string;
   description?: string;
   is_active?: boolean;
   display_order?: number;
@@ -31,7 +30,6 @@ export interface BoardMemberCreate {
 export interface BoardMemberUpdate {
   name?: string;
   position?: string;
-  img_url?: string;
   description?: string;
   is_active?: boolean;
   display_order?: number;

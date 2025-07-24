@@ -176,21 +176,29 @@ const ArticlesPage: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSave = async (articleData: any) => {
+  const handleSave = async (data: any, image?: File) => {
     try {
       if (editingArticle) {
         // Update existing article
-        await articleService.updateArticle(editingArticle.id, articleData);
+        await articleService.updateArticle(editingArticle.id, data, image);
         toast({
           title: 'Artikel berhasil diperbarui',
-          description: `Artikel ${articleData.title} telah diperbarui.`,
+          description: `Artikel ${data.title} telah diperbarui.`,
         });
       } else {
-        // Create new article
-        await articleService.createArticle(articleData);
+        // Create new article - image is required
+        if (!image) {
+          toast({
+            title: 'Gambar wajib diupload',
+            description: 'Silakan pilih gambar untuk artikel baru.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        await articleService.createArticle(data, image);
         toast({
           title: 'Artikel berhasil dibuat',
-          description: `Artikel ${articleData.title} telah ditambahkan ke sistem.`,
+          description: `Artikel ${data.title} telah ditambahkan ke sistem.`,
         });
       }
       setIsDialogOpen(false);

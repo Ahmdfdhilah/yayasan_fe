@@ -23,6 +23,14 @@ import {
   FormMessage,
   FormDescription,
 } from '@workspace/ui/components/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@workspace/ui/components/select';
+import FileUpload from '@/components/common/FileUpload';
 import { Article, ArticleCreate, ArticleUpdate } from '@/services/articles/types';
 
 const articleFormSchema = z.object({
@@ -31,7 +39,6 @@ const articleFormSchema = z.object({
     .regex(/^[a-z0-9-]+$/, 'Slug hanya boleh mengandung huruf kecil, angka, dan tanda hubung'),
   description: z.string().min(1, 'Konten wajib diisi'),
   excerpt: z.string().optional().or(z.literal('')),
-  img_url: z.string().url('URL gambar tidak valid').optional().or(z.literal('')),
   category: z.string().min(1, 'Kategori wajib diisi').max(100, 'Kategori maksimal 100 karakter'),
   is_published: z.boolean(),
 });
@@ -42,8 +49,19 @@ interface ArticleDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editingArticle: Article | null;
-  onSave: (data: ArticleCreate | ArticleUpdate) => void;
+  onSave: (data: ArticleCreate | ArticleUpdate, image?: File) => void;
 }
+
+// Common article categories
+const ARTICLE_CATEGORIES = [
+  'Berita',
+  'Pengumuman', 
+  'Kegiatan',
+  'Prestasi',
+  'Akademik',
+  'Ekstrakurikuler',
+  'Umum',
+];
 
 export const ArticleDialog: React.FC<ArticleDialogProps> = ({
   open,
@@ -53,6 +71,7 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const isEdit = !!editingArticle;
 
   const form = useForm<ArticleFormData>({
@@ -62,7 +81,6 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
       slug: '',
       description: '',
       excerpt: '',
-      img_url: '',
       category: '',
       is_published: false,
     },
@@ -76,7 +94,6 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
           slug: editingArticle.slug,
           description: editingArticle.description,
           excerpt: editingArticle.excerpt || '',
-          img_url: editingArticle.img_url || '',
           category: editingArticle.category,
           is_published: editingArticle.is_published,
         });
@@ -86,11 +103,11 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
           slug: '',
           description: '',
           excerpt: '',
-          img_url: '',
           category: '',
           is_published: false,
         });
       }
+      setSelectedFiles([]);
     }
   }, [open, editingArticle, form]);
 
@@ -98,13 +115,28 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
   const generateSlug = (title: string) => {
     return title
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
+      .trim()
+      .replace(/[^\w\s-]/g, '') // Remove special characters
+      .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
+      .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
   };
 
+  // Watch title changes to auto-generate slug
+  const watchTitle = form.watch('title');
+  useEffect(() => {
+    if (watchTitle && !isEdit) {
+      const newSlug = generateSlug(watchTitle);
+      form.setValue('slug', newSlug);
+    }
+  }, [watchTitle, isEdit, form]);
+
   const onSubmit = async (data: ArticleFormData) => {
+    // Validasi file upload untuk create
+    if (!isEdit && selectedFiles.length === 0) {
+      toast.error({ title: 'Gambar artikel wajib diupload' });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -113,221 +145,223 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
         slug: data.slug,
         description: data.description,
         excerpt: data.excerpt || undefined,
-        img_url: data.img_url || undefined,
         category: data.category,
         is_published: data.is_published,
         published_at: data.is_published ? new Date().toISOString() : undefined,
       };
 
-      onSave(submitData);
+      const imageFile = selectedFiles.length > 0 ? selectedFiles[0] : undefined;
+      await onSave(submitData, imageFile);
+      
       onOpenChange(false);
-    } catch (error) {
+      form.reset();
+      setSelectedFiles([]);
+      
+      toast.success({ title: isEdit ? 'Artikel berhasil diperbarui' : 'Artikel berhasil ditambahkan' });
+    } catch (error: any) {
       console.error('Error saving article:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal menyimpan Artikel. Silakan coba lagi.',
-        variant: 'destructive'
-      });
+      toast.error({ title: error.message || 'Gagal menyimpan artikel' });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancel = () => {
-    if (!loading) {
-      form.reset();
-      onOpenChange(false);
-    }
+  const handleFilesChange = (files: File[]) => {
+    setSelectedFiles(files);
   };
+
+  const handleFileError = (error: string) => {
+    toast.error({ title: error });
+  };
+
+  const existingFiles = editingArticle?.img_url ? [{
+    name: `Current Image - ${editingArticle.title}`,
+    url: editingArticle.img_url,
+    viewUrl: editingArticle.img_url,
+  }] : [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] flex flex-col">
-        <DialogHeader className="flex-shrink-0 border-b pb-4">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
           <DialogTitle>
             {isEdit ? 'Edit Artikel' : 'Tambah Artikel Baru'}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto py-4">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Judul</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Masukkan judul artikel"
-                            disabled={loading}
-                            {...field}
-                            onChange={(e) => {
-                              field.onChange(e);
-                              // Auto-generate slug if not editing
-                              if (!isEdit && e.target.value) {
-                                form.setValue('slug', generateSlug(e.target.value));
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Basic Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Judul Artikel</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Masukkan judul artikel"
+                        {...field}
+                        disabled={loading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                  <FormField
-                    control={form.control}
-                    name="slug"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Slug</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="artikel-slug"
-                            disabled={loading}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          URL-friendly identifier (huruf kecil, angka, dan tanda hubung)
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+              <FormField
+                control={form.control}
+                name="slug"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Slug URL</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="url-artikel"
+                        {...field}
+                        disabled={loading}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      URL artikel (otomatis dibuat dari judul)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Kategori</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Masukkan kategori artikel"
-                            disabled={loading}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="img_url"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>URL Gambar</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="https://example.com/image.jpg"
-                            disabled={loading}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          URL gambar utama artikel (opsional)
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="excerpt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ringkasan</FormLabel>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Kategori</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={loading}>
                       <FormControl>
-                        <Textarea
-                          placeholder="Masukkan ringkasan artikel (opsional)"
-                          disabled={loading}
-                          rows={3}
-                          {...field}
-                        />
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih kategori artikel" />
+                        </SelectTrigger>
                       </FormControl>
+                      <SelectContent>
+                        {ARTICLE_CATEGORIES.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="is_published"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>Status Publikasi</FormLabel>
                       <FormDescription>
-                        Ringkasan singkat yang akan ditampilkan di daftar artikel
+                        Artikel akan ditampilkan di website
                       </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={loading}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
 
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Konten</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Masukkan konten lengkap artikel"
-                          disabled={loading}
-                          rows={10}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Konten lengkap artikel (mendukung HTML)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+            {/* Image Upload */}
+            <div>
+              <FileUpload
+                label="Gambar Artikel"
+                description="Upload gambar artikel (JPG, PNG, WebP, max 5MB)"
+                accept="image/*"
+                maxSize={5 * 1024 * 1024} // 5MB
+                maxFiles={1}
+                files={selectedFiles}
+                existingFiles={existingFiles}
+                onFilesChange={handleFilesChange}
+                onError={handleFileError}
+                required={!isEdit}
+                disabled={loading}
+                showPreview={true}
+                allowRemove={true}
+              />
+            </div>
 
-                <FormField
-                  control={form.control}
-                  name="is_published"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Publikasikan Artikel</FormLabel>
-                        <FormDescription>
-                          Artikel akan ditampilkan di website publik
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={loading}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </form>
-          </Form>
-        </div>
+            {/* Excerpt */}
+            <FormField
+              control={form.control}
+              name="excerpt"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ringkasan</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Masukkan ringkasan artikel (opsional)"
+                      rows={3}
+                      {...field}
+                      disabled={loading}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Ringkasan singkat artikel yang akan ditampilkan di daftar artikel
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <DialogFooter className="flex-shrink-0 border-t pt-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleCancel}
-            disabled={loading}
-          >
-            Batal
-          </Button>
-          <Button
-            onClick={form.handleSubmit(onSubmit)}
-            disabled={loading}
-          >
-            {loading ? 'Menyimpan...' : isEdit ? 'Perbarui Artikel' : 'Buat Artikel'}
-          </Button>
-        </DialogFooter>
+            {/* Content */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Konten Artikel</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Masukkan konten lengkap artikel"
+                      rows={10}
+                      {...field}
+                      disabled={loading}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Konten lengkap artikel (mendukung HTML sederhana)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={loading}
+              >
+                Batal
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? 'Menyimpan...' : (isEdit ? 'Perbarui' : 'Simpan')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

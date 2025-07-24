@@ -1,8 +1,6 @@
 // apps/vite-react-app/src/services/board-members/service.ts
 import { BaseService } from "../base";
 import {
-  BoardMemberCreate,
-  BoardMemberUpdate,
   BoardMemberResponse,
   BoardMemberListResponse,
   BoardMemberSummary,
@@ -87,11 +85,20 @@ class BoardMemberService extends BaseService {
     return this.get(endpoint);
   }
 
-  // Create new board member (admin only)
+  // Create new board member with multipart form data (admin only)
   async createBoardMember(
-    boardMemberData: BoardMemberCreate
+    data: BoardMemberCreate,
+    image: File
   ): Promise<BoardMemberResponse> {
-    return this.post("/", boardMemberData);
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(data));
+    formData.append('image', image);
+    
+    return this.post("/", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 
   // Get board member by ID
@@ -101,12 +108,23 @@ class BoardMemberService extends BaseService {
     return this.get(`/${boardMemberId}`);
   }
 
-  // Update board member (admin only)
+  // Update board member with optional image upload (admin only)
   async updateBoardMember(
     boardMemberId: number,
-    boardMemberData: BoardMemberUpdate
+    data: BoardMemberUpdate,
+    image?: File
   ): Promise<BoardMemberResponse> {
-    return this.put(`/${boardMemberId}`, boardMemberData);
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(data));
+    if (image) {
+      formData.append('image', image);
+    }
+    
+    return this.put(`/${boardMemberId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 
   // Delete board member (admin only)
@@ -116,12 +134,12 @@ class BoardMemberService extends BaseService {
     return this.delete(`/${boardMemberId}`);
   }
 
-  // Update display order (admin only)
+  // Update display order (admin only) - Updated endpoint path
   async updateDisplayOrder(
     boardMemberId: number,
     newOrder: number
   ): Promise<BoardMemberResponse> {
-    return this.patch(`/${boardMemberId}/display-order`, { new_order: newOrder });
+    return this.patch(`/${boardMemberId}/order`, { new_order: newOrder });
   }
 
   // Toggle active status (admin only)

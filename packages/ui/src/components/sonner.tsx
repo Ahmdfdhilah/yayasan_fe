@@ -54,9 +54,17 @@ export function useToast() {
   return {
     toast,
     dismiss: sonnerToast.dismiss,
-    error: (props: Omit<ToastProps, "variant">) =>
-      toast({ ...props, variant: "destructive" }),
-    success: (props: Omit<ToastProps, "variant">) =>
-      toast({ ...props, variant: "default" }),
+    error: (props: Omit<ToastProps, "variant"> | string) => {
+      if (typeof props === "string") {
+        return toast({ title: props, variant: "destructive" });
+      }
+      return toast({ ...props, variant: "destructive" });
+    },
+    success: (props: Omit<ToastProps, "variant"> | string) => {
+      if (typeof props === "string") {
+        return toast({ title: props, variant: "default" });
+      }
+      return toast({ ...props, variant: "default" });
+    },
   }
 }

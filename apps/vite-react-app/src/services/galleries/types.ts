@@ -19,7 +19,6 @@ export interface Gallery {
 
 // Request Types
 export interface GalleryCreate {
-  img_url: string;
   title: string;
   excerpt?: string;
   is_active?: boolean;
@@ -27,7 +26,6 @@ export interface GalleryCreate {
 }
 
 export interface GalleryUpdate {
-  img_url?: string;
   title?: string;
   excerpt?: string;
   is_active?: boolean;

@@ -155,34 +155,25 @@ const BoardMembersPage: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSave = async (boardMemberData: any) => {
+  const handleSave = async (data: any, image?: File) => {
     try {
       if (editingBoardMember) {
         // Update existing board member
-        await boardMemberService.updateBoardMember(editingBoardMember.id, boardMemberData);
-        toast({
-          title: 'Anggota Dewan berhasil diperbarui',
-          description: `Anggota Dewan ${boardMemberData.name} telah diperbarui.`,
-        });
+        await boardMemberService.updateBoardMember(editingBoardMember.id, data, image);
       } else {
-        // Create new board member
-        await boardMemberService.createBoardMember(boardMemberData);
-        toast({
-          title: 'Anggota Dewan berhasil dibuat',
-          description: `Anggota Dewan ${boardMemberData.name} telah ditambahkan ke sistem.`,
-        });
+        // Create new board member - image is required
+        if (!image) {
+          throw new Error('Gambar wajib diupload untuk pengurus baru');
+        }
+        await boardMemberService.createBoardMember(data, image);
       }
       setIsDialogOpen(false);
       setEditingBoardMember(null);
       fetchBoardMembers(); // Refresh the list
     } catch (error: any) {
       console.error('Failed to save board member:', error);
-      const errorMessage = error?.message || 'Gagal menyimpan Anggota Dewan. Silakan coba lagi.';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive'
-      });
+      const errorMessage = error?.message || 'Gagal menyimpan pengurus. Silakan coba lagi.';
+      throw new Error(errorMessage);
     }
   };
 

@@ -1,16 +1,14 @@
 // apps/vite-react-app/src/services/galleries/service.ts
 import { BaseService } from "../base";
 import {
-  GalleryCreate,
-  GalleryUpdate,
-  GalleryBulkOrderUpdate,
   GalleryResponse,
   GalleryListResponse,
   GallerySummary,
   GalleryFilterParams,
   GalleryStatistics,
-  BulkOrderUpdateResponse,
   MessageResponse,
+  GalleryCreate,
+  GalleryUpdate,
 } from "./types";
 
 class GalleryService extends BaseService {
@@ -89,11 +87,20 @@ class GalleryService extends BaseService {
     return this.get(endpoint);
   }
 
-  // Create new gallery (admin only)
+  // Create new gallery with multipart form data (admin only)
   async createGallery(
-    galleryData: GalleryCreate
+    data: GalleryCreate,
+    image: File
   ): Promise<GalleryResponse> {
-    return this.post("/", galleryData);
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(data));
+    formData.append('image', image);
+    
+    return this.post("/", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 
   // Get gallery by ID
@@ -103,12 +110,23 @@ class GalleryService extends BaseService {
     return this.get(`/${galleryId}`);
   }
 
-  // Update gallery (admin only)
+  // Update gallery with optional image upload (admin only)
   async updateGallery(
     galleryId: number,
-    galleryData: GalleryUpdate
+    data: GalleryUpdate,
+    image?: File
   ): Promise<GalleryResponse> {
-    return this.put(`/${galleryId}`, galleryData);
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(data));
+    if (image) {
+      formData.append('image', image);
+    }
+    
+    return this.put(`/${galleryId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 
   // Delete gallery (admin only)
@@ -133,33 +151,6 @@ class GalleryService extends BaseService {
     newOrder: number
   ): Promise<GalleryResponse> {
     return this.patch(`/${galleryId}/order`, { new_order: newOrder });
-  }
-
-  // Bulk update gallery orders (admin only)
-  async bulkUpdateGalleryOrder(
-    bulkOrderData: GalleryBulkOrderUpdate
-  ): Promise<BulkOrderUpdateResponse> {
-    return this.post("/bulk-order", bulkOrderData);
-  }
-
-  // Normalize gallery orders (admin only)
-  async normalizeGalleryOrders(): Promise<MessageResponse> {
-    return this.post("/normalize-orders");
-  }
-
-  // Export all galleries in order (admin only)
-  async exportGalleriesOrdered(): Promise<GalleryResponse[]> {
-    return this.get("/export/ordered");
-  }
-
-  // Move gallery up one position (admin only)
-  async moveGalleryUp(galleryId: number): Promise<GalleryResponse> {
-    return this.post(`/move-up/${galleryId}`);
-  }
-
-  // Move gallery down one position (admin only)
-  async moveGalleryDown(galleryId: number): Promise<GalleryResponse> {
-    return this.post(`/move-down/${galleryId}`);
   }
 }
 
