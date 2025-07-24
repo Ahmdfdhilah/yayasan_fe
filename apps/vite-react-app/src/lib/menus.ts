@@ -95,6 +95,31 @@ export const appMenuItems: SidebarItem[] = [
     ],
   },
 
+
+  // Period Management - Admin only
+  {
+    title: 'Periode',
+    href: '/periods',
+    icon: Calendar,
+    allowedRoles: ['admin'],
+  },
+
+  // Organization Management - Admin only
+  {
+    title: 'Sekolah',
+    href: '/organizations',
+    icon: Building,
+    allowedRoles: ['admin'],
+  },
+
+  // User Management - Admin only
+  {
+    title: 'Manajemen Pengguna',
+    href: '/users',
+    icon: Users,
+    allowedRoles: ['admin'],
+  },
+
   // Content Management - Admin only
   {
     title: 'Manajemen Konten',
@@ -128,37 +153,14 @@ export const appMenuItems: SidebarItem[] = [
     ],
   },
 
-  // Period Management - Admin only
+  // Media Files Management - All users can view their own files
   {
-    title: 'Periode',
-    href: '/periods',
-    icon: Calendar,
-    allowedRoles: ['admin'],
+    title: 'File Saya',
+    href: '/media-files',
+    icon: FolderOpen,
+    allowedRoles: ['admin', 'guru', 'kepala_sekolah'],
   },
 
-  // Organization Management - Admin only
-  {
-    title: 'Sekolah',
-    href: '/organizations',
-    icon: Building,
-    allowedRoles: ['admin'],
-  },
-
-  // User Management - Admin only
-  {
-    title: 'Manajemen Pengguna',
-    href: '/users',
-    icon: Users,
-    allowedRoles: ['admin'],
-  },
-    // Media Files Management - All users can view their own files
-    {
-      title: 'File Saya',
-      href: '/media-files',
-      icon: FolderOpen,
-      allowedRoles: ['admin', 'guru', 'kepala_sekolah'],
-    },
-  
 ];
 
 // Helper function to get appropriate menu items based on user roles

@@ -7,6 +7,7 @@ export interface Organization {
   id: number;
   name: string;
   description?: string;
+  excerpt?: string;
   head_id?: number;
   created_at: string;
   updated_at?: string;
@@ -19,12 +20,14 @@ export interface Organization {
 export interface OrganizationCreate {
   name: string;
   description?: string;
+  excerpt?: string;
   head_id?: number;
 }
 
 export interface OrganizationUpdate {
   name?: string;
   description?: string;
+  excerpt?: string;
   head_id?: number;
 }
 

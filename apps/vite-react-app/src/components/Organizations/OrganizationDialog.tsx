@@ -13,6 +13,7 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Textarea } from '@workspace/ui/components/textarea';
+import { RichTextEditor } from '@/components/common/RichTextEditor';
 import {
   Form,
   FormControl,
@@ -29,6 +30,7 @@ import { userService } from '@/services/users';
 const organizationFormSchema = z.object({
   name: z.string().min(1, 'Nama wajib diisi').max(255, 'Nama maksimal 255 karakter'),
   description: z.string().optional().or(z.literal('')),
+  excerpt: z.string().optional().or(z.literal('')),
   head_id: z.number().optional().or(z.literal('')),
 });
 
@@ -59,6 +61,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
     defaultValues: {
       name: '',
       description: '',
+      excerpt: '',
       head_id: undefined,
     },
   });
@@ -91,12 +94,14 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
         form.reset({
           name: editingOrganization.name,
           description: editingOrganization.description || '',
+          excerpt: editingOrganization.excerpt || '',
           head_id: editingOrganization.head_id,
         });
       } else {
         form.reset({
           name: '',
           description: '',
+          excerpt: '',
           head_id: undefined,
         });
       }
@@ -113,6 +118,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
       const submitData = {
         name: data.name,
         description: data.description || undefined,
+        excerpt: data.excerpt || undefined,
         head_id: data.head_id || undefined,
       };
 
@@ -192,12 +198,34 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Deskripsi</FormLabel>
+                      <FormLabel>Deskripsi Lengkap</FormLabel>
+                      <FormControl>
+                        <RichTextEditor
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Masukkan deskripsi lengkap sekolah (opsional)"
+                          disabled={loading}
+                          variant="default"
+                          minHeight={150}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="excerpt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ringkasan Singkat</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Masukkan deskripsi Sekolah (opsional)"
+                          placeholder="Masukkan ringkasan singkat sekolah (opsional)"
                           disabled={loading}
-                          rows={3}
+                          rows={2}
+                          maxLength={500}
                           {...field}
                         />
                       </FormControl>

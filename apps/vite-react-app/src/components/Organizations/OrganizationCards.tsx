@@ -3,6 +3,7 @@ import { Organization } from '@/services/organizations/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { 
@@ -86,10 +87,17 @@ export const OrganizationCards: React.FC<OrganizationCardsProps> = ({
             </div>
 
             {/* Description */}
-            {organization.description && (
+            {(organization.description || organization.excerpt) && (
               <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-2">
                 <FileText className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span className="line-clamp-2">{organization.description}</span>
+                <div className="line-clamp-2">
+                  <RichTextDisplay 
+                    content={organization.excerpt || organization.description}
+                    isDetailView={false}
+                    maxLength={100}
+                    fallback="Tidak ada deskripsi"
+                  />
+                </div>
               </div>
             )}
 

@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from '@workspace/ui/components/select';
 import FileUpload from '@/components/common/FileUpload';
+import { RichTextEditor } from '@/components/common/RichTextEditor';
 import { Article, ArticleCreate, ArticleUpdate } from '@/services/articles/types';
 
 const articleFormSchema = z.object({
@@ -55,7 +56,7 @@ interface ArticleDialogProps {
 // Common article categories
 const ARTICLE_CATEGORIES = [
   'Berita',
-  'Pengumuman', 
+  'Pengumuman',
   'Kegiatan',
   'Prestasi',
   'Akademik',
@@ -133,7 +134,11 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
   const onSubmit = async (data: ArticleFormData) => {
     // Validasi file upload untuk create
     if (!isEdit && selectedFiles.length === 0) {
-      toast.error({ title: 'Gambar artikel wajib diupload' });
+      toast({
+        title: 'Error',
+        description: 'Gambar artikel wajib diupload',
+        variant: 'destructive'
+      });
       return;
     }
 
@@ -152,15 +157,22 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
 
       const imageFile = selectedFiles.length > 0 ? selectedFiles[0] : undefined;
       await onSave(submitData, imageFile);
-      
+
       onOpenChange(false);
       form.reset();
       setSelectedFiles([]);
-      
-      toast.success({ title: isEdit ? 'Artikel berhasil diperbarui' : 'Artikel berhasil ditambahkan' });
+
+      toast({
+        title: 'Berhasil',
+        description: isEdit ? 'Artikel berhasil diperbarui' : 'Artikel berhasil ditambahkan'
+      });
     } catch (error: any) {
       console.error('Error saving article:', error);
-      toast.error({ title: error.message || 'Gagal menyimpan artikel' });
+      toast({
+        title: 'Error',
+        description: error.message || 'Gagal menyimpan artikel',
+        variant: 'destructive'
+      });
     } finally {
       setLoading(false);
     }
@@ -171,7 +183,11 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
   };
 
   const handleFileError = (error: string) => {
-    toast.error({ title: error });
+    toast({
+      title: 'Error',
+      description: error,
+      variant: 'destructive'
+    });
   };
 
   const existingFiles = editingArticle?.img_url ? [{
@@ -192,7 +208,7 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
               <FormField
                 control={form.control}
                 name="title"
@@ -233,7 +249,7 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
               <FormField
                 control={form.control}
                 name="category"
@@ -255,28 +271,6 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
                       </SelectContent>
                     </Select>
                     <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="is_published"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                    <div className="space-y-0.5">
-                      <FormLabel>Status Publikasi</FormLabel>
-                      <FormDescription>
-                        Artikel akan ditampilkan di website
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={loading}
-                      />
-                    </FormControl>
                   </FormItem>
                 )}
               />
@@ -332,17 +326,41 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
                 <FormItem>
                   <FormLabel>Konten Artikel</FormLabel>
                   <FormControl>
-                    <Textarea
+                    <RichTextEditor
+                      value={field.value}
+                      onChange={field.onChange}
                       placeholder="Masukkan konten lengkap artikel"
-                      rows={10}
-                      {...field}
                       disabled={loading}
+                      variant="full"
+                      minHeight={300}
                     />
                   </FormControl>
                   <FormDescription>
-                    Konten lengkap artikel (mendukung HTML sederhana)
+                    Konten lengkap artikel dengan format rich text
                   </FormDescription>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="is_published"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                  <div className="space-y-0.5">
+                    <FormLabel>Status Publikasi</FormLabel>
+                    <FormDescription>
+                      Artikel akan ditampilkan di website
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={loading}
+                    />
+                  </FormControl>
                 </FormItem>
               )}
             />

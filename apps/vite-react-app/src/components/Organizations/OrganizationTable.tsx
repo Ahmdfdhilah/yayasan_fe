@@ -9,6 +9,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { Users } from 'lucide-react';
@@ -62,7 +63,12 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
                   {organization.name}
                 </TableCell>
                 <TableCell>
-                  {organization.description || 'Tidak ada deskripsi'}
+                  <RichTextDisplay 
+                    content={organization.excerpt || organization.description}
+                    isDetailView={false}
+                    maxLength={80}
+                    fallback="Tidak ada deskripsi"
+                  />
                 </TableCell>
                 <TableCell>
                   {organization.head_name || 'Belum ada'}

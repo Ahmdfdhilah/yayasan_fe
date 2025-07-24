@@ -3,6 +3,7 @@ import { Article } from '@/services/articles/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -66,9 +67,14 @@ export const ArticleCards: React.FC<ArticleCardsProps> = ({
                   )}
                   <div className="flex-1">
                     <h3 className="font-medium text-sm line-clamp-2">{article.title}</h3>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {article.display_excerpt}
-                    </p>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      <RichTextDisplay 
+                        content={article.excerpt || article.description}
+                        isDetailView={false}
+                        maxLength={100}
+                        fallback="Tidak ada ringkasan"
+                      />
+                    </div>
                   </div>
                 </div>
                 

@@ -9,6 +9,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { Badge } from '@workspace/ui/components/badge';
@@ -70,7 +71,12 @@ export const ArticleTable: React.FC<ArticleTableProps> = ({
                     <div>
                       <div className="font-medium">{article.title}</div>
                       <div className="text-xs text-muted-foreground">
-                        {article.display_excerpt}
+                        <RichTextDisplay 
+                          content={article.excerpt || article.description}
+                          isDetailView={false}
+                          maxLength={60}
+                          fallback="Tidak ada ringkasan"
+                        />
                       </div>
                     </div>
                   </div>
