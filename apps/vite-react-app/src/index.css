@@ -98,3 +98,48 @@
     margin-top: 1em;
     margin-bottom: 0.5em;
 }
+
+/* Zoom Level Optimizations for Dashboard Layout */
+@media screen and (min-resolution: 120dpi) and (max-resolution: 144dpi) {
+  /* 125% zoom optimization */
+  .sidebar-content {
+    font-size: 0.9rem;
+  }
+  
+  .dashboard-layout {
+    line-height: 1.4;
+  }
+}
+
+@media screen and (max-resolution: 96dpi) {
+  /* 80% zoom optimization */
+  .sidebar-content {
+    font-size: 1.1rem;
+  }
+  
+  .dashboard-layout {
+    line-height: 1.6;
+  }
+}
+
+/* Better overflow handling for responsive layouts */
+.dashboard-main {
+  overflow-x: auto;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Improved text scaling across zoom levels */
+@media (min-width: 1024px) {
+  .responsive-text {
+    font-size: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+  }
+}
+
+/* DPI-specific optimizations */
+@media (-webkit-min-device-pixel-ratio: 1.25) {
+  .high-dpi-text {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

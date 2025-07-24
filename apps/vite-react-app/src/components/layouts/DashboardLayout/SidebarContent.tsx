@@ -43,7 +43,7 @@ export function SidebarContent({
   }, [currentRole]);
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col min-h-0">
       <SidebarHeader 
         collapsed={collapsed} 
         onToggleCollapse={onToggleCollapse} 
@@ -51,7 +51,7 @@ export function SidebarContent({
 
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full">
-          <div className={cn("p-4 pb-2", collapsed && "px-2")}>
+          <div className={cn("p-3 pb-2", collapsed && "px-2")}>
             <nav className="space-y-1">
               {menuItems.map((item) => (
                 <SidebarMenuItem 

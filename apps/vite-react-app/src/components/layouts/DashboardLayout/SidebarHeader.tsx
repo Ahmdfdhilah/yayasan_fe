@@ -13,11 +13,11 @@ export function SidebarHeader({ collapsed, onToggleCollapse }: SidebarHeaderProp
   
   return (
     <>
-      <div className={cn("flex h-16 items-center flex-shrink-0", collapsed ? "px-3 justify-center" : "px-6 justify-between")}>
+      <div className={cn("flex h-14 lg:h-16 items-center flex-shrink-0", collapsed ? "px-2 lg:px-3 justify-center" : "px-4 lg:px-6 justify-between")}>
         <Link to="/admin" className={cn("flex items-center", collapsed ? "justify-center" : "space-x-2")}>
           <img 
             src={logo} 
-            className={cn("transition-all duration-300 object-contain", collapsed ? "w-8 h-8" : "w-12 h-12")} 
+            className={cn("transition-all duration-300 object-contain", collapsed ? "w-8 h-8" : "w-10 h-10 lg:w-12 lg:h-12")} 
             alt="logo okoce" 
           />
         </Link>
@@ -25,7 +25,7 @@ export function SidebarHeader({ collapsed, onToggleCollapse }: SidebarHeaderProp
           <Button
             variant="ghost"
             size="sm"
-            className="hidden md:flex h-8 w-8 p-0 flex-shrink-0"
+            className="hidden lg:flex h-8 w-8 p-0 flex-shrink-0"
             onClick={onToggleCollapse}
             title="Collapse sidebar"
           >

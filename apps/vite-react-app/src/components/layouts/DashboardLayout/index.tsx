@@ -54,8 +54,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="min-h-screen bg-muted/5">
       {/* Desktop Sidebar */}
       <div className={cn(
-        "hidden md:fixed md:inset-y-0 md:z-50 md:flex md:flex-col transition-all duration-300",
-        isCollapsed ? "md:w-20" : "md:w-64" 
+        "hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col transition-all duration-300",
+        isCollapsed ? "lg:w-[5rem]" : "lg:w-[16rem]" 
       )}>
         <div className="flex grow flex-col gap-y-0  bg-sidebar">
           <SidebarContent 
@@ -71,7 +71,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Mobile Sidebar */}
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-        <SheetContent side="left" className="p-0 w-64">
+        <SheetContent side="left" className="p-0 w-64 max-w-[80vw]">
           <SidebarContent 
             collapsed={false}
             expandedMenus={expandedMenus}
@@ -86,13 +86,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main Content */}
       <div className={cn(
         "min-h-screen flex flex-col transition-all duration-300",
-        isCollapsed ? "md:pl-20" : "md:pl-64" 
+        isCollapsed ? "lg:pl-[5rem]" : "lg:pl-[16rem]" 
       )}>
         <MobileHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
 
         {/* Page Content */}
         <main className="flex-1 min-h-0">
-          <div className="py-3 lg:py-6 px-4 sm:px-6 lg:px-8">
+          <div className="py-3 lg:py-6 px-3 sm:px-4 lg:px-6 xl:px-8">
             {children || <Outlet />}
           </div>
         </main>
