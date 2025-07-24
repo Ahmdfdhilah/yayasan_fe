@@ -29,7 +29,6 @@ import { Gallery, GalleryCreate, GalleryUpdate } from '@/services/galleries/type
 const galleryFormSchema = z.object({
   title: z.string().min(1, 'Judul wajib diisi').max(255, 'Judul maksimal 255 karakter'),
   excerpt: z.string().optional().or(z.literal('')),
-  is_active: z.boolean(),
   display_order: z.number().min(0, 'Urutan tidak boleh negatif'),
 });
 
@@ -58,7 +57,6 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
     defaultValues: {
       title: '',
       excerpt: '',
-      is_active: true,
       display_order: 0,
     },
   });
@@ -69,14 +67,12 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
         form.reset({
           title: editingGallery.title,
           excerpt: editingGallery.excerpt || '',
-          is_active: editingGallery.is_active,
           display_order: editingGallery.display_order,
         });
       } else {
         form.reset({
           title: '',
           excerpt: '',
-          is_active: true,
           display_order: 0,
         });
       }
@@ -97,7 +93,6 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
       const submitData = {
         title: data.title,
         excerpt: data.excerpt || undefined,
-        is_active: data.is_active,
         display_order: data.display_order,
       };
 
@@ -186,45 +181,27 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="display_order"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Urutan Tampilan</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        disabled={loading}
-                        {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                      />
-                    </FormControl>
-                    <FormDescription>Urutan tampilan galeri (0 = paling atas)</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="is_active"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">Status Aktif</FormLabel>
-                      <FormDescription>Galeri akan ditampilkan di website</FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} disabled={loading} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="display_order"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Urutan Tampilan</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      disabled={loading}
+                      {...field}
+                      onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                    />
+                  </FormControl>
+                  <FormDescription>Urutan tampilan galeri (0 = paling atas)</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </form>
         </Form>
 

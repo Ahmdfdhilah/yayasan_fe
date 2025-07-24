@@ -45,6 +45,16 @@ export const getNewsImageUrl = (imageUrl?: string | null): string => {
 };
 
 /**
+ * Get gallery image URL specifically for gallery items
+ * 
+ * @param imageUrl - Gallery image URL from API
+ * @returns Full image URL or gallery placeholder
+ */
+export const getGalleryImageUrl = (imageUrl?: string | null): string => {
+  return getImageUrl(imageUrl, '/placeholder-gallery.jpg');
+};
+
+/**
  * Get board member image URL specifically for board/team members
  * 
  * @param imageUrl - Board member image URL from API

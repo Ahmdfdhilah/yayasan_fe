@@ -9,7 +9,6 @@ export interface BoardMember {
   position: string;
   img_url?: string;
   description?: string;
-  is_active: boolean;
   display_order: number;
   created_at: string;
   updated_at?: string;
@@ -23,7 +22,6 @@ export interface BoardMemberCreate {
   name: string;
   position: string;
   description?: string;
-  is_active?: boolean;
   display_order?: number;
 }
 
@@ -31,7 +29,6 @@ export interface BoardMemberUpdate {
   name?: string;
   position?: string;
   description?: string;
-  is_active?: boolean;
   display_order?: number;
 }
 
@@ -45,7 +42,6 @@ export interface BoardMemberSummary {
   name: string;
   position: string;
   img_url?: string;
-  is_active: boolean;
   display_order: number;
 }
 
@@ -54,7 +50,6 @@ export interface BoardMemberFilterParams {
   page?: number;
   size?: number;
   search?: string;
-  is_active?: boolean;
   sort_by?: string;
   sort_order?: "asc" | "desc";
 }
@@ -62,8 +57,6 @@ export interface BoardMemberFilterParams {
 // Statistics Types
 export interface BoardMemberStatistics {
   total_members: number;
-  active_members: number;
-  inactive_members: number;
   positions: string[];
 }
 

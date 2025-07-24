@@ -30,7 +30,6 @@ const boardMemberFormSchema = z.object({
   name: z.string().min(1, 'Nama wajib diisi').max(255, 'Nama maksimal 255 karakter'),
   position: z.string().min(1, 'Posisi wajib diisi').max(255, 'Posisi maksimal 255 karakter'),
   description: z.string().optional().or(z.literal('')),
-  is_active: z.boolean(),
   display_order: z.number().min(0, 'Urutan tidak boleh negatif'),
 });
 
@@ -60,7 +59,6 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
       name: '',
       position: '',
       description: '',
-      is_active: true,
       display_order: 0,
     },
   });
@@ -72,7 +70,6 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
           name: editingBoardMember.name,
           position: editingBoardMember.position,
           description: editingBoardMember.description || '',
-          is_active: editingBoardMember.is_active,
           display_order: editingBoardMember.display_order,
         });
       } else {
@@ -80,7 +77,6 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
           name: '',
           position: '',
           description: '',
-          is_active: true,
           display_order: 0,
         });
       }
@@ -102,7 +98,6 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
         name: data.name,
         position: data.position,
         description: data.description || undefined,
-        is_active: data.is_active,
         display_order: data.display_order,
       };
 
@@ -228,54 +223,30 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
               )}
             />
 
-            {/* Settings */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="is_active"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                    <div className="space-y-0.5">
-                      <FormLabel>Status Aktif</FormLabel>
-                      <FormDescription>
-                        Pengurus akan ditampilkan di website
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={loading}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="display_order"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Urutan Tampil</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                        disabled={loading}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Urutan tampil di website (0 = paling atas)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {/* Display Order */}
+            <FormField
+              control={form.control}
+              name="display_order"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Urutan Tampil</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      {...field}
+                      onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      disabled={loading}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Urutan tampil di website (0 = paling atas)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <DialogFooter>
               <Button

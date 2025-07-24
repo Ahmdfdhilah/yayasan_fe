@@ -3,6 +3,7 @@ import { Gallery } from '@/services/galleries/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import { getGalleryImageUrl, getThumbnailUrl } from '@/utils/imageUtils';
 
 interface GalleryCardsProps {
   galleries: Gallery[];
@@ -49,7 +50,7 @@ export const GalleryCards: React.FC<GalleryCardsProps> = ({
           <CardContent className="p-4">
             <div className="flex items-start justify-between">
               <div className="flex items-center space-x-3 flex-1">
-                <img src={gallery.img_url} alt={gallery.title} className="w-16 h-16 rounded object-cover" />
+                <img src={getThumbnailUrl(gallery.img_url, 64)} alt={gallery.title} className="w-16 h-16 rounded object-cover" />
                 <div className="flex-1">
                   <h3 className="font-medium text-sm">{gallery.title}</h3>
                   <div className="flex items-center space-x-2 mt-1">

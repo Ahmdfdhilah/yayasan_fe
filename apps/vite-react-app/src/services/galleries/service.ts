@@ -33,29 +33,27 @@ class GalleryService extends BaseService {
     return this.get(endpoint);
   }
 
-  // Get active galleries
-  async getActiveGalleries(limit?: number): Promise<GalleryResponse[]> {
+  // Get all galleries
+  async getAllGalleries(limit?: number): Promise<GalleryResponse[]> {
     const queryParams = new URLSearchParams();
     if (limit) {
       queryParams.append("limit", limit.toString());
     }
     
-    const endpoint = queryParams.toString() ? `/active?${queryParams.toString()}` : "/active";
+    const endpoint = queryParams.toString() ? `/all?${queryParams.toString()}` : "/all";
     return this.get(endpoint);
   }
 
   // Search galleries
   async searchGalleries(
     query: string, 
-    limit?: number, 
-    activeOnly: boolean = true
+    limit?: number
   ): Promise<GalleryResponse[]> {
     const queryParams = new URLSearchParams();
     queryParams.append("q", query);
     if (limit) {
       queryParams.append("limit", limit.toString());
     }
-    queryParams.append("active_only", activeOnly.toString());
     
     return this.get(`/search?${queryParams.toString()}`);
   }
@@ -136,12 +134,6 @@ class GalleryService extends BaseService {
     return this.delete(`/${galleryId}`);
   }
 
-  // Toggle active status (admin only)
-  async toggleActiveStatus(
-    galleryId: number
-  ): Promise<GalleryResponse> {
-    return this.patch(`/${galleryId}/toggle-active`);
-  }
 
   // ===== ORDERING METHODS =====
 

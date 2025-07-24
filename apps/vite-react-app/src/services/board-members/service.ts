@@ -31,14 +31,14 @@ class BoardMemberService extends BaseService {
     return this.get(endpoint);
   }
 
-  // Get active board members
-  async getActiveBoardMembers(limit?: number): Promise<BoardMemberResponse[]> {
+  // Get all board members
+  async getAllBoardMembers(limit?: number): Promise<BoardMemberResponse[]> {
     const queryParams = new URLSearchParams();
     if (limit) {
       queryParams.append("limit", limit.toString());
     }
     
-    const endpoint = queryParams.toString() ? `/active?${queryParams.toString()}` : "/active";
+    const endpoint = queryParams.toString() ? `/all?${queryParams.toString()}` : "/all";
     return this.get(endpoint);
   }
 
@@ -50,15 +50,13 @@ class BoardMemberService extends BaseService {
   // Search board members
   async searchBoardMembers(
     query: string, 
-    limit?: number, 
-    activeOnly: boolean = true
+    limit?: number
   ): Promise<BoardMemberResponse[]> {
     const queryParams = new URLSearchParams();
     queryParams.append("q", query);
     if (limit) {
       queryParams.append("limit", limit.toString());
     }
-    queryParams.append("active_only", activeOnly.toString());
     
     return this.get(`/search?${queryParams.toString()}`);
   }
@@ -142,12 +140,6 @@ class BoardMemberService extends BaseService {
     return this.patch(`/${boardMemberId}/order`, { new_order: newOrder });
   }
 
-  // Toggle active status (admin only)
-  async toggleActiveStatus(
-    boardMemberId: number
-  ): Promise<BoardMemberResponse> {
-    return this.patch(`/${boardMemberId}/toggle-active`);
-  }
 }
 
 export const boardMemberService = new BoardMemberService();

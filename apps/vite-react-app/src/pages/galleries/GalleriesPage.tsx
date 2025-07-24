@@ -19,10 +19,10 @@ import Filtering from '@/components/common/Filtering';
 import Pagination from '@/components/common/Pagination';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@workspace/ui/components/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@workspace/ui/components/dialog';
+import { getGalleryImageUrl } from '@/utils/imageUtils';
 
 interface GalleryPageFilters {
   search: string;
-  is_active: string;
   page: number;
   size: number;
   [key: string]: string | number;
@@ -33,7 +33,7 @@ const GalleriesPage: React.FC = () => {
   const { toast } = useToast();
   
   const { updateURL, getCurrentFilters } = useURLFilters<GalleryPageFilters>({
-    defaults: { search: '', is_active: 'all', page: 1, size: 10 },
+    defaults: { search: '', page: 1, size: 10 },
     cleanDefaults: true,
   });
 
@@ -56,7 +56,6 @@ const GalleriesPage: React.FC = () => {
         page: filters.page,
         size: filters.size,
         search: filters.search || undefined,
-        is_active: filters.is_active !== 'all' ? filters.is_active === 'true' : undefined,
       };
 
       const response = await galleryService.getGalleries(params);
@@ -78,7 +77,7 @@ const GalleriesPage: React.FC = () => {
     if (hasAccess) {
       fetchGalleries();
     }
-  }, [filters.page, filters.size, filters.search, filters.is_active, hasAccess]);
+  }, [filters.page, filters.size, filters.search, hasAccess]);
 
   const totalPages = Math.ceil(totalItems / filters.size);
 
@@ -186,21 +185,6 @@ const GalleriesPage: React.FC = () => {
         }
       />
 
-      <Filtering>
-        <div className="space-y-2">
-          <Label htmlFor="active-filter">Status</Label>
-          <Select value={filters.is_active} onValueChange={(value) => updateURL({ is_active: value, page: 1 })}>
-            <SelectTrigger id="active-filter">
-              <SelectValue placeholder="Filter berdasarkan status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Galeri</SelectItem>
-              <SelectItem value="true">Aktif</SelectItem>
-              <SelectItem value="false">Tidak Aktif</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </Filtering>
 
       <Card>
         <CardContent>
@@ -268,7 +252,7 @@ const GalleriesPage: React.FC = () => {
                 <Label>Gambar</Label>
                 <div className="p-2 bg-muted rounded">
                   <img 
-                    src={viewingGallery.img_url} 
+                    src={getGalleryImageUrl(viewingGallery.img_url)} 
                     alt={viewingGallery.title}
                     className="w-full max-w-md h-auto rounded"
                   />
@@ -279,12 +263,6 @@ const GalleriesPage: React.FC = () => {
                   <Label>Judul</Label>
                   <div className="p-2 bg-muted rounded text-sm">
                     {viewingGallery.title}
-                  </div>
-                </div>
-                <div>
-                  <Label>Status</Label>
-                  <div className="p-2 bg-muted rounded text-sm">
-                    {viewingGallery.is_active ? 'Aktif' : 'Tidak Aktif'}
                   </div>
                 </div>
               </div>

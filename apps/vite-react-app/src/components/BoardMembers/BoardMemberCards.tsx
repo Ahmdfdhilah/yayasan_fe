@@ -5,6 +5,7 @@ import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { getBoardImageUrl, getThumbnailUrl } from '@/utils/imageUtils';
 
 interface BoardMemberCardsProps {
   boardMembers: BoardMember[];
@@ -59,7 +60,7 @@ export const BoardMemberCards: React.FC<BoardMemberCardsProps> = ({
                 <div className="flex items-center space-x-3 mb-2">
                   {boardMember.img_url && (
                     <img 
-                      src={boardMember.img_url} 
+                      src={getThumbnailUrl(boardMember.img_url, 64)} 
                       alt={boardMember.name}
                       className="w-10 h-10 rounded-full object-cover"
                     />

@@ -8,7 +8,6 @@ export interface Gallery {
   img_url: string;
   title: string;
   excerpt?: string;
-  is_active: boolean;
   display_order: number;
   created_at: string;
   updated_at?: string;
@@ -21,14 +20,12 @@ export interface Gallery {
 export interface GalleryCreate {
   title: string;
   excerpt?: string;
-  is_active?: boolean;
   display_order?: number;
 }
 
 export interface GalleryUpdate {
   title?: string;
   excerpt?: string;
-  is_active?: boolean;
   display_order?: number;
 }
 
@@ -50,7 +47,6 @@ export interface GallerySummary {
   id: number;
   img_url: string;
   title: string;
-  is_active: boolean;
   display_order: number;
 }
 
@@ -75,7 +71,6 @@ export interface GalleryFilterParams {
   page?: number;
   size?: number;
   search?: string;
-  is_active?: boolean;
   sort_by?: string;
   sort_order?: "asc" | "desc";
 }
@@ -83,8 +78,6 @@ export interface GalleryFilterParams {
 // Statistics Types
 export interface GalleryStatistics {
   total_galleries: number;
-  active_galleries: number;
-  inactive_galleries: number;
   order_conflicts?: number;
 }
 

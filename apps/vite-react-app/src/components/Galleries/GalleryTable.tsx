@@ -5,6 +5,7 @@ import ActionDropdown from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { Badge } from '@workspace/ui/components/badge';
+import { getThumbnailUrl } from '@/utils/imageUtils';
 
 interface GalleryTableProps {
   galleries: Gallery[];
@@ -47,7 +48,7 @@ export const GalleryTable: React.FC<GalleryTableProps> = ({
             galleries.map((gallery) => (
               <TableRow key={gallery.id}>
                 <TableCell>
-                  <img src={gallery.img_url} alt={gallery.title} className="w-12 h-12 rounded object-cover" />
+                  <img src={getThumbnailUrl(gallery.img_url, 48)} alt={gallery.title} className="w-12 h-12 rounded object-cover" />
                 </TableCell>
                 <TableCell>
                   <div className="font-medium">{gallery.title}</div>

@@ -39,10 +39,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog';
+import { getBoardImageUrl } from '@/utils/imageUtils';
 
 interface BoardMemberPageFilters {
   search: string;
-  is_active: string;
   page: number;
   size: number;
   [key: string]: string | number;
@@ -56,7 +56,6 @@ const BoardMembersPage: React.FC = () => {
   const { updateURL, getCurrentFilters } = useURLFilters<BoardMemberPageFilters>({
     defaults: {
       search: '',
-      is_active: 'all',
       page: 1,
       size: 10,
     },
@@ -86,7 +85,6 @@ const BoardMembersPage: React.FC = () => {
         page: filters.page,
         size: filters.size,
         search: filters.search || undefined,
-        is_active: filters.is_active !== 'all' ? filters.is_active === 'true' : undefined,
       };
 
       const response = await boardMemberService.getBoardMembers(params);
@@ -109,7 +107,7 @@ const BoardMembersPage: React.FC = () => {
     if (hasAccess) {
       fetchBoardMembers();
     }
-  }, [filters.page, filters.size, filters.search, filters.is_active, hasAccess]);
+  }, [filters.page, filters.size, filters.search, hasAccess]);
 
   // Pagination
   const totalPages = Math.ceil(totalItems / filters.size);
@@ -186,9 +184,6 @@ const BoardMembersPage: React.FC = () => {
     updateURL({ search, page: 1 });
   };
 
-  const handleActiveFilterChange = (is_active: string) => {
-    updateURL({ is_active, page: 1 });
-  };
 
   const handlePageChange = (page: number) => {
     updateURL({ page });
@@ -199,9 +194,6 @@ const BoardMembersPage: React.FC = () => {
     let title = "Daftar Anggota Dewan";
     const activeFilters = [];
     
-    if (filters.is_active !== 'all') {
-      activeFilters.push(filters.is_active === 'true' ? 'Aktif' : 'Tidak Aktif');
-    }
     
     if (activeFilters.length > 0) {
       title += " - " + activeFilters.join(" - ");
@@ -237,21 +229,6 @@ const BoardMembersPage: React.FC = () => {
         }
       />
 
-      <Filtering>
-        <div className="space-y-2">
-          <Label htmlFor="active-filter">Status</Label>
-          <Select value={filters.is_active} onValueChange={handleActiveFilterChange}>
-            <SelectTrigger id="active-filter">
-              <SelectValue placeholder="Filter berdasarkan status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Anggota</SelectItem>
-              <SelectItem value="true">Aktif</SelectItem>
-              <SelectItem value="false">Tidak Aktif</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </Filtering>
 
       <Card>
         <CardContent>
@@ -333,12 +310,6 @@ const BoardMembersPage: React.FC = () => {
                 </div>
               </div>
               <div>
-                <Label>Status</Label>
-                <div className="p-2 bg-muted rounded text-sm">
-                  {viewingBoardMember.is_active ? 'Aktif' : 'Tidak Aktif'}
-                </div>
-              </div>
-              <div>
                 <Label>Urutan Tampilan</Label>
                 <div className="p-2 bg-muted rounded text-sm">
                   {viewingBoardMember.display_order}
@@ -349,7 +320,7 @@ const BoardMembersPage: React.FC = () => {
                   <Label>Foto</Label>
                   <div className="p-2 bg-muted rounded text-sm">
                     <img 
-                      src={viewingBoardMember.img_url} 
+                      src={getBoardImageUrl(viewingBoardMember.img_url)} 
                       alt={viewingBoardMember.name}
                       className="w-32 h-32 object-cover rounded"
                     />

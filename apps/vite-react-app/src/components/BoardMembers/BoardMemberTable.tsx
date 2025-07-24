@@ -12,6 +12,7 @@ import ActionDropdown from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { Badge } from '@workspace/ui/components/badge';
+import { getThumbnailUrl } from '@/utils/imageUtils';
 
 interface BoardMemberTableProps {
   boardMembers: BoardMember[];
@@ -62,7 +63,7 @@ export const BoardMemberTable: React.FC<BoardMemberTableProps> = ({
                   <div className="flex items-center space-x-3">
                     {boardMember.img_url && (
                       <img 
-                        src={boardMember.img_url} 
+                        src={getThumbnailUrl(boardMember.img_url, 48)} 
                         alt={boardMember.name}
                         className="w-8 h-8 rounded-full object-cover"
                       />
