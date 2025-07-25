@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
-import { DashboardPage } from '@/pages/DashboardPage';
+import { DashboardPage } from '@/pages/dashboard/DashboardPage';
 
 export function RoleBasedHome() {
   const { user } = useAuth();

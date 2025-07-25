@@ -418,7 +418,6 @@ const TeacherEvaluationDetailPage: React.FC = () => {
 
   const getPageDescription = () => {
     if (isOwnEvaluation) {
-      const role = isKepalaSekolah() ? "Kepala Sekolah" : "Guru";
       return `Detail evaluasi untuk periode ${currentPeriod?.academic_year || ''} - ${currentPeriod?.semester || ''}`;
     }
     return `Evaluasi kinerja ${teacherInfo.teacher?.display_name || 'N/A'}`;

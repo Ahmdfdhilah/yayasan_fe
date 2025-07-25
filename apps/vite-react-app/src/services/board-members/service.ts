@@ -1,6 +1,8 @@
 // apps/vite-react-app/src/services/board-members/service.ts
 import { BaseService } from "../base";
 import {
+  BoardMemberCreate,
+  BoardMemberUpdate,
   BoardMemberResponse,
   BoardMemberListResponse,
   BoardMemberSummary,

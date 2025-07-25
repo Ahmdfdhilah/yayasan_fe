@@ -83,3 +83,39 @@ export interface DashboardQueryParams extends DashboardFilters {}
 export interface QuickStatsQueryParams {
   period_id: number;
 }
+
+export interface QuickStats {
+  total_teachers: number;
+  total_rpp_submissions: number;
+  total_evaluations: number;
+  avg_evaluation_score: number | null;
+}
+
+export interface BaseDashboard {
+  period: PeriodSummary | null;
+  user_role: string;
+  organization_name: string | null;
+  last_updated: string;
+}
+
+export interface TeacherSummary {
+  teacher_id: number;
+  teacher_name: string;
+  total_submissions: number;
+  avg_score: number | null;
+}
+
+export interface SystemOverview {
+  total_organizations: number;
+  total_teachers: number;
+  total_submissions: number;
+  total_evaluations: number;
+}
+
+export interface SystemActivity {
+  id: number;
+  activity_type: string;
+  description: string;
+  timestamp: string;
+  user_name?: string;
+}

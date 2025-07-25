@@ -6,7 +6,7 @@ import ActionDropdown from '@/components/common/ActionDropdown';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { getOrganizationImageUrl, getThumbnailUrl } from '@/utils/imageUtils';
+import { getThumbnailUrl } from '@/utils/imageUtils';
 import { 
   Building, 
   Calendar,

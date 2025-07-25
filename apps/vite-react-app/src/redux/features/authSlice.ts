@@ -325,7 +325,10 @@ const authSlice = createSlice({
       })
       .addCase(updateProfileAsync.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload;
+        state.user = {
+          ...action.payload,
+          organization_name: action.payload.organization_name || null
+        };
         state.error = null;
       })
       .addCase(updateProfileAsync.rejected, (state, action) => {

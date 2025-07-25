@@ -6,22 +6,14 @@ import { BoardMember, BoardMemberFilterParams } from '@/services/board-members/t
 import { boardMemberService } from '@/services/board-members';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent } from '@workspace/ui/components/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@workspace/ui/components/select';
-import { Label } from '@workspace/ui/components/label';
 import { Plus } from 'lucide-react';
+import { Label } from '@workspace/ui/components/label';
 import { BoardMemberTable } from '@/components/BoardMembers/BoardMemberTable';
 import { BoardMemberCards } from '@/components/BoardMembers/BoardMemberCards';
 import { BoardMemberDialog } from '@/components/BoardMembers/BoardMemberDialog';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import SearchContainer from '@/components/common/SearchContainer';
-import Filtering from '@/components/common/Filtering';
 import Pagination from '@/components/common/Pagination';
 import {
   AlertDialog,
@@ -192,7 +184,7 @@ const BoardMembersPage: React.FC = () => {
   // Generate composite title
   const getCompositeTitle = () => {
     let title = "Daftar Anggota Dewan";
-    const activeFilters = [];
+    const activeFilters: string[] = [];
     
     
     if (activeFilters.length > 0) {

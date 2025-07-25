@@ -1,9 +1,8 @@
 import React from 'react';
 import { Gallery } from '@/services/galleries/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
-import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { getGalleryImageUrl, getThumbnailUrl } from '@/utils/imageUtils';
+import { getThumbnailUrl } from '@/utils/imageUtils';
 
 interface GalleryCardsProps {
   galleries: Gallery[];

@@ -1,6 +1,8 @@
 // apps/vite-react-app/src/services/articles/service.ts
 import { BaseService } from "../base";
 import {
+  ArticleCreate,
+  ArticleUpdate,
   ArticlePublish,
   ArticleResponse,
   ArticleListResponse,

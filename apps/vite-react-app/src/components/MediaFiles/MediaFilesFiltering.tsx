@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue
 } from '@workspace/ui/components/select';
-import { Input } from '@workspace/ui/components/input';
 import { MediaFileFilterParams } from '@/services/media-files/types';
 
 interface MediaFilesFilteringProps {

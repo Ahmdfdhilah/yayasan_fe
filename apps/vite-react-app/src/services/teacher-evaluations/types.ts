@@ -193,3 +193,14 @@ export interface MessageResponse {
   message: string;
   success?: boolean;
 }
+
+// Aliases for backward compatibility
+export type TeacherEvaluationWithDetails = TeacherEvaluation;
+export type MyEvaluationsFilterParams = TeacherEvaluationFilterParams;
+export type TeacherEvaluationMessageResponse = MessageResponse;
+export type AssignTeachersToPeriodRequest = AssignTeachersToEvaluationPeriod;
+export type AssignTeachersResponse = AssignTeachersToEvaluationPeriodResponse;
+export type TeacherEvaluationStats = PeriodEvaluationStats;
+export type TeacherEvaluationStatus = EvaluationGrade;
+export type EvaluationData = TeacherEvaluationItemCreate;
+export type EvaluationRating = TeacherEvaluationItem;

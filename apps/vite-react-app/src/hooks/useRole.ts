@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import { useAppSelector } from '@/redux/hooks';
-import { selectUser } from '@/redux/features/authSlice';
 import { USER_ROLES } from '@/lib/constants';
 
 export const useRole = () => {

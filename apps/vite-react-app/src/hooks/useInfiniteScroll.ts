@@ -26,7 +26,7 @@ export interface UseInfiniteScrollOptions<T, P> {
 export function useInfiniteScroll<T, P>({
   fetchFn,
   params,
-  pageSize = 10,
+  pageSize: _pageSize = 10,
   enabled = true
 }: UseInfiniteScrollOptions<T, P>): [InfiniteScrollState<T>, InfiniteScrollActions] {
   const [state, setState] = useState<InfiniteScrollState<T>>({

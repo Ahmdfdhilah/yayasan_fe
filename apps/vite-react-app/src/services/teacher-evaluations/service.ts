@@ -8,6 +8,7 @@ import {
   UpdateEvaluationFinalNotes,
   TeacherEvaluationBulkItemUpdate,
   AssignTeachersToEvaluationPeriod,
+  AssignTeachersToEvaluationPeriodResponse,
   TeacherEvaluationResponse,
   TeacherEvaluationItemResponse,
   TeacherEvaluationListResponse,
@@ -136,7 +137,7 @@ class TeacherEvaluationService extends BaseService {
   // Assign teachers to period (bulk assignment)
   async assignTeachersToPeriod(
     assignmentData: AssignTeachersToEvaluationPeriod
-  ): Promise<TeacherEvaluationResponse[]> {
+  ): Promise<AssignTeachersToEvaluationPeriodResponse> {
     return this.post("/assign-teachers-to-period", assignmentData);
   }
 

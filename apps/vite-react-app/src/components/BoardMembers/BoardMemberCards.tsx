@@ -1,11 +1,10 @@
 import React from 'react';
 import { BoardMember } from '@/services/board-members/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
-import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { getBoardImageUrl, getThumbnailUrl } from '@/utils/imageUtils';
+import { getThumbnailUrl } from '@/utils/imageUtils';
 
 interface BoardMemberCardsProps {
   boardMembers: BoardMember[];
