@@ -8,6 +8,7 @@ export interface Organization {
   name: string;
   description?: string;
   excerpt?: string;
+  img_url?: string;
   head_id?: number;
   created_at: string;
   updated_at?: string;

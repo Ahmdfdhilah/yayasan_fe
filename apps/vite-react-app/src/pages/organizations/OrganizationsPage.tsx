@@ -158,21 +158,21 @@ const OrganizationsPage: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSave = async (organizationData: any) => {
+  const handleSave = async (data: any, image?: File) => {
     try {
       if (editingOrganization) {
         // Update existing organization
-        await organizationService.updateOrganization(editingOrganization.id, organizationData);
+        await organizationService.updateOrganization(editingOrganization.id, data, image);
         toast({
           title: 'Sekolah berhasil diperbarui',
-          description: `Sekolah ${organizationData.name} telah diperbarui.`,
+          description: `Sekolah ${data.name} telah diperbarui.`,
         });
       } else {
         // Create new organization
-        await organizationService.createOrganization(organizationData);
+        await organizationService.createOrganization(data, image);
         toast({
           title: 'Sekolah berhasil dibuat',
-          description: `Sekolah ${organizationData.name} telah ditambahkan ke sistem.`,
+          description: `Sekolah ${data.name} telah ditambahkan ke sistem.`,
         });
       }
       setIsDialogOpen(false);

@@ -31,11 +31,22 @@ class OrganizationService extends BaseService {
     return this.get(endpoint);
   }
 
-  // Create new organization
+  // Create new organization with multipart form data
   async createOrganization(
-    organizationData: OrganizationCreate
+    data: OrganizationCreate,
+    image?: File
   ): Promise<OrganizationResponse> {
-    return this.post("/", organizationData);
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(data));
+    if (image) {
+      formData.append('image', image);
+    }
+    
+    return this.post("/", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 
   // Get organization by ID
@@ -45,12 +56,23 @@ class OrganizationService extends BaseService {
     return this.get(`/${organizationId}`);
   }
 
-  // Update organization
+  // Update organization with multipart form data
   async updateOrganization(
     organizationId: number,
-    organizationData: OrganizationUpdate
+    data: OrganizationUpdate,
+    image?: File
   ): Promise<OrganizationResponse> {
-    return this.put(`/${organizationId}`, organizationData);
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(data));
+    if (image) {
+      formData.append('image', image);
+    }
+    
+    return this.put(`/${organizationId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 
   // Delete organization

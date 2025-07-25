@@ -6,6 +6,7 @@ import ActionDropdown from '@/components/common/ActionDropdown';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { getOrganizationImageUrl, getThumbnailUrl } from '@/utils/imageUtils';
 import { 
   Building, 
   Calendar,
@@ -66,12 +67,20 @@ export const OrganizationCards: React.FC<OrganizationCardsProps> = ({
       {organizations.map((organization) => (
         <Card key={organization.id} className="hover:shadow-md transition-shadow">
           <CardContent className="p-4">
-            {/* Header with Icon and Actions */}
+            {/* Header with Image/Icon and Actions */}
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center space-x-3">
-                <div className="flex items-center justify-center w-10 h-10 bg-muted rounded-full">
-                  <Building className="w-5 h-5" />
-                </div>
+                {organization.img_url ? (
+                  <img 
+                    src={getThumbnailUrl(organization.img_url, 64)} 
+                    alt={organization.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center w-10 h-10 bg-muted rounded-full">
+                    <Building className="w-5 h-5" />
+                  </div>
+                )}
                 <div>
                   <h3 className="font-medium text-sm">{organization.name}</h3>
                   <div className="flex items-center space-x-2 mt-1">

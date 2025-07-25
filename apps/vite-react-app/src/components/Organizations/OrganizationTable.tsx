@@ -13,6 +13,7 @@ import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { Users } from 'lucide-react';
+import { getThumbnailUrl } from '@/utils/imageUtils';
 
 interface OrganizationTableProps {
   organizations: Organization[];
@@ -37,7 +38,6 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
           <TableRow>
             <TableHead>Sekolah</TableHead>
             <TableHead>Deskripsi</TableHead>
-            <TableHead>Kepala</TableHead>
             <TableHead>Pengguna</TableHead>
             <TableHead>Dibuat</TableHead>
             <TableHead className="text-right">Aksi</TableHead>
@@ -46,13 +46,13 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                 Memuat Sekolah...
               </TableCell>
             </TableRow>
           ) : organizations.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                 Tidak ada Sekolah ditemukan
               </TableCell>
             </TableRow>
@@ -60,7 +60,27 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
             organizations.map((organization) => (
               <TableRow key={organization.id}>
                 <TableCell>
-                  {organization.name}
+                  <div className="flex items-center space-x-3">
+                    {organization.img_url ? (
+                      <img 
+                        src={getThumbnailUrl(organization.img_url, 48)} 
+                        alt={organization.name}
+                        className="w-8 h-8 rounded object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center w-8 h-8 bg-muted rounded">
+                        <Users className="w-4 h-4" />
+                      </div>
+                    )}
+                    <div>
+                      <div className="font-medium">{organization.name}</div>
+                      {organization.head_name && (
+                        <div className="text-xs text-muted-foreground">
+                          Kepala: {organization.head_name}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </TableCell>
                 <TableCell>
                   <RichTextDisplay 
@@ -69,9 +89,6 @@ export const OrganizationTable: React.FC<OrganizationTableProps> = ({
                     maxLength={80}
                     fallback="Tidak ada deskripsi"
                   />
-                </TableCell>
-                <TableCell>
-                  {organization.head_name || 'Belum ada'}
                 </TableCell>
                 <TableCell className='text-center flex'>
                   <Users className='w-4' />

@@ -13,7 +13,6 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Textarea } from '@workspace/ui/components/textarea';
-import { Switch } from '@workspace/ui/components/switch';
 import {
   Form,
   FormControl,
@@ -47,7 +46,7 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
   editingGallery,
   onSave
 }) => {
-  const { toast } = useToast();
+  const { error: toastError, success: toastSuccess } = useToast();
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const isEdit = !!editingGallery;
@@ -83,7 +82,7 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
   const onSubmit = async (data: GalleryFormData) => {
     // Validasi file upload untuk create
     if (!isEdit && selectedFiles.length === 0) {
-      toast.error({ title: 'Gambar wajib diupload untuk galeri baru' });
+      toastError('Gambar wajib diupload untuk galeri baru');
       return;
     }
 
@@ -103,10 +102,10 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
       form.reset();
       setSelectedFiles([]);
       
-      toast.success({ title: isEdit ? 'Galeri berhasil diperbarui' : 'Galeri berhasil ditambahkan' });
+      toastSuccess(isEdit ? 'Galeri berhasil diperbarui' : 'Galeri berhasil ditambahkan');
     } catch (error: any) {
       console.error('Error saving gallery:', error);
-      toast.error({ title: error.message || 'Gagal menyimpan galeri' });
+      toastError(error.message || 'Gagal menyimpan galeri');
     } finally {
       setLoading(false);
     }
@@ -117,7 +116,7 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
   };
 
   const handleFileError = (error: string) => {
-    toast.error({ title: error });
+    toastError(error);
   };
 
   const existingFiles = editingGallery?.img_url ? [{
@@ -195,6 +194,11 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
                       disabled={loading}
                       {...field}
                       onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      onFocus={(e) => {
+                        if (e.target.value === '0') {
+                          e.target.select();
+                        }
+                      }}
                     />
                   </FormControl>
                   <FormDescription>Urutan tampilan galeri (0 = paling atas)</FormDescription>

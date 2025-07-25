@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form';
 import { Combobox } from '@workspace/ui/components/combobox';
+import FileUpload from '@/components/common/FileUpload';
 import { Organization, OrganizationCreate, OrganizationUpdate } from '@/services/organizations/types';
 import { User } from '@/services/users/types';
 import { userService } from '@/services/users';
@@ -40,7 +41,7 @@ interface OrganizationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editingOrganization: Organization | null;
-  onSave: (data: OrganizationCreate | OrganizationUpdate) => void;
+  onSave: (data: OrganizationCreate | OrganizationUpdate, image?: File) => void;
 }
 
 export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
@@ -54,6 +55,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
   const [usersLoading, setUsersLoading] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [searchValue, setSearchValue] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const isEdit = !!editingOrganization;
 
   const form = useForm<OrganizationFormData>({
@@ -107,6 +109,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
       }
       // Reset search and load initial users
       setSearchValue('');
+      setSelectedFiles([]);
       loadUsers();
     }
   }, [open, editingOrganization, form]);
@@ -122,7 +125,8 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
         head_id: data.head_id || undefined,
       };
 
-      onSave(submitData);
+      const imageFile = selectedFiles.length > 0 ? selectedFiles[0] : undefined;
+      onSave(submitData, imageFile);
       onOpenChange(false);
     } catch (error) {
       console.error('Error saving organization:', error);
@@ -140,6 +144,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
     if (!loading) {
       form.reset();
       setSearchValue('');
+      setSelectedFiles([]);
       onOpenChange(false);
     }
   };
@@ -161,6 +166,24 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
   };
 
   const selectedUser = users.find(user => user.id === form.getValues('head_id'));
+
+  const handleFilesChange = (files: File[]) => {
+    setSelectedFiles(files);
+  };
+
+  const handleFileError = (error: string) => {
+    toast({
+      title: 'Error',
+      description: error,
+      variant: 'destructive'
+    });
+  };
+
+  const existingFiles = editingOrganization?.img_url ? [{
+    name: `Current Image - ${editingOrganization.name}`,
+    url: editingOrganization.img_url,
+    viewUrl: editingOrganization.img_url,
+  }] : [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -233,6 +256,25 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
                     </FormItem>
                   )}
                 />
+
+                {/* Image Upload */}
+                <div>
+                  <FileUpload
+                    label="Gambar Sekolah"
+                    description="Upload gambar sekolah (JPG, PNG, WebP, max 5MB)"
+                    accept="image/*"
+                    maxSize={5 * 1024 * 1024} // 5MB
+                    maxFiles={1}
+                    files={selectedFiles}
+                    existingFiles={existingFiles}
+                    onFilesChange={handleFilesChange}
+                    onError={handleFileError}
+                    required={false}
+                    disabled={loading}
+                    showPreview={true}
+                    allowRemove={true}
+                  />
+                </div>
 
                 <FormField
                   control={form.control}

@@ -13,7 +13,6 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Textarea } from '@workspace/ui/components/textarea';
-import { Switch } from '@workspace/ui/components/switch';
 import {
   Form,
   FormControl,
@@ -48,7 +47,7 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
   editingBoardMember,
   onSave
 }) => {
-  const { toast } = useToast();
+  const { error: toastError, success: toastSuccess } = useToast();
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const isEdit = !!editingBoardMember;
@@ -87,7 +86,7 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
   const onSubmit = async (data: BoardMemberFormData) => {
     // Validasi file upload untuk create
     if (!isEdit && selectedFiles.length === 0) {
-      toast.error({ title: 'Gambar wajib diupload untuk pengurus baru' });
+      toastError('Gambar wajib diupload untuk pengurus baru');
       return;
     }
 
@@ -103,15 +102,15 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
 
       const imageFile = selectedFiles.length > 0 ? selectedFiles[0] : undefined;
       await onSave(submitData, imageFile);
-      
+
       onOpenChange(false);
       form.reset();
       setSelectedFiles([]);
-      
-      toast.success({ title: isEdit ? 'Pengurus berhasil diperbarui' : 'Pengurus berhasil ditambahkan' });
+
+      toastSuccess(isEdit ? 'Pengurus berhasil diperbarui' : 'Pengurus berhasil ditambahkan');
     } catch (error: any) {
       console.error('Error saving board member:', error);
-      toast.error({ title: error.message || 'Gagal menyimpan pengurus' });
+      toastError(error.message || 'Gagal menyimpan pengurus');
     } finally {
       setLoading(false);
     }
@@ -122,7 +121,7 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
   };
 
   const handleFileError = (error: string) => {
-    toast.error({ title: error });
+    toastError(error);
   };
 
   const existingFiles = editingBoardMember?.img_url ? [{
@@ -237,6 +236,11 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
                       placeholder="0"
                       {...field}
                       onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      onFocus={(e) => {
+                        if (e.target.value === '0') {
+                          e.target.select();
+                        }
+                      }}
                       disabled={loading}
                     />
                   </FormControl>
