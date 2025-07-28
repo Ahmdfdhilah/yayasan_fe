@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // Generic type for filter values
@@ -41,6 +41,25 @@ export const useURLFilters = <T extends Filters>(config: FilterConfig<T>) => {
   // Prevent infinite loops by tracking last update
   const lastUpdateRef = useRef<string>('');
   const isUpdatingRef = useRef<boolean>(false);
+  const pendingUpdateRef = useRef<Partial<T> | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clear updating flag when location actually changes
+  useEffect(() => {
+    if (isUpdatingRef.current) {
+      // Clear any existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      
+      // Set a new timeout to reset flags
+      timeoutRef.current = setTimeout(() => {
+        pendingUpdateRef.current = null;
+        isUpdatingRef.current = false;
+        timeoutRef.current = null;
+      }, 50);
+    }
+  }, [location.search]);
 
   /**
    * Parse URL query parameters and return typed filter object
@@ -79,7 +98,7 @@ export const useURLFilters = <T extends Filters>(config: FilterConfig<T>) => {
     replace?: boolean;
     preserveOthers?: boolean;
   }) => {
-    // Prevent infinite loops
+    // Prevent infinite loops during updates
     if (isUpdatingRef.current) {
       return;
     }
@@ -117,22 +136,17 @@ export const useURLFilters = <T extends Filters>(config: FilterConfig<T>) => {
     const newSearch = searchParams.toString();
     const newPath = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`;
     
-    // Check if this is the same update we just made
-    const updateKey = `${newPath}:${JSON.stringify(newFilters)}`;
-    if (lastUpdateRef.current === updateKey) {
+    // Only prevent if this is exactly the same URL we're currently on
+    if (newPath === `${location.pathname}${location.search}`) {
       return;
     }
     
-    // Set updating flag and track this update
+    // Set updating flag
     isUpdatingRef.current = true;
-    lastUpdateRef.current = updateKey;
     
     navigate(newPath, { replace });
     
-    // Reset flag after navigation
-    setTimeout(() => {
-      isUpdatingRef.current = false;
-    }, 50);
+    // The useEffect will handle clearing the flags when location.search changes
   }, [navigate, location.pathname, location.search, defaults, cleanDefaults]);
 
   /**

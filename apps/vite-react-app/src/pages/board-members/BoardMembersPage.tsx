@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRole } from '@/hooks/useRole';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
@@ -51,7 +51,7 @@ const BoardMembersPage: React.FC = () => {
       page: 1,
       size: 10,
     },
-    cleanDefaults: true,
+    cleanDefaults: false,
   });
 
   // Get current filters from URL
@@ -60,6 +60,7 @@ const BoardMembersPage: React.FC = () => {
   const [boardMembers, setBoardMembers] = useState<BoardMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [editingBoardMember, setEditingBoardMember] = useState<BoardMember | null>(null);
@@ -67,10 +68,10 @@ const BoardMembersPage: React.FC = () => {
   const [boardMemberToDelete, setBoardMemberToDelete] = useState<BoardMember | null>(null);
 
   // Calculate access control
-  const hasAccess = isAdmin();
+  const hasAccess = useMemo(() => isAdmin(), [isAdmin]);
 
   // Fetch board members function
-  const fetchBoardMembers = async () => {
+  const fetchBoardMembers = useCallback(async () => {
     setLoading(true);
     try {
       const params: BoardMemberFilterParams = {
@@ -82,6 +83,7 @@ const BoardMembersPage: React.FC = () => {
       const response = await boardMemberService.getBoardMembers(params);
       setBoardMembers(response.items);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch board members:', error);
       toast({
@@ -92,17 +94,16 @@ const BoardMembersPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters.page, filters.size, filters.search]);
 
   // Effect to fetch board members when filters change
   useEffect(() => {
     if (hasAccess) {
       fetchBoardMembers();
     }
-  }, [filters.page, filters.size, filters.search, hasAccess]);
+  }, [fetchBoardMembers, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination handled by totalPages state
 
   const handleView = (boardMember: BoardMember) => {
     setViewingBoardMember(boardMember);

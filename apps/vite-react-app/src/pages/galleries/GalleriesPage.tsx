@@ -32,13 +32,14 @@ const GalleriesPage: React.FC = () => {
   
   const { updateURL, getCurrentFilters } = useURLFilters<GalleryPageFilters>({
     defaults: { search: '', page: 1, size: 10 },
-    cleanDefaults: true,
+    cleanDefaults: false,
   });
 
   const filters = getCurrentFilters();
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [editingGallery, setEditingGallery] = useState<Gallery | null>(null);
@@ -59,6 +60,7 @@ const GalleriesPage: React.FC = () => {
       const response = await galleryService.getGalleries(params);
       setGalleries(response.items);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch galleries:', error);
       toast({
@@ -77,7 +79,6 @@ const GalleriesPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.search, hasAccess]);
 
-  const totalPages = Math.ceil(totalItems / filters.size);
 
   const handleView = (gallery: Gallery) => {
     setViewingGallery(gallery);

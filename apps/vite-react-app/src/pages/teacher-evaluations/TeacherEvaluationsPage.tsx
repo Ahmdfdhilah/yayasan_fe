@@ -34,8 +34,8 @@ interface EvaluationPageFilters {
   search: string;
   period_id: string;
   organization_id: string;
-  skip: number;
-  limit: number;
+  page: number;
+  size: number;
   [key: string]: string | number;
 }
 
@@ -58,10 +58,10 @@ const TeacherEvaluationsPage: React.FC = () => {
       search: '',
       period_id: 'active',
       organization_id: 'all',
-      skip: 0,
-      limit: 10,
+      page: 1,
+      size: 10,
     },
-    cleanDefaults: true,
+    cleanDefaults: false,
   });
 
   // Get current filters from URL
@@ -73,6 +73,7 @@ const TeacherEvaluationsPage: React.FC = () => {
   const [activePeriod, setActivePeriod] = useState<Period | null>(null);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   // Check access
   const hasAccess = isAdmin() || isKepalaSekolah();
@@ -82,8 +83,8 @@ const TeacherEvaluationsPage: React.FC = () => {
     setLoading(true);
     try {
       const params: TeacherEvaluationFilterParams = {
-        skip: filters.skip,
-        limit: filters.limit,
+        skip: (filters.page - 1) * filters.size,
+        limit: filters.size,
       };
 
       // Period filtering
@@ -106,6 +107,7 @@ const TeacherEvaluationsPage: React.FC = () => {
       const response = await teacherEvaluationService.getTeacherEvaluationsFiltered(params);
       setEvaluations(response.items || []);
       setTotalItems(response.total || 0);
+      setTotalPages(response.pages || 0);
     } catch (error: any) {
       console.error('Error loading evaluations:', error);
       const errorMessage = error?.message || 'Gagal memuat data evaluasi. Silakan coba lagi.';
@@ -165,10 +167,9 @@ const TeacherEvaluationsPage: React.FC = () => {
     if (hasAccess && (filters.period_id !== 'active' || activePeriod)) {
       fetchEvaluations();
     }
-  }, [filters.skip, filters.limit, filters.search, filters.period_id, filters.organization_id, activePeriod, hasAccess]);
+  }, [filters.page, filters.size, filters.search, filters.period_id, filters.organization_id, activePeriod, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.limit);
+  // Pagination handled by totalPages state
 
   const handleViewEvaluation = (evaluation: TeacherEvaluationResponse) => {
     // Navigate to evaluation detail page using teacher_id, with period_id from current filters
@@ -183,25 +184,24 @@ const TeacherEvaluationsPage: React.FC = () => {
   };
 
   const handleItemsPerPageChange = (value: string) => {
-    updateURL({ limit: parseInt(value), skip: 0 });
+    updateURL({ size: parseInt(value), page: 1 });
   };
 
   // Filter handlers
   const handleSearchChange = (search: string) => {
-    updateURL({ search, skip: 0 });
+    updateURL({ search, page: 1 });
   };
 
   const handlePeriodChange = (period_id: string) => {
-    updateURL({ period_id, skip: 0 });
+    updateURL({ period_id, page: 1 });
   };
 
   const handleOrganizationChange = (organization_id: string) => {
-    updateURL({ organization_id, skip: 0 });
+    updateURL({ organization_id, page: 1 });
   };
 
   const handlePageChange = (page: number) => {
-    const skip = (page - 1) * filters.limit;
-    updateURL({ skip });
+    updateURL({ page });
   };
 
   // Generate composite title
@@ -344,9 +344,9 @@ const TeacherEvaluationsPage: React.FC = () => {
             {/* Pagination */}
             {totalPages > 1 && (
               <Pagination
-                currentPage={Math.floor(filters.skip / filters.limit) + 1}
+                currentPage={filters.page}
                 totalPages={totalPages}
-                itemsPerPage={filters.limit}
+                itemsPerPage={filters.size}
                 totalItems={totalItems}
                 onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}

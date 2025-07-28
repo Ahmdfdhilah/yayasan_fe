@@ -19,10 +19,10 @@ export interface PaginationParams {
 
 export interface PaginatedResponse<T> {
   items: T[];
-  total: number;
-  page: number;
-  limit: number;
-  pages: number;
+  total: number; //total item 
+  page: number; // page berapa
+  limit: number; // total item perpage
+  pages: number; //jumlah pages
 }
 
 

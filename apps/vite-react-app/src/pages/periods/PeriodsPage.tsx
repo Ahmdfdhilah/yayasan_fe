@@ -64,7 +64,7 @@ const PeriodsPage: React.FC = () => {
       page: 1,
       size: 10,
     },
-    cleanDefaults: true,
+    cleanDefaults: false,
   });
 
   // Get current filters from URL
@@ -73,6 +73,7 @@ const PeriodsPage: React.FC = () => {
   const [periods, setPeriods] = useState<Period[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [editingPeriod, setEditingPeriod] = useState<Period | null>(null);
@@ -98,7 +99,7 @@ const PeriodsPage: React.FC = () => {
       // Add search functionality (not in API but we can filter client-side or extend API)
       const response = await periodService.getPeriods(params);
 
-      // Client-side search if q is provided
+      // Client-side search if q is provided - only show filtered results
       let filteredPeriods = response.items;
       if (filters.q) {
         filteredPeriods = response.items.filter(period =>
@@ -106,10 +107,16 @@ const PeriodsPage: React.FC = () => {
           period.semester.toLowerCase().includes(filters.q.toLowerCase()) ||
           (period.description && period.description.toLowerCase().includes(filters.q.toLowerCase()))
         );
+        // Use filtered results for pagination when searching
+        setPeriods(filteredPeriods);
+        setTotalItems(filteredPeriods.length);
+        setTotalPages(Math.ceil(filteredPeriods.length / filters.size));
+      } else {
+        // Use API response pagination when not searching
+        setPeriods(response.items);
+        setTotalItems(response.total);
+        setTotalPages(response.pages);
       }
-
-      setPeriods(filteredPeriods);
-      setTotalItems(filteredPeriods.length || response.total);
     } catch (error) {
       console.error('Failed to fetch periods:', error);
       toast({
@@ -129,8 +136,7 @@ const PeriodsPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.q, filters.academic_year, filters.semester, filters.is_active, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination handled by totalPages state
 
   const handleView = (period: Period) => {
     setViewingPeriod(period);

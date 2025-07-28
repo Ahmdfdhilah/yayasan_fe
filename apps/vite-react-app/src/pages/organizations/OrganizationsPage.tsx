@@ -62,7 +62,7 @@ const OrganizationsPage: React.FC = () => {
       page: 1,
       size: 10,
     },
-    cleanDefaults: true,
+    cleanDefaults: false,
   });
 
   // Get current filters from URL
@@ -71,6 +71,7 @@ const OrganizationsPage: React.FC = () => {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [editingOrganization, setEditingOrganization] = useState<Organization | null>(null);
@@ -95,6 +96,7 @@ const OrganizationsPage: React.FC = () => {
       const response = await organizationService.getOrganizations(params);
       setOrganizations(response.items);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch organizations:', error);
       toast({
@@ -114,8 +116,7 @@ const OrganizationsPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.q, filters.has_users, filters.has_head, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination handled by totalPages state
 
   const handleView = (organization: Organization) => {
     setViewingOrganization(organization);

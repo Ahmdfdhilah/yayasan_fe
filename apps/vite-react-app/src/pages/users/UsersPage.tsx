@@ -72,6 +72,7 @@ const UsersPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -96,6 +97,7 @@ const UsersPage: React.FC = () => {
       const response = await userService.getUsers(params);
       setUsers(response.items);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error: any) {
       console.error('Failed to fetch users:', error);
       const errorMessage = error?.message || 'Gagal memuat data pengguna. Silakan coba lagi.';
@@ -116,8 +118,7 @@ const UsersPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.search, filters.role, filters.status, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination handled by totalPages state
 
   const handleView = (user: User) => {
     setViewingUser(user);

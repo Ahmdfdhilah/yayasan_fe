@@ -72,6 +72,7 @@ const ArticlesPage: React.FC = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
@@ -96,6 +97,7 @@ const ArticlesPage: React.FC = () => {
       const response = await articleService.getArticles(params);
       setArticles(response.items);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch articles:', error);
       toast({
@@ -132,8 +134,7 @@ const ArticlesPage: React.FC = () => {
     }
   }, [hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination handled by totalPages state
 
   const handleView = (article: Article) => {
     setViewingArticle(article);

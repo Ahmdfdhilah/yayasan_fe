@@ -32,13 +32,14 @@ const MessagesPage: React.FC = () => {
   
   const { updateURL, getCurrentFilters } = useURLFilters<MessagePageFilters>({
     defaults: { search: '', status: 'all', unread_only: 'false', page: 1, size: 10 },
-    cleanDefaults: true,
+    cleanDefaults: false,
   });
 
   const filters = getCurrentFilters();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [viewingMessage, setViewingMessage] = useState<Message | null>(null);
   const [messageToDelete, setMessageToDelete] = useState<Message | null>(null);
@@ -59,6 +60,7 @@ const MessagesPage: React.FC = () => {
       const response = await messageService.getMessages(params);
       setMessages(response.items);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch messages:', error);
       toast({
@@ -77,7 +79,6 @@ const MessagesPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.search, filters.status, filters.unread_only, hasAccess]);
 
-  const totalPages = Math.ceil(totalItems / filters.size);
 
   const handleView = async (message: Message) => {
     try {

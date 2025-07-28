@@ -43,7 +43,7 @@ const MediaFilesPage: React.FC = () => {
       page: 1,
       size: 20,
     },
-    cleanDefaults: true,
+    cleanDefaults: false,
   });
 
   // Get current filters from URL
@@ -53,6 +53,7 @@ const MediaFilesPage: React.FC = () => {
   const [files, setFiles] = useState<MediaFileResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   // Determine user context
@@ -118,6 +119,7 @@ const MediaFilesPage: React.FC = () => {
 
       setFiles(response.items || []);
       setTotalItems(response.total || 0);
+      setTotalPages(response.pages || 0);
     } catch (error: any) {
       console.error('Failed to fetch files:', error);
       const errorMessage = error?.message || 'Gagal memuat data file. Silakan coba lagi.';
@@ -139,8 +141,7 @@ const MediaFilesPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.search, filters.sort_by, filters.sort_order, filters.max_size, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination handled by totalPages state
 
   // Handlers
   const handleSearchChange = useCallback((search: string) => {

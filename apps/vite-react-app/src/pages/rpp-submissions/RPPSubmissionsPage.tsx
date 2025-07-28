@@ -59,7 +59,7 @@ const RPPSubmissionsPage: React.FC = () => {
       page: 1,
       size: 10,
     },
-    cleanDefaults: true,
+    cleanDefaults: false,
   });
 
   // Get current filters from URL
@@ -70,6 +70,7 @@ const RPPSubmissionsPage: React.FC = () => {
   const [periods, setPeriods] = useState<Period[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   // Check access
   const hasAccess = isAdmin() || isKepalaSekolah();
@@ -105,6 +106,7 @@ const RPPSubmissionsPage: React.FC = () => {
       const response = await rppSubmissionService.getSubmissions(params);
       setSubmissions(response.items || []);
       setTotalItems(response.total || 0);
+      setTotalPages(response.pages || 0);
     } catch (error: any) {
       console.error('Error loading RPP submissions:', error);
       const errorMessage = error?.message || 'Gagal memuat data RPP submissions. Silakan coba lagi.';
@@ -154,8 +156,7 @@ const RPPSubmissionsPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.search, filters.organization_id, filters.period_id, filters.status, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination handled by totalPages state
 
   const handleViewSubmission = (submission: RPPSubmissionResponse) => {
     // Navigate to submission detail page with teacher ID and period ID in URL
