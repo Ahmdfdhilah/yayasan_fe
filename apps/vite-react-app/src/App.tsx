@@ -31,6 +31,7 @@ import BoardMembersPage from './pages/board-members/BoardMembersPage';
 import ArticlesPage from './pages/articles/ArticlesPage';
 import GalleriesPage from './pages/galleries/GalleriesPage';
 import MessagesPage from './pages/messages/MessagesPage';
+import HomePage from './pages/home/HomePage';
 
 // Simple redirect component for My Evaluations
 const MyEvaluationsRedirect = () => {
@@ -50,6 +51,8 @@ function App() {
                 <Routes>
                   {/* Public routes */}
                   <Route path="/" element={<DefaultLayout />}>
+                    <Route index element={<HomePage />} />
+                    <Route path='home' element={<HomePage />} />
                     <Route path='login' element={
                       <PublicRoute>
                         <LoginPage />

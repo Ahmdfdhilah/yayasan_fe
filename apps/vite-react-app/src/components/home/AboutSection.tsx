@@ -1,0 +1,111 @@
+import { Button } from "@workspace/ui/components/button";
+import { Card, CardContent } from "@workspace/ui/components/card";
+import { Badge } from "@workspace/ui/components/badge";
+import { ArrowRight, MapPin, Calendar, Users } from 'lucide-react';
+
+const educationLevels = [
+  "TKIT (Taman Kanak-Kanak Islam Terpadu)",
+  "SDIT (Sekolah Dasar Islam Terpadu)", 
+  "SMPIT (SMP Islam Terpadu)",
+  "SMAIT (SMA Islam Terpadu)",
+  "Pondok Pesantren Tahfidz Qur'an"
+];
+
+const highlights = [
+  {
+    icon: Calendar,
+    title: "Berdiri Sejak 1993",
+    description: "Lebih dari 30 tahun pengalaman dalam pendidikan Islam"
+  },
+  {
+    icon: MapPin,
+    title: "Lokasi Strategis",
+    description: "Jl. Ir. H. Djuanda No. 19, Way Jepara, Lampung Timur"
+  },
+  {
+    icon: Users,
+    title: "Pendidikan Holistik",
+    description: "Menggabungkan ilmu agama dan umum dengan pendekatan modern"
+  }
+];
+
+export const AboutSection = () => {
+  return (
+    <section className="py-16">
+      <div className="max-w-screen-xl mx-auto px-4">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <Badge variant="outline" className="mb-4 border-primary text-primary">
+              Tentang Kami
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
+              Yayasan Baitul Muslim Lampung Timur
+            </h2>
+            <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+              Yayasan Baitul Muslim Lampung Timur adalah lembaga pendidikan dan dakwah Islam yang telah berdiri sejak 15 Juli 1993. 
+              Kami menyelenggarakan pendidikan Islam terpadu berkualitas dari tingkat TKIT hingga Pondok Pesantren Tahfidz Qur'an.
+            </p>
+            <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+              Berlokasi di Way Jepara, Lampung Timur, kami berkomitmen memberikan pendidikan yang menggabungkan ilmu agama dan umum 
+              dengan pendekatan yang holistik dan modern.
+            </p>
+
+            {/* Highlights */}
+            <div className="grid gap-4 mb-8">
+              {highlights.map((item, index) => {
+                const IconComponent = item.icon;
+                return (
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="bg-primary/10 p-2 rounded-lg">
+                      <IconComponent className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground">{item.title}</h4>
+                      <p className="text-muted-foreground text-sm">{item.description}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              Pelajari Lebih Lanjut
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+
+          <div className="space-y-6">
+            <div className="relative">
+              <img 
+                src="https://picsum.photos/600/400" 
+                alt="Yayasan Baitul Muslim" 
+                className="rounded-lg shadow-lg w-full"
+              />
+              <Card className="absolute -bottom-6 -right-6 shadow-lg border-0 bg-primary text-primary-foreground">
+                <CardContent className="p-6 text-center">
+                  <div className="text-2xl font-bold">30+</div>
+                  <div className="text-sm opacity-90">Tahun Melayani</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Education Levels */}
+            <Card className="bg-muted/50 border-muted">
+              <CardContent className="p-6">
+                <h3 className="font-semibold text-foreground mb-4">Jenjang Pendidikan</h3>
+                <div className="space-y-3">
+                  {educationLevels.map((level, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
+                      <span className="text-sm text-muted-foreground">{level}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
