@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowRight, Calendar, Search, Filter } from 'lucide-react';
 import { getNewsImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
-import { Pagination } from '@/components/common/Pagination';
+import Pagination from '@/components/common/Pagination';
 import type { Article } from '@/services/articles/types';
 import { articleService } from '@/services/articles';
 
@@ -28,7 +28,7 @@ const ArticlesListPage = () => {
   const sortOrder = searchParams.get('sort_order') || 'desc';
 
   const [localSearch, setLocalSearch] = useState(searchQuery);
-  const [localCategory, setLocalCategory] = useState(categoryFilter);
+  const [localCategory, setLocalCategory] = useState(categoryFilter || 'all');
 
   // Available categories (you might want to fetch this from API)
   const categories = [
@@ -66,7 +66,7 @@ const ArticlesListPage = () => {
       try {
         const response = await articleService.getArticles({
           page: currentPage,
-          size: 12,
+          size: 10,
           search: searchQuery || undefined,
           category: categoryFilter || undefined,
           is_published: true,
@@ -75,8 +75,8 @@ const ArticlesListPage = () => {
         });
 
         setArticles(response.items);
-        setTotalPages(response.total_pages);
-        setTotalItems(response.total_items);
+        setTotalPages(response.pages);
+        setTotalItems(response.total);
       } catch (error) {
         console.error('Error loading articles:', error);
       } finally {
@@ -110,7 +110,7 @@ const ArticlesListPage = () => {
   const handleSearch = () => {
     updateParams({ 
       search: localSearch || null,
-      category: localCategory || null
+      category: localCategory === 'all' ? null : localCategory || null
     });
   };
 
@@ -128,7 +128,7 @@ const ArticlesListPage = () => {
 
   const clearFilters = () => {
     setLocalSearch('');
-    setLocalCategory('');
+    setLocalCategory('all');
     updateParams({ 
       search: null,
       category: null,
@@ -179,7 +179,7 @@ const ArticlesListPage = () => {
                   <SelectValue placeholder="Semua Kategori" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Semua Kategori</SelectItem>
+                  <SelectItem value="all">Semua Kategori</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
@@ -299,7 +299,10 @@ const ArticlesListPage = () => {
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
+                itemsPerPage={12}
+                totalItems={totalItems}
                 onPageChange={handlePageChange}
+                onItemsPerPageChange={() => {}}
               />
             </div>
           )}

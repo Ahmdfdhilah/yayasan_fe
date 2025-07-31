@@ -4,7 +4,7 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
-import { ArrowLeft, Users, MapPin, Phone, Mail, Globe, Share2, Calendar } from 'lucide-react';
+import { ArrowLeft, Users, Share2, Calendar } from 'lucide-react';
 import { getOrganizationImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import type { Organization } from '@/services/organizations/types';
@@ -24,7 +24,7 @@ const OrganizationDetailPage = () => {
       setError(null);
       
       try {
-        const org = await organizationService.getOrganization(parseInt(id));
+        const org = await organizationService.getOrganizationById(parseInt(id));
         setOrganization(org);
       } catch (err) {
         console.error('Error loading organization:', err);
@@ -138,12 +138,6 @@ const OrganizationDetailPage = () => {
                 <span>{organization.user_count} anggota</span>
               </div>
             )}
-            {organization.address && (
-              <div className="flex items-center gap-1">
-                <MapPin className="w-4 h-4" />
-                <span>{organization.address}</span>
-              </div>
-            )}
             {organization.created_at && (
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
@@ -195,96 +189,10 @@ const OrganizationDetailPage = () => {
               </CardContent>
             </Card>
 
-            {/* Additional Information */}
-            {(organization.mission || organization.vision) && (
-              <Card className="mb-8">
-                <CardHeader>
-                  <CardTitle>Visi & Misi</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {organization.vision && (
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">Visi</h4>
-                      <div className="prose prose-sm max-w-none">
-                        <RichTextDisplay 
-                          content={organization.vision}
-                          isDetailView={true}
-                        />
-                      </div>
-                    </div>
-                  )}
-                  {organization.mission && (
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">Misi</h4>
-                      <div className="prose prose-sm max-w-none">
-                        <RichTextDisplay 
-                          content={organization.mission}
-                          isDetailView={true}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
           </div>
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            {/* Contact Information */}
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Informasi Kontak</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {organization.address && (
-                  <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-medium text-foreground">Alamat</p>
-                      <p className="text-sm text-muted-foreground">{organization.address}</p>
-                    </div>
-                  </div>
-                )}
-
-                {organization.phone && (
-                  <div className="flex items-start gap-3">
-                    <Phone className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-medium text-foreground">Telepon</p>
-                      <p className="text-sm text-muted-foreground">{organization.phone}</p>
-                    </div>
-                  </div>
-                )}
-
-                {organization.email && (
-                  <div className="flex items-start gap-3">
-                    <Mail className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-medium text-foreground">Email</p>
-                      <p className="text-sm text-muted-foreground">{organization.email}</p>
-                    </div>
-                  </div>
-                )}
-
-                {organization.website && (
-                  <div className="flex items-start gap-3">
-                    <Globe className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-medium text-foreground">Website</p>
-                      <a 
-                        href={organization.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-primary hover:underline"
-                      >
-                        {organization.website}
-                      </a>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
 
             {/* Statistics */}
             <Card>

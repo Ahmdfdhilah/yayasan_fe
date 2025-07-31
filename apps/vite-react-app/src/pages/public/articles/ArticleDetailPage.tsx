@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Card, CardContent } from "@workspace/ui/components/card";
-import { ArrowLeft, Calendar, User, Share2, Eye } from 'lucide-react';
+import { ArrowLeft, Calendar, Share2 } from 'lucide-react';
 import { getNewsImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import type { Article } from '@/services/articles/types';
@@ -170,18 +170,6 @@ const ArticleDetailPage = () => {
                 })}</span>
               </div>
             )}
-            {article.author && (
-              <div className="flex items-center gap-1">
-                <User className="w-4 h-4" />
-                <span>{article.author}</span>
-              </div>
-            )}
-            {article.view_count && (
-              <div className="flex items-center gap-1">
-                <Eye className="w-4 h-4" />
-                <span>{article.view_count.toLocaleString()} views</span>
-              </div>
-            )}
           </div>
 
           {(article.display_excerpt || article.excerpt) && (
@@ -208,7 +196,7 @@ const ArticleDetailPage = () => {
         {/* Article Body */}
         <div className="prose prose-lg max-w-none mb-12">
           <RichTextDisplay 
-            content={article.content || article.body}
+            content={article.description}
             isDetailView={true}
             fallback="Konten artikel tidak tersedia."
           />

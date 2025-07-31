@@ -6,10 +6,10 @@ import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Input } from "@workspace/ui/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
-import { ArrowRight, Users, Search, Filter, MapPin } from 'lucide-react';
+import { ArrowRight, Users, Search } from 'lucide-react';
 import { getOrganizationImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
-import { Pagination } from '@/components/common/Pagination';
+import Pagination from '@/components/common/Pagination';
 import type { Organization } from '@/services/organizations/types';
 import { organizationService } from '@/services/organizations';
 
@@ -55,15 +55,15 @@ const OrganizationsListPage = () => {
       try {
         const response = await organizationService.getOrganizations({
           page: currentPage,
-          size: 12,
-          search: searchQuery || undefined,
+          size: 10,
+          q: searchQuery || undefined,
           sort_by: sortBy as any,
           sort_order: sortOrder as 'asc' | 'desc'
         });
 
         setOrganizations(response.items);
-        setTotalPages(response.total_pages);
-        setTotalItems(response.total_items);
+        setTotalPages(response.pages);
+        setTotalItems(response.total);
       } catch (error) {
         console.error('Error loading organizations:', error);
       } finally {
@@ -200,7 +200,7 @@ const OrganizationsListPage = () => {
           {/* Organizations Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {loading ? (
-              Array.from({ length: 12 }).map((_, index) => (
+              Array.from({ length: 10 }).map((_, index) => (
                 <OrganizationCardSkeleton key={index} />
               ))
             ) : organizations.length > 0 ? (
@@ -225,12 +225,6 @@ const OrganizationsListPage = () => {
                         <div className="flex items-center gap-1">
                           <Users className="w-3 h-3" />
                           <span>{org.user_count} anggota</span>
-                        </div>
-                      )}
-                      {org.address && (
-                        <div className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          <span className="truncate max-w-24">{org.address}</span>
                         </div>
                       )}
                     </div>
@@ -280,7 +274,10 @@ const OrganizationsListPage = () => {
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
+                itemsPerPage={10}
+                totalItems={totalItems}
                 onPageChange={handlePageChange}
+                onItemsPerPageChange={() => {}}
               />
             </div>
           )}
