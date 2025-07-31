@@ -1,11 +1,9 @@
 import React from 'react';
 import { Message } from '@/services/messages/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@workspace/ui/components/table';
-import { Badge } from '@workspace/ui/components/badge';
-import { Button } from '@workspace/ui/components/button';
+import ActionDropdown from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Eye, Archive, Trash2, EyeOff } from 'lucide-react';
 
 interface MessageTableProps {
   messages: Message[];
@@ -19,16 +17,16 @@ interface MessageTableProps {
 export const MessageTable: React.FC<MessageTableProps> = ({
   messages, loading = false, onView, onDelete, onMarkAsRead, onArchive
 }) => {
-  const getStatusBadge = (status: string) => {
+  const getStatus = (status: string) => {
     switch (status) {
-      case 'unread':
-        return <Badge variant="destructive">Belum Dibaca</Badge>;
-      case 'read':
-        return <Badge variant="default">Sudah Dibaca</Badge>;
-      case 'archived':
-        return <Badge variant="secondary">Diarsipkan</Badge>;
+      case 'UNREAD':
+        return 'Belum Dibaca';
+      case 'READ':
+        return 'Sudah Dibaca';
+      case 'ARCHIEVED':
+        return 'Diarsipkan';
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return status;
     }
   };
 
@@ -72,29 +70,30 @@ export const MessageTable: React.FC<MessageTableProps> = ({
                     {message.short_message}
                   </div>
                 </TableCell>
-                <TableCell>{getStatusBadge(message.status)}</TableCell>
+                <TableCell>{getStatus(message.status)}</TableCell>
                 <TableCell>
-                  {format(new Date(message.created_at), 'dd MMM yyyy HH:mm', { locale: id })}
+                  {format(new Date(message.created_at), 'dd MMM yyyy', { locale: id })}
                 </TableCell>
                 <TableCell className="text-right">
-                  <div className="flex items-center justify-end space-x-1">
-                    <Button size="sm" variant="ghost" onClick={() => onView(message)}>
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                    {message.is_unread && (
-                      <Button size="sm" variant="ghost" onClick={() => onMarkAsRead(message)}>
-                        <EyeOff className="w-4 h-4" />
-                      </Button>
-                    )}
-                    {message.status !== 'archived' && (
-                      <Button size="sm" variant="ghost" onClick={() => onArchive(message)}>
-                        <Archive className="w-4 h-4" />
-                      </Button>
-                    )}
-                    <Button size="sm" variant="ghost" onClick={() => onDelete(message)}>
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+                  <ActionDropdown
+                    onView={() => onView(message)}
+                    onDelete={() => onDelete(message)}
+                    showView={true}
+                    showEdit={false}
+                    showDelete={true}
+                    customActions={[
+                      ...(message.is_unread ? [{
+                        label: 'Tandai Dibaca',
+                        onClick: () => onMarkAsRead(message),
+                        icon: 'Eye'
+                      }] : []),
+                      ...(message.status !== 'ARCHIEVED' ? [{
+                        label: 'Arsipkan',
+                        onClick: () => onArchive(message),
+                        icon: 'Archive'
+                      }] : [])
+                    ]}
+                  />
                 </TableCell>
               </TableRow>
             ))

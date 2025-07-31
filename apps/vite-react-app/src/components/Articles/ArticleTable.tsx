@@ -12,7 +12,6 @@ import ActionDropdown from '@/components/common/ActionDropdown';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Badge } from '@workspace/ui/components/badge';
 
 interface ArticleTableProps {
   articles: Article[];
@@ -29,6 +28,9 @@ export const ArticleTable: React.FC<ArticleTableProps> = ({
   onDelete,
   onView
 }) => {
+  const getStatus = (is_published: boolean) => {
+    return is_published ? 'Dipublikasikan' : 'Draft';
+  };
 
   return (
     <div className="rounded-md border">
@@ -82,12 +84,10 @@ export const ArticleTable: React.FC<ArticleTableProps> = ({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline">{article.category}</Badge>
+                  {article.category}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={article.is_published ? 'default' : 'secondary'}>
-                    {article.is_published ? 'Dipublikasikan' : 'Draft'}
-                  </Badge>
+                  {getStatus(article.is_published)}
                 </TableCell>
                 <TableCell>
                   {article.published_at 

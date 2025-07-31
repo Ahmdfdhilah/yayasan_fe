@@ -205,9 +205,9 @@ const MessagesPage: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Status</SelectItem>
-              <SelectItem value="unread">Belum Dibaca</SelectItem>
-              <SelectItem value="read">Sudah Dibaca</SelectItem>
-              <SelectItem value="archived">Diarsipkan</SelectItem>
+              <SelectItem value="UNREAD">Belum Dibaca</SelectItem>
+              <SelectItem value="READ">Sudah Dibaca</SelectItem>
+              <SelectItem value="ARCHIEVED">Diarsipkan</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -313,8 +313,8 @@ const MessagesPage: React.FC = () => {
                 <div>
                   <Label>Status</Label>
                   <div className="p-2 bg-muted rounded text-sm">
-                    {viewingMessage.status === 'unread' ? 'Belum Dibaca' : 
-                     viewingMessage.status === 'read' ? 'Sudah Dibaca' : 'Diarsipkan'}
+                    {viewingMessage.status === 'UNREAD' ? 'Belum Dibaca' : 
+                     viewingMessage.status === 'READ' ? 'Sudah Dibaca' : 'Diarsipkan'}
                   </div>
                 </div>
                 <div>

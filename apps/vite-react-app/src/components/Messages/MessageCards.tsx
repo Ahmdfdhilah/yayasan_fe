@@ -1,11 +1,10 @@
 import React from 'react';
 import { Message } from '@/services/messages/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
-import { Badge } from '@workspace/ui/components/badge';
-import { Button } from '@workspace/ui/components/button';
+import ActionDropdown from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Eye, Archive, Trash2, EyeOff } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 
 interface MessageCardsProps {
   messages: Message[];
@@ -19,16 +18,16 @@ interface MessageCardsProps {
 export const MessageCards: React.FC<MessageCardsProps> = ({
   messages, loading = false, onView, onDelete, onMarkAsRead, onArchive
 }) => {
-  const getStatusBadge = (status: string) => {
+  const getStatus = (status: string) => {
     switch (status) {
-      case 'unread':
-        return <Badge variant="destructive" className="text-xs">Belum Dibaca</Badge>;
-      case 'read':
-        return <Badge variant="default" className="text-xs">Sudah Dibaca</Badge>;
-      case 'archived':
-        return <Badge variant="secondary" className="text-xs">Diarsipkan</Badge>;
+      case 'UNREAD':
+        return 'Belum Dibaca';
+      case 'READ':
+        return 'Sudah Dibaca';
+      case 'ARCHIEVED':
+        return 'Diarsipkan';
       default:
-        return <Badge variant="outline" className="text-xs">{status}</Badge>;
+        return status;
     }
   };
 
@@ -69,7 +68,7 @@ export const MessageCards: React.FC<MessageCardsProps> = ({
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-1">
                     <h3 className="font-medium text-sm">{message.name}</h3>
-                    {getStatusBadge(message.status)}
+                    {getStatus(message.status)}
                   </div>
                   <p className="text-xs text-muted-foreground">{message.email}</p>
                 </div>
@@ -78,34 +77,38 @@ export const MessageCards: React.FC<MessageCardsProps> = ({
                 </span>
               </div>
 
-              <div>
-                <h4 className="font-medium text-sm mb-1">{message.short_title}</h4>
-                <p className="text-xs text-muted-foreground line-clamp-2">
-                  {message.short_message}
-                </p>
-              </div>
 
-              <div className="flex items-center space-x-2">
-                <Button size="sm" variant="outline" onClick={() => onView(message)}>
-                  <Eye className="w-3 h-3 mr-1" />
-                  Lihat
-                </Button>
-                {message.is_unread && (
-                  <Button size="sm" variant="outline" onClick={() => onMarkAsRead(message)}>
-                    <EyeOff className="w-3 h-3 mr-1" />
-                    Tandai Dibaca
-                  </Button>
-                )}
-                {message.status !== 'archived' && (
-                  <Button size="sm" variant="outline" onClick={() => onArchive(message)}>
-                    <Archive className="w-3 h-3 mr-1" />
-                    Arsip
-                  </Button>
-                )}
-                <Button size="sm" variant="outline" onClick={() => onDelete(message)}>
-                  <Trash2 className="w-3 h-3 mr-1" />
-                  Hapus
-                </Button>
+              <div className="flex items-start justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center justify-center w-8 h-8 bg-muted rounded-full">
+                    <MessageSquare className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm mb-1">{message.short_title}</h4>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {message.short_message}
+                    </p>
+                  </div>
+                </div>
+                <ActionDropdown
+                  onView={() => onView(message)}
+                  onDelete={() => onDelete(message)}
+                  showView={true}
+                  showEdit={false}
+                  showDelete={true}
+                  customActions={[
+                    ...(message.is_unread ? [{
+                      label: 'Tandai Dibaca',
+                      onClick: () => onMarkAsRead(message),
+                      icon: 'Eye'
+                    }] : []),
+                    ...(message.status !== 'ARCHIEVED' ? [{
+                      label: 'Arsipkan',
+                      onClick: () => onArchive(message),
+                      icon: 'Archive'
+                    }] : [])
+                  ]}
+                />
               </div>
             </div>
           </CardContent>

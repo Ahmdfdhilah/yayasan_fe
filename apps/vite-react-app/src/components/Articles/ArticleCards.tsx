@@ -1,7 +1,6 @@
 import React from 'react';
 import { Article } from '@/services/articles/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
-import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { format } from 'date-fns';
@@ -22,6 +21,9 @@ export const ArticleCards: React.FC<ArticleCardsProps> = ({
   onDelete,
   onView
 }) => {
+  const getStatus = (is_published: boolean) => {
+    return is_published ? 'Dipublikasikan' : 'Draft';
+  };
   if (loading) {
     return (
       <div className="grid gap-4">
@@ -81,16 +83,12 @@ export const ArticleCards: React.FC<ArticleCardsProps> = ({
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Kategori:</span>
-                    <Badge variant="outline" className="text-xs">
-                      {article.category}
-                    </Badge>
+                    <span>{article.category}</span>
                   </div>
                   
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Status:</span>
-                    <Badge variant={article.is_published ? 'default' : 'secondary'} className="text-xs">
-                      {article.is_published ? 'Dipublikasikan' : 'Draft'}
-                    </Badge>
+                    <span>{getStatus(article.is_published)}</span>
                   </div>
                   
                   <div className="flex items-center justify-between text-xs">

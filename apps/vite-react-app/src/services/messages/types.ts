@@ -4,9 +4,9 @@ import { PaginatedResponse } from "../base/types";
 
 // Message Status Enum
 export enum MessageStatus {
-  UNREAD = "unread",
-  READ = "read",
-  ARCHIVED = "archived"
+  UNREAD = "UNREAD",
+  READ = "READ", 
+  ARCHIEVED = "ARCHIEVED"
 }
 
 // Message Types

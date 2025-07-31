@@ -97,25 +97,25 @@ export const appMenuItems: SidebarItem[] = [
     allowedRoles: ['admin'],
     children: [
       {
-        title: 'Manajemen Aspek Evaluasi',
+        title: 'Aspek Evaluasi',
         href: '/evaluation-aspects',
         icon: BookOpen,
         allowedRoles: ['admin'],
       },
       {
-        title: 'Manajemen Periode',
+        title: 'Periode',
         href: '/periods',
         icon: Calendar,
         allowedRoles: ['admin'],
       },
       {
-        title: 'Manajemen Sekolah',
+        title: 'Sekolah',
         href: '/organizations',
         icon: Building,
         allowedRoles: ['admin'],
       },
       {
-        title: 'Manajemen Pengguna',
+        title: 'Pengguna',
         href: '/users',
         icon: Users,
         allowedRoles: ['admin'],
