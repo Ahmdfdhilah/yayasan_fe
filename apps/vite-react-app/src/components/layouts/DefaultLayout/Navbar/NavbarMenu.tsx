@@ -26,6 +26,13 @@ export const NavMenu = (props: ComponentProps<typeof NavigationMenu>) => (
             </NavigationMenuItem>
             <NavigationMenuItem>
                 <NavigationMenuLink asChild>
+                    <Link to="/galleries" className="text-foreground hover:text-primary transition-colors">
+                        Galeri
+                    </Link>
+                </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+                <NavigationMenuLink asChild>
                     <Link to="/schools" className="text-foreground hover:text-primary transition-colors">
                         Sekolah
                     </Link>

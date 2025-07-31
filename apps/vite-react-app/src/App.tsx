@@ -36,6 +36,8 @@ import ArticlesListPage from './pages/public/articles/ArticlesListPage';
 import ArticleDetailPage from './pages/public/articles/ArticleDetailPage';
 import OrganizationsListPage from './pages/public/organizations/OrganizationsListPage';
 import OrganizationDetailPage from './pages/public/organizations/OrganizationDetailPage';
+import GalleriesListPage from './pages/public/galleries/GalleriesListPage';
+import GalleryDetailPage from './pages/public/galleries/GalleryDetailPage';
 
 // Simple redirect component for My Evaluations
 const MyEvaluationsRedirect = () => {
@@ -65,6 +67,10 @@ function App() {
                     {/* Public Organizations Routes - using /schools to avoid conflict with CMS */}
                     <Route path='schools' element={<OrganizationsListPage />} />
                     <Route path='schools/:id' element={<OrganizationDetailPage />} />
+                    
+                    {/* Public Galleries Routes */}
+                    <Route path='galleries' element={<GalleriesListPage />} />
+                    <Route path='galleries/:id' element={<GalleryDetailPage />} />
                     
                     <Route path='login' element={
                       <PublicRoute>
@@ -204,7 +210,7 @@ function App() {
                       </RoleProtectedRoute>
                     } />
 
-                    <Route path="galleries" element={
+                    <Route path="cms/galleries" element={
                       <RoleProtectedRoute allowedRoles={['admin']}>
                         <GalleriesPage />
                       </RoleProtectedRoute>
