@@ -31,7 +31,11 @@ import BoardMembersPage from './pages/board-members/BoardMembersPage';
 import ArticlesPage from './pages/articles/ArticlesPage';
 import GalleriesPage from './pages/galleries/GalleriesPage';
 import MessagesPage from './pages/messages/MessagesPage';
-import HomePage from './pages/home/HomePage';
+import HomePage from './pages/public/home/HomePage';
+import ArticlesListPage from './pages/public/articles/ArticlesListPage';
+import ArticleDetailPage from './pages/public/articles/ArticleDetailPage';
+import OrganizationsListPage from './pages/public/organizations/OrganizationsListPage';
+import OrganizationDetailPage from './pages/public/organizations/OrganizationDetailPage';
 
 // Simple redirect component for My Evaluations
 const MyEvaluationsRedirect = () => {
@@ -53,6 +57,15 @@ function App() {
                   <Route path="/" element={<DefaultLayout />}>
                     <Route index element={<HomePage />} />
                     <Route path='home' element={<HomePage />} />
+                    
+                    {/* Public Articles Routes */}
+                    <Route path='articles' element={<ArticlesListPage />} />
+                    <Route path='articles/:slug' element={<ArticleDetailPage />} />
+                    
+                    {/* Public Organizations Routes - using /schools to avoid conflict with CMS */}
+                    <Route path='schools' element={<OrganizationsListPage />} />
+                    <Route path='schools/:id' element={<OrganizationDetailPage />} />
+                    
                     <Route path='login' element={
                       <PublicRoute>
                         <LoginPage />
@@ -96,7 +109,7 @@ function App() {
                       </RoleProtectedRoute>
                     } />
 
-                    <Route path="organizations" element={
+                    <Route path="cms/organizations" element={
                       <RoleProtectedRoute allowedRoles={['admin']}>
                         <OrganizationsPage />
                       </RoleProtectedRoute>
@@ -185,7 +198,7 @@ function App() {
                       </RoleProtectedRoute>
                     } />
 
-                    <Route path="articles" element={
+                    <Route path="cms/articles" element={
                       <RoleProtectedRoute allowedRoles={['admin']}>
                         <ArticlesPage/>
                       </RoleProtectedRoute>

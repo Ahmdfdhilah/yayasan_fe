@@ -57,11 +57,11 @@ export const SchoolsSection = ({ organizations, loading }: SchoolsSectionProps) 
           ) : (
             organizations.slice(0, 5).map((org, index) => (
               <Card key={org.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
-                <div className="aspect-video relative overflow-hidden rounded-t-lg">
+                <div className="aspect-video relative overflow-hidden rounded-t-lg bg-muted">
                   <img 
                     src={getOrganizationImageUrl(org.img_url) || `https://picsum.photos/400/240?random=${index + 10}`}
                     alt={org.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                   />
                   <Badge className="absolute top-3 left-3 bg-primary hover:bg-primary/90">
                     Organisasi

@@ -56,12 +56,12 @@ export const ArticlesSection = ({ articles, loading }: ArticlesSectionProps) => 
             ))
           ) : (
             articles.slice(0, 5).map((article, index) => (
-              <Card key={article.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
-                <div className="aspect-video relative overflow-hidden rounded-t-lg">
+              <Card key={article.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group pt-0">
+                <div className="aspect-video relative overflow-hidden rounded-t-lg bg-muted">
                   <img 
                     src={getNewsImageUrl(article.img_url) || `https://picsum.photos/400/240?random=${index + 1}`}
                     alt={article.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                   />
                   <Badge className="absolute top-3 left-3 bg-primary hover:bg-primary/90">
                     {article.category}
