@@ -3,16 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@workspace
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
-import { ArrowRight, Calendar, User } from 'lucide-react';
-
-interface Article {
-  id: number;
-  title: string;
-  description: string;
-  author?: string;
-  date?: string;
-  imageUrl?: string;
-}
+import { ArrowRight, Calendar } from 'lucide-react';
+import type { Article } from '@/services/articles/types';
 
 interface ArticlesSectionProps {
   articles: Article[];
@@ -62,43 +54,37 @@ export const ArticlesSection = ({ articles, loading }: ArticlesSectionProps) => 
             ))
           ) : (
             articles.slice(0, 5).map((article, index) => (
-              <Card key={article.id || index} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
+              <Card key={article.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
                 <div className="aspect-video relative overflow-hidden rounded-t-lg">
                   <img 
-                    src={article.imageUrl || `https://picsum.photos/400/240?random=${index + 1}`}
-                    alt={article.title || `Artikel ${index + 1}`}
+                    src={article.img_url || `https://picsum.photos/400/240?random=${index + 1}`}
+                    alt={article.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <Badge className="absolute top-3 left-3 bg-primary hover:bg-primary/90">
-                    Artikel
+                    {article.category}
                   </Badge>
                 </div>
                 <CardHeader className="pb-3">
                   <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
-                    {article.title || `Judul Artikel ${index + 1}`}
+                    {article.title}
                   </CardTitle>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    {article.author && (
-                      <div className="flex items-center gap-1">
-                        <User className="w-3 h-3" />
-                        <span>{article.author}</span>
-                      </div>
-                    )}
-                    {article.date && (
+                    {article.published_at && (
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
-                        <span>{article.date}</span>
+                        <span>{new Date(article.published_at).toLocaleDateString('id-ID')}</span>
                       </div>
                     )}
                   </div>
                 </CardHeader>
                 <CardContent className="pb-4">
                   <p className="text-muted-foreground line-clamp-3 leading-relaxed">
-                    {article.description || `Deskripsi artikel yang menarik dan informatif tentang berbagai topik pendidikan dan kegiatan yayasan.`}
+                    {article.display_excerpt || article.excerpt || 'Deskripsi artikel yang menarik dan informatif tentang berbagai topik pendidikan dan kegiatan yayasan.'}
                   </p>
                 </CardContent>
                 <CardFooter>
-                  <Link to={`/articles/${article.id || index}`} className="w-full">
+                  <Link to={`/articles/${article.slug}`} className="w-full">
                     <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary">
                       Baca Selengkapnya
                       <ArrowRight className="w-3 h-3 ml-1" />
