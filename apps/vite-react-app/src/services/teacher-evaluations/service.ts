@@ -10,6 +10,7 @@ import {
   AssignTeachersToEvaluationPeriod,
   AssignTeachersToEvaluationPeriodResponse,
   TeacherEvaluationResponse,
+  TeacherEvaluationDetailResponse,
   TeacherEvaluationItemResponse,
   TeacherEvaluationListResponse,
   TeacherEvaluationFilterParams,
@@ -36,14 +37,14 @@ class TeacherEvaluationService extends BaseService {
   // Create evaluation with items (parent + children)
   async createEvaluationWithItems(
     evaluationData: TeacherEvaluationWithItemsCreate
-  ): Promise<TeacherEvaluationResponse> {
+  ): Promise<TeacherEvaluationDetailResponse> {
     return this.post("/with-items", evaluationData);
   }
 
-  // Get teacher evaluation by ID
+  // Get teacher evaluation by ID (returns detail with items)
   async getTeacherEvaluation(
     evaluationId: number
-  ): Promise<TeacherEvaluationResponse> {
+  ): Promise<TeacherEvaluationDetailResponse> {
     return this.get(`/${evaluationId}`);
   }
 
@@ -93,7 +94,7 @@ class TeacherEvaluationService extends BaseService {
   async bulkUpdateEvaluationItems(
     evaluationId: number,
     bulkData: TeacherEvaluationBulkItemUpdate
-  ): Promise<TeacherEvaluationResponse> {
+  ): Promise<TeacherEvaluationDetailResponse> {
     return this.patch(`/${evaluationId}/bulk-items`, bulkData);
   }
 
@@ -116,19 +117,18 @@ class TeacherEvaluationService extends BaseService {
     return this.get(endpoint);
   }
 
-  // Get teacher evaluation by period and evaluator
+  // Get teacher evaluation by period (evaluator no longer needed - one teacher per period has one evaluator)
   async getTeacherEvaluationByPeriod(
     teacherId: number,
-    periodId: number,
-    evaluatorId: number
-  ): Promise<TeacherEvaluationResponse> {
-    return this.get(`/teacher/${teacherId}/period/${periodId}/evaluator/${evaluatorId}`);
+    periodId: number
+  ): Promise<TeacherEvaluationDetailResponse> {
+    return this.get(`/teacher/${teacherId}/period/${periodId}`);
   }
 
-  // Get evaluations by period
+  // Get evaluations by period (returns detailed evaluations with items)
   async getEvaluationsByPeriod(
     periodId: number
-  ): Promise<TeacherEvaluationResponse[]> {
+  ): Promise<TeacherEvaluationDetailResponse[]> {
     return this.get(`/period/${periodId}`);
   }
 
@@ -185,7 +185,7 @@ class TeacherEvaluationService extends BaseService {
   // ===== HELPER METHODS FOR CALCULATION =====
 
   // Calculate completion percentage for evaluation
-  calculateCompletionPercentage(evaluation: TeacherEvaluationResponse, totalAspects: number): number {
+  calculateCompletionPercentage(evaluation: TeacherEvaluationDetailResponse, totalAspects: number): number {
     const completedItems = evaluation.items?.length || 0;
     return totalAspects > 0 ? (completedItems / totalAspects) * 100 : 0;
   }

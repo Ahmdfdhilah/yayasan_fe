@@ -26,7 +26,10 @@ export interface TeacherEvaluation {
   created_at?: string;
   updated_at?: string;
   organization_name?: string;
-  
+}
+
+// Teacher evaluation with items (for detail views)
+export interface TeacherEvaluationWithItems extends TeacherEvaluation {
   // Child relationships
   items: TeacherEvaluationItem[];
 }
@@ -111,7 +114,11 @@ export interface AssignTeachersToEvaluationPeriod {
 // Response Types
 export interface TeacherEvaluationItemResponse extends TeacherEvaluationItem {}
 
+// Basic response (without items) - used for list views  
 export interface TeacherEvaluationResponse extends TeacherEvaluation {}
+
+// Detail response (with items) - used for individual evaluation views
+export interface TeacherEvaluationDetailResponse extends TeacherEvaluationWithItems {}
 
 export interface TeacherEvaluationListResponse extends PaginatedResponse<TeacherEvaluation> {}
 
