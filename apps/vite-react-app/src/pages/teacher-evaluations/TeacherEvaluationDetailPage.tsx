@@ -60,7 +60,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   // URL Filters configuration
   const { updateURL, getCurrentFilters } = useURLFilters<DetailPageFilters>({
     defaults: {
-      period_id: 'latest',
+      period_id: '',
     },
     cleanDefaults: true,
   });
@@ -99,6 +99,24 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     }
   }, [teacherId, filters.period_id, periods]);
 
+  // Auto-select period only if no period_id in URL
+  useEffect(() => {
+    if (periods.length > 0 && !filters.period_id) {
+      let selectedPeriodId: string;
+      
+      if (activePeriod) {
+        // Use active period if exists
+        selectedPeriodId = activePeriod.id.toString();
+      } else {
+        // Use first period as fallback
+        selectedPeriodId = periods[0].id.toString();
+      }
+      
+      console.log('Auto-selecting period (no URL param):', selectedPeriodId);
+      updateURL({ period_id: selectedPeriodId });
+    }
+  }, [activePeriod, periods, filters.period_id, updateURL]);
+
   const loadPeriods = async () => {
     try {
       const response = await periodService.getPeriods();
@@ -112,48 +130,32 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     try {
       setLoading(true);
 
-      if (periods.length === 0) {
-        throw new Error('No periods available');
+      if (!filters.period_id) {
+        console.log('No period_id in filters, skipping load');
+        return;
       }
 
-      // Determine which period to use
-      let selectedPeriod: Period;
-
-      if (filters.period_id === 'latest') {
-        // Sort periods to get the latest
-        const sortedPeriods = [...periods].sort((a, b) => {
-          if (a.academic_year !== b.academic_year) {
-            return b.academic_year.localeCompare(a.academic_year);
-          }
-          return a.semester === 'Ganjil' ? 1 : -1;
-        });
-        selectedPeriod = sortedPeriods[0];
-      } else {
-        const foundPeriod = periods.find(p => p.id === Number(filters.period_id));
-        if (!foundPeriod) {
-          throw new Error('Selected period not found');
-        }
-        selectedPeriod = foundPeriod;
-      }
-
-      setCurrentPeriod(selectedPeriod);
-
+      const periodId = Number(filters.period_id);
+      
       // Get teacher evaluations using filtered endpoint - this respects access control
       const response = await teacherEvaluationService.getEvaluationsByTeacher(
         Number(teacherId),
-        { period_id: selectedPeriod.id }
+        { period_id: periodId }
       );
 
       // Extract evaluations from response
       const teacherEvaluations = response?.items || [];
       
-      // Store final evaluations result
-      const finalEvaluations = teacherEvaluations;
+      // Find current period from periods list for display
+      const foundPeriod = periods.find(p => p.id === periodId);
+      if (foundPeriod) {
+        setCurrentPeriod(foundPeriod);
+      }
 
       // Set form values from evaluation items
       // Create a map of aspect_id -> grade from all evaluation items
       const evaluationData: Record<string, string> = {};
-      finalEvaluations.forEach(evaluation => {
+      teacherEvaluations.forEach(evaluation => {
         evaluation.items?.forEach((item: { aspect_id: { toString: () => string | number; }; grade: string; }) => {
           evaluationData[item.aspect_id.toString()] = item.grade;
         });
@@ -161,15 +163,16 @@ const TeacherEvaluationDetailPage: React.FC = () => {
 
       form.reset({
         aspects: evaluationData,
-        notes: finalEvaluations[0]?.final_notes || '',
+        notes: teacherEvaluations[0]?.final_notes || '',
       });
 
-      setEvaluations(finalEvaluations);
+      setEvaluations(teacherEvaluations);
 
       // Always start in view mode
       setMode('view');
     } catch (error) {
       console.error('Error loading evaluation detail:', error);
+      
       toast({
         title: 'Error',
         description: 'Gagal memuat detail evaluasi. Silakan coba lagi.',
@@ -220,6 +223,16 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       setActivePeriod(activeResponse);
     } catch (error) {
       console.error('Error loading active period:', error);
+      // If no active period, try to find one manually
+      try {
+        const allPeriodsResponse = await periodService.getPeriods({ is_active: true, page: 1, size: 100 });
+        const activePeriods = allPeriodsResponse.items || [];
+        if (activePeriods.length > 0) {
+          setActivePeriod(activePeriods[0]);
+        }
+      } catch (fallbackError) {
+        console.error('Error in fallback active period load:', fallbackError);
+      }
     }
   };
 
@@ -483,10 +496,10 @@ const TeacherEvaluationDetailPage: React.FC = () => {
               <SelectValue placeholder="Pilih periode" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="latest">Periode Terbaru</SelectItem>
               {periods.map((period) => (
                 <SelectItem key={period.id} value={period.id.toString()}>
                   {period.academic_year} - {period.semester}
+                  {period.is_active ? ' (Aktif)' : ''}
                 </SelectItem>
               ))}
             </SelectContent>

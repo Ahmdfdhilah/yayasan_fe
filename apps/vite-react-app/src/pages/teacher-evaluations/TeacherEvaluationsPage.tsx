@@ -136,7 +136,7 @@ const TeacherEvaluationsPage: React.FC = () => {
   // Load periods
   const loadPeriods = async () => {
     try {
-      const response = await periodService.getPeriods();
+      const response = await periodService.getPeriods({ page: 1, size: 100 });
       setPeriods(response.items || []);
     } catch (error) {
       console.error('Error loading periods:', error);
@@ -150,6 +150,16 @@ const TeacherEvaluationsPage: React.FC = () => {
       setActivePeriod(activeResponse);
     } catch (error) {
       console.error('Error loading active period:', error);
+      // If no active period, try to find one manually
+      try {
+        const allPeriodsResponse = await periodService.getPeriods({ is_active: true, page: 1, size: 100 });
+        const activePeriods = allPeriodsResponse.items || [];
+        if (activePeriods.length > 0) {
+          setActivePeriod(activePeriods[0]);
+        }
+      } catch (fallbackError) {
+        console.error('Error in fallback active period load:', fallbackError);
+      }
     }
   };
 
@@ -162,12 +172,19 @@ const TeacherEvaluationsPage: React.FC = () => {
     }
   }, [hasAccess]);
 
-  // Effect to fetch evaluations when filters or active period change
+  // Auto-select active period if no period is selected or if "active" is selected
   useEffect(() => {
-    if (hasAccess && (filters.period_id !== 'active' || activePeriod)) {
+    if (activePeriod && (filters.period_id === 'active' || !filters.period_id)) {
+      updateURL({ period_id: activePeriod.id.toString() });
+    }
+  }, [activePeriod]);
+
+  // Effect to fetch evaluations when filters change
+  useEffect(() => {
+    if (hasAccess) {
       fetchEvaluations();
     }
-  }, [filters.page, filters.size, filters.search, filters.period_id, filters.organization_id, activePeriod, hasAccess]);
+  }, [filters.page, filters.size, filters.search, filters.period_id, filters.organization_id, hasAccess]);
 
   // Pagination handled by totalPages state
 
@@ -281,11 +298,11 @@ const TeacherEvaluationsPage: React.FC = () => {
               <SelectValue placeholder="Pilih periode" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="active">Periode Aktif</SelectItem>
               <SelectItem value="all">Semua Periode</SelectItem>
               {periods.map((period) => (
                 <SelectItem key={period.id} value={period.id.toString()}>
                   {period.academic_year} - {period.semester}
+                  {period.is_active ? ' (Aktif)' : ''}
                 </SelectItem>
               ))}
             </SelectContent>
