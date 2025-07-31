@@ -58,7 +58,7 @@ const OrganizationDetailPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="mx-auto px-4 lg:px-12 py-12">
           <Skeleton className="h-8 w-32 mb-6" />
           <Skeleton className="h-10 w-3/4 mb-4" />
           <Skeleton className="h-6 w-1/2 mb-8" />
@@ -98,7 +98,7 @@ const OrganizationDetailPage = () => {
     <div className="min-h-screen bg-background">
       {/* Back Navigation */}
       <div className="border-b bg-muted/20">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="mx-auto px-4 lg:px-12 py-">
           <Link to="/schools">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -109,7 +109,7 @@ const OrganizationDetailPage = () => {
       </div>
 
       {/* Organization Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="mx-auto px-4 lg:px-12 py-8">
         {/* Header */}
         <header className="mb-8">
           <div className="flex items-center gap-2 mb-4">
@@ -172,7 +172,7 @@ const OrganizationDetailPage = () => {
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             {/* Description */}
             <Card className="mb-8">
               <CardHeader>
@@ -192,10 +192,10 @@ const OrganizationDetailPage = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1">
+          {/* <div className="lg:col-span-1"> */}
 
             {/* Statistics */}
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Statistik</CardTitle>
               </CardHeader>
@@ -205,9 +205,9 @@ const OrganizationDetailPage = () => {
                     <span className="text-muted-foreground">Total Anggota</span>
                     <span className="font-semibold text-foreground">{organization.user_count}</span>
                   </div>
-                )}
+                )} */}
                 
-                {organization.created_at && (
+                {/* {organization.created_at && (
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Tahun Berdiri</span>
                     <span className="font-semibold text-foreground">
@@ -215,9 +215,11 @@ const OrganizationDetailPage = () => {
                     </span>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </div>
+                 */}
+                 {/* TODO */}
+              {/* </CardContent>
+            </Card> */}
+          {/* </div> */}
         </div>
 
         {/* Footer */}

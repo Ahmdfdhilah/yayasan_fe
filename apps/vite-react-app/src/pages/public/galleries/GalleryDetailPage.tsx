@@ -89,7 +89,7 @@ const GalleryDetailPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="mx-auto px-4 lg:px-12 py-8">
           <Skeleton className="h-8 w-32 mb-6" />
           <Skeleton className="h-10 w-3/4 mb-4" />
           <Skeleton className="h-6 w-1/2 mb-8" />
@@ -129,7 +129,7 @@ const GalleryDetailPage = () => {
     <div className="min-h-screen bg-background">
       {/* Back Navigation */}
       <div className="border-b bg-muted/20">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="mx-auto px-4 lg:px-12 py-8">
           <Link to="/galleries">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
