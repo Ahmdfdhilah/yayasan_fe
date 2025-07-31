@@ -238,7 +238,7 @@ const ArticlesListPage = () => {
           </div>
 
           {/* Articles Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {loading ? (
               Array.from({ length: itemsPerPage }).map((_, index) => (
                 <ArticleCardSkeleton key={index} />
@@ -280,7 +280,7 @@ const ArticlesListPage = () => {
                     </div>
                   </CardContent>
                   <CardFooter>
-                    <Link to={`/articles/${article.slug}`} className="w-full">
+                    <Link to={`/articles/${article.id}`} className="w-full">
                       <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary">
                         Baca Selengkapnya
                         <ArrowRight className="w-3 h-3 ml-1" />

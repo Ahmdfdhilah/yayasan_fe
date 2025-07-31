@@ -91,7 +91,7 @@ export const ArticlesSection = ({ articles, loading }: ArticlesSectionProps) => 
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Link to={`/articles/${article.slug}`} className="w-full">
+                  <Link to={`/articles/${article.id}`} className="w-full">
                     <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary">
                       Baca Selengkapnya
                       <ArrowRight className="w-3 h-3 ml-1" />

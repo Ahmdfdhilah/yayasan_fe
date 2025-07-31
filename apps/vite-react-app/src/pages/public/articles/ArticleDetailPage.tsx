@@ -11,46 +11,37 @@ import type { Article } from '@/services/articles/types';
 import { articleService } from '@/services/articles';
 
 const ArticleDetailPage = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { id } = useParams<{ id: string }>();
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
 
   useEffect(() => {
-    if (!slug) return;
+    if (!id) return;
 
     const loadArticle = async () => {
       setLoading(true);
       setError(null);
       
       try {
-        // Get article by slug
-        const articlesResponse = await articleService.getArticles({
-          search: slug,
-          is_published: true,
-          size: 1
-        });
-
-        const foundArticle = articlesResponse.items.find(a => a.slug === slug);
+        // Get article by ID
+        const foundArticle = await articleService.getArticleById(parseInt(id));
         
         if (foundArticle) {
           setArticle(foundArticle);
           
-          // Load related articles from same category
-          if (foundArticle.category) {
-            const relatedResponse = await articleService.getArticles({
-              category: foundArticle.category,
-              is_published: true,
-              size: 4,
-              sort_by: 'published_at',
-              sort_order: 'desc'
-            });
-            
-            // Filter out current article
-            const related = relatedResponse.items.filter(a => a.id !== foundArticle.id);
-            setRelatedArticles(related);
-          }
+          // Load latest articles (exclude current one)
+          const latestResponse = await articleService.getArticles({
+            is_published: true,
+            size: 7, // Get 7 to have 6 after filtering current
+            sort_by: 'published_at',
+            sort_order: 'desc'
+          });
+          
+          // Filter out current article
+          const latest = latestResponse.items.filter(a => a.id !== foundArticle.id).slice(0, 6);
+          setRelatedArticles(latest);
         } else {
           setError('Artikel tidak ditemukan');
         }
@@ -63,7 +54,7 @@ const ArticleDetailPage = () => {
     };
 
     loadArticle();
-  }, [slug]);
+  }, [id]);
 
   const handleShare = async () => {
     if (navigator.share && article) {
@@ -126,7 +117,7 @@ const ArticleDetailPage = () => {
     <div className="min-h-screen bg-background">
       {/* Back Navigation */}
       <div className="border-b bg-muted/20">
-        <div className="mx-auto px-4 lg:px-12 py-8">
+        <div className="px-4 lg:px-12 py-8">
           <Link to="/articles">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -137,7 +128,7 @@ const ArticleDetailPage = () => {
       </div>
 
       {/* Article Content */}
-      <article className="max-w-4xl mx-auto px-4 py-8">
+      <article className="px-4 lg:px-12 py-8">
         {/* Header */}
         <header className="mb-8">
           <div className="flex items-center gap-2 mb-4">
@@ -222,20 +213,20 @@ const ArticleDetailPage = () => {
         </footer>
       </article>
 
-      {/* Related Articles */}
+      {/* Latest Articles */}
       {relatedArticles.length > 0 && (
         <section className="bg-muted/20 py-16">
-          <div className="max-w-4xl mx-auto px-4">
+          <div className="px-4 lg:px-12">
             <h2 className="text-2xl font-bold text-foreground mb-8">
-              Artikel Terkait
+              Artikel Terbaru
             </h2>
             
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {relatedArticles.map((relatedArticle, index) => (
                 <Card key={relatedArticle.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
                   <div className="aspect-video relative overflow-hidden rounded-t-lg bg-muted">
                     <img 
-                      src={getNewsImageUrl(relatedArticle.img_url) || `https://picsum.photos/400/240?random=${index + 100}`}
+                      src={getNewsImageUrl(relatedArticle.img_url) || `https://picsum.photos/300/200?random=${index + 100}`}
                       alt={relatedArticle.title}
                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                     />
@@ -243,29 +234,21 @@ const ArticleDetailPage = () => {
                       {relatedArticle.category}
                     </Badge>
                   </div>
-                  <CardContent className="p-6">
-                    <h3 className="font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                  <CardContent className="p-3">
+                    <h3 className="font-medium text-foreground mb-1 line-clamp-2 group-hover:text-primary transition-colors text-xs">
                       {relatedArticle.title}
                     </h3>
-                    <div className="text-sm text-muted-foreground mb-4">
-                      {relatedArticle.published_at && (
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          <span>{new Date(relatedArticle.published_at).toLocaleDateString('id-ID')}</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-muted-foreground line-clamp-2 text-sm mb-4">
+                    <div className="text-muted-foreground line-clamp-1 text-xs mb-3">
                       <RichTextDisplay 
                         content={relatedArticle.display_excerpt || relatedArticle.excerpt}
                         fallback="Deskripsi artikel..."
-                        maxLength={80}
+                        maxLength={40}
                         className="text-muted-foreground"
                       />
                     </div>
-                    <Link to={`/articles/${relatedArticle.slug}`}>
-                      <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary">
-                        Baca Selengkapnya
+                    <Link to={`/articles/${relatedArticle.id}`}>
+                      <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary text-xs">
+                        Baca
                       </Button>
                     </Link>
                   </CardContent>

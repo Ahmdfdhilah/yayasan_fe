@@ -62,7 +62,7 @@ function App() {
                     
                     {/* Public Articles Routes */}
                     <Route path='articles' element={<ArticlesListPage />} />
-                    <Route path='articles/:slug' element={<ArticleDetailPage />} />
+                    <Route path='articles/:id' element={<ArticleDetailPage />} />
                     
                     {/* Public Organizations Routes - using /schools to avoid conflict with CMS */}
                     <Route path='schools' element={<OrganizationsListPage />} />
