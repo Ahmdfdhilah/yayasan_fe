@@ -12,22 +12,37 @@ export const NavMenu = (props: ComponentProps<typeof NavigationMenu>) => (
         <NavigationMenuList className="gap-6 space-x-0 data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-start">
             <NavigationMenuItem>
                 <NavigationMenuLink asChild>
-                    <Link to="#">Home</Link>
+                    <Link to="/" className="text-foreground hover:text-primary transition-colors">
+                        Beranda
+                    </Link>
                 </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
                 <NavigationMenuLink asChild>
-                    <Link to="#">Blog</Link>
+                    <Link to="/articles" className="text-foreground hover:text-primary transition-colors">
+                        Artikel
+                    </Link>
                 </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
                 <NavigationMenuLink asChild>
-                    <Link to="#">About</Link>
+                    <Link to="/schools" className="text-foreground hover:text-primary transition-colors">
+                        Sekolah
+                    </Link>
                 </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
                 <NavigationMenuLink asChild>
-                    <Link to="#">Contact Us</Link>
+                    <Link to="/about" className="text-foreground hover:text-primary transition-colors">
+                        Tentang
+                    </Link>
+                </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                    <Link to="/contact" className="text-foreground hover:text-primary transition-colors">
+                        Kontak
+                    </Link>
                 </NavigationMenuLink>
             </NavigationMenuItem>
         </NavigationMenuList>
