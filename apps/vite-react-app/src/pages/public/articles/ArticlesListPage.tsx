@@ -19,6 +19,7 @@ const ArticlesListPage = () => {
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(parseInt(searchParams.get('size') || '10'));
   
   // Get params from URL
   const currentPage = parseInt(searchParams.get('page') || '1');
@@ -66,7 +67,7 @@ const ArticlesListPage = () => {
       try {
         const response = await articleService.getArticles({
           page: currentPage,
-          size: 10,
+          size: itemsPerPage,
           search: searchQuery || undefined,
           category: categoryFilter || undefined,
           is_published: true,
@@ -85,7 +86,7 @@ const ArticlesListPage = () => {
     };
 
     loadArticles();
-  }, [currentPage, searchQuery, categoryFilter, sortBy, sortOrder]);
+  }, [currentPage, searchQuery, categoryFilter, sortBy, sortOrder, itemsPerPage]);
 
   // Update URL params
   const updateParams = (newParams: Record<string, string | null>) => {
@@ -116,6 +117,15 @@ const ArticlesListPage = () => {
 
   const handlePageChange = (page: number) => {
     updateParams({ page: page.toString() });
+  };
+
+  const handleItemsPerPageChange = (value: string) => {
+    const newSize = parseInt(value);
+    setItemsPerPage(newSize);
+    updateParams({ 
+      size: value,
+      page: '1' // Reset to first page
+    });
   };
 
   const handleSortChange = (value: string) => {
@@ -230,7 +240,7 @@ const ArticlesListPage = () => {
           {/* Articles Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
             {loading ? (
-              Array.from({ length: 12 }).map((_, index) => (
+              Array.from({ length: itemsPerPage }).map((_, index) => (
                 <ArticleCardSkeleton key={index} />
               ))
             ) : articles.length > 0 ? (
@@ -299,10 +309,10 @@ const ArticlesListPage = () => {
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
-                itemsPerPage={12}
+                itemsPerPage={itemsPerPage}
                 totalItems={totalItems}
                 onPageChange={handlePageChange}
-                onItemsPerPageChange={() => {}}
+                onItemsPerPageChange={handleItemsPerPageChange}
               />
             </div>
           )}

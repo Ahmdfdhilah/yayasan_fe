@@ -19,6 +19,7 @@ const OrganizationsListPage = () => {
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(parseInt(searchParams.get('size') || '10'));
   
   // Get params from URL
   const currentPage = parseInt(searchParams.get('page') || '1');
@@ -55,7 +56,7 @@ const OrganizationsListPage = () => {
       try {
         const response = await organizationService.getOrganizations({
           page: currentPage,
-          size: 10,
+          size: itemsPerPage,
           q: searchQuery || undefined,
           sort_by: sortBy as any,
           sort_order: sortOrder as 'asc' | 'desc'
@@ -72,7 +73,7 @@ const OrganizationsListPage = () => {
     };
 
     loadOrganizations();
-  }, [currentPage, searchQuery, sortBy, sortOrder]);
+  }, [currentPage, searchQuery, sortBy, sortOrder, itemsPerPage]);
 
   // Update URL params
   const updateParams = (newParams: Record<string, string | null>) => {
@@ -102,6 +103,15 @@ const OrganizationsListPage = () => {
 
   const handlePageChange = (page: number) => {
     updateParams({ page: page.toString() });
+  };
+
+  const handleItemsPerPageChange = (value: string) => {
+    const newSize = parseInt(value);
+    setItemsPerPage(newSize);
+    updateParams({ 
+      size: value,
+      page: '1' // Reset to first page
+    });
   };
 
   const handleSortChange = (value: string) => {
@@ -200,7 +210,7 @@ const OrganizationsListPage = () => {
           {/* Organizations Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {loading ? (
-              Array.from({ length: 10 }).map((_, index) => (
+              Array.from({ length: itemsPerPage }).map((_, index) => (
                 <OrganizationCardSkeleton key={index} />
               ))
             ) : organizations.length > 0 ? (
@@ -274,10 +284,10 @@ const OrganizationsListPage = () => {
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
-                itemsPerPage={10}
+                itemsPerPage={itemsPerPage}
                 totalItems={totalItems}
                 onPageChange={handlePageChange}
-                onItemsPerPageChange={() => {}}
+                onItemsPerPageChange={handleItemsPerPageChange}
               />
             </div>
           )}
