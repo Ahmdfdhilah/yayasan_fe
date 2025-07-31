@@ -32,7 +32,7 @@ const GalleriesPage: React.FC = () => {
   
   const { updateURL, getCurrentFilters } = useURLFilters<GalleryPageFilters>({
     defaults: { search: '', page: 1, size: 10 },
-    cleanDefaults: false,
+    cleanDefaults: true,
   });
 
   const filters = getCurrentFilters();

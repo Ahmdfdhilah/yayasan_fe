@@ -32,7 +32,7 @@ const MessagesPage: React.FC = () => {
   
   const { updateURL, getCurrentFilters } = useURLFilters<MessagePageFilters>({
     defaults: { search: '', status: 'all', unread_only: 'false', page: 1, size: 10 },
-    cleanDefaults: false,
+    cleanDefaults: true,
   });
 
   const filters = getCurrentFilters();

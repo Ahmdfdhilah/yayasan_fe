@@ -62,7 +62,7 @@ const OrganizationsPage: React.FC = () => {
       page: 1,
       size: 10,
     },
-    cleanDefaults: false,
+    cleanDefaults: true,
   });
 
   // Get current filters from URL

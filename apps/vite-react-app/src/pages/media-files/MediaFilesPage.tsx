@@ -43,7 +43,7 @@ const MediaFilesPage: React.FC = () => {
       page: 1,
       size: 20,
     },
-    cleanDefaults: false,
+    cleanDefaults: true,
   });
 
   // Get current filters from URL
