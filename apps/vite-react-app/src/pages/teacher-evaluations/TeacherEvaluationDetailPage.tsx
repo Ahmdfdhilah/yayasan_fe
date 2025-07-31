@@ -119,7 +119,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
 
   const loadPeriods = async () => {
     try {
-      const response = await periodService.getPeriods();
+      const response = await periodService.getPeriods({ page: 1, size: 100 });
       setPeriods(response.items || []);
     } catch (error) {
       console.error('Error loading periods:', error);
@@ -143,10 +143,19 @@ const TeacherEvaluationDetailPage: React.FC = () => {
         periodId
       );
       
-      // Find current period from periods list for display
-      const foundPeriod = periods.find(p => p.id === periodId);
-      if (foundPeriod) {
-        setCurrentPeriod(foundPeriod);
+      // Get period by ID for display info
+      if (!currentPeriod || currentPeriod.id !== periodId) {
+        try {
+          const periodResponse = await periodService.getPeriodById(periodId);
+          setCurrentPeriod(periodResponse);
+        } catch (error) {
+          console.error('Error loading period by ID:', error);
+          // Fallback to find from periods list
+          const foundPeriod = periods.find(p => p.id === periodId);
+          if (foundPeriod) {
+            setCurrentPeriod(foundPeriod);
+          }
+        }
       }
 
       // Set form values from evaluation items
