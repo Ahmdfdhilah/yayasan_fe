@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRole } from '@/hooks/useRole';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
@@ -158,6 +158,13 @@ const GalleriesPage: React.FC = () => {
     }
   };
 
+  // Filter handlers
+  const handleSearchChange = useCallback((search: string) => {
+    if (search !== filters.search) {
+      updateURL({ search, page: 1 });
+    }
+  }, [updateURL, filters.search]);
+
   if (!hasAccess) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -195,7 +202,7 @@ const GalleriesPage: React.FC = () => {
 
             <SearchContainer
               searchQuery={filters.search}
-              onSearchChange={(search) => updateURL({ search, page: 1 })}
+              onSearchChange={handleSearchChange}
               placeholder="Cari galeri berdasarkan judul..."
             />
 

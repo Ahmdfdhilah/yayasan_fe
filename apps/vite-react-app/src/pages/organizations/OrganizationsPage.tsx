@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRole } from '@/hooks/useRole';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
@@ -194,18 +194,24 @@ const OrganizationsPage: React.FC = () => {
     updateURL({ size: parseInt(value), page: 1 });
   };
 
-  // Filter handlers
-  const handleSearchChange = (q: string) => {
-    updateURL({ q, page: 1 });
-  };
+  // Filter handlers - memoized to prevent unnecessary calls
+  const handleSearchChange = useCallback((q: string) => {
+    if (q !== filters.q) {
+      updateURL({ q, page: 1 });
+    }
+  }, [updateURL, filters.q]);
 
-  const handleUsersFilterChange = (has_users: string) => {
-    updateURL({ has_users, page: 1 });
-  };
+  const handleUsersFilterChange = useCallback((has_users: string) => {
+    if (has_users !== filters.has_users) {
+      updateURL({ has_users, page: 1 });
+    }
+  }, [updateURL, filters.has_users]);
 
-  const handleHeadFilterChange = (has_head: string) => {
-    updateURL({ has_head, page: 1 });
-  };
+  const handleHeadFilterChange = useCallback((has_head: string) => {
+    if (has_head !== filters.has_head) {
+      updateURL({ has_head, page: 1 });
+    }
+  }, [updateURL, filters.has_head]);
 
   const handlePageChange = (page: number) => {
     updateURL({ page });

@@ -39,7 +39,6 @@ export const useURLFilters = <T extends Filters>(config: FilterConfig<T>) => {
   const { defaults, cleanDefaults = true } = config;
   
   // Prevent infinite loops by tracking last update
-  const lastUpdateRef = useRef<string>('');
   const isUpdatingRef = useRef<boolean>(false);
   const pendingUpdateRef = useRef<Partial<T> | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);

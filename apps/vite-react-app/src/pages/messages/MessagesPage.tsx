@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRole } from '@/hooks/useRole';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
@@ -157,6 +157,25 @@ const MessagesPage: React.FC = () => {
     }
   };
 
+  // Filter handlers
+  const handleSearchChange = useCallback((search: string) => {
+    if (search !== filters.search) {
+      updateURL({ search, page: 1 });
+    }
+  }, [updateURL, filters.search]);
+
+  const handleStatusChange = useCallback((status: string) => {
+    if (status !== filters.status) {
+      updateURL({ status, page: 1 });
+    }
+  }, [updateURL, filters.status]);
+
+  const handleUnreadOnlyChange = useCallback((unread_only: string) => {
+    if (unread_only !== filters.unread_only) {
+      updateURL({ unread_only, page: 1 });
+    }
+  }, [updateURL, filters.unread_only]);
+
   if (!hasAccess) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -180,7 +199,7 @@ const MessagesPage: React.FC = () => {
       <Filtering>
         <div className="space-y-2">
           <Label htmlFor="status-filter">Status</Label>
-          <Select value={filters.status} onValueChange={(value) => updateURL({ status: value, page: 1 })}>
+          <Select value={filters.status} onValueChange={handleStatusChange}>
             <SelectTrigger id="status-filter">
               <SelectValue placeholder="Filter berdasarkan status" />
             </SelectTrigger>
@@ -195,7 +214,7 @@ const MessagesPage: React.FC = () => {
 
         <div className="space-y-2">
           <Label htmlFor="unread-filter">Tampilan</Label>
-          <Select value={filters.unread_only} onValueChange={(value) => updateURL({ unread_only: value, page: 1 })}>
+          <Select value={filters.unread_only} onValueChange={handleUnreadOnlyChange}>
             <SelectTrigger id="unread-filter">
               <SelectValue placeholder="Filter tampilan" />
             </SelectTrigger>
@@ -217,7 +236,7 @@ const MessagesPage: React.FC = () => {
 
             <SearchContainer
               searchQuery={filters.search}
-              onSearchChange={(search) => updateURL({ search, page: 1 })}
+              onSearchChange={handleSearchChange}
               placeholder="Cari pesan berdasarkan nama, email, atau judul..."
             />
 

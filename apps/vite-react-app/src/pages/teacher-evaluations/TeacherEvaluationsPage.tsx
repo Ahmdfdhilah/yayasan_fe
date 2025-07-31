@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
 import { useURLFilters } from '@/hooks/useURLFilters';
@@ -188,17 +188,23 @@ const TeacherEvaluationsPage: React.FC = () => {
   };
 
   // Filter handlers
-  const handleSearchChange = (search: string) => {
-    updateURL({ search, page: 1 });
-  };
+  const handleSearchChange = useCallback((search: string) => {
+    if (search !== filters.search) {
+      updateURL({ search, page: 1 });
+    }
+  }, [updateURL, filters.search]);
 
-  const handlePeriodChange = (period_id: string) => {
-    updateURL({ period_id, page: 1 });
-  };
+  const handlePeriodChange = useCallback((period_id: string) => {
+    if (period_id !== filters.period_id) {
+      updateURL({ period_id, page: 1 });
+    }
+  }, [updateURL, filters.period_id]);
 
-  const handleOrganizationChange = (organization_id: string) => {
-    updateURL({ organization_id, page: 1 });
-  };
+  const handleOrganizationChange = useCallback((organization_id: string) => {
+    if (organization_id !== filters.organization_id) {
+      updateURL({ organization_id, page: 1 });
+    }
+  }, [updateURL, filters.organization_id]);
 
   const handlePageChange = (page: number) => {
     updateURL({ page });

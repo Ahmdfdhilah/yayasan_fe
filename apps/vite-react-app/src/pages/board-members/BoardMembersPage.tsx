@@ -173,9 +173,11 @@ const BoardMembersPage: React.FC = () => {
   };
 
   // Filter handlers
-  const handleSearchChange = (search: string) => {
-    updateURL({ search, page: 1 });
-  };
+  const handleSearchChange = useCallback((search: string) => {
+    if (search !== filters.search) {
+      updateURL({ search, page: 1 });
+    }
+  }, [updateURL, filters.search]);
 
 
   const handlePageChange = (page: number) => {

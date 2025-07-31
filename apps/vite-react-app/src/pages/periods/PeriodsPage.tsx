@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRole } from '@/hooks/useRole';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
@@ -230,21 +230,29 @@ const PeriodsPage: React.FC = () => {
   };
 
   // Filter handlers
-  const handleSearchChange = (q: string) => {
-    updateURL({ q, page: 1 });
-  };
+  const handleSearchChange = useCallback((q: string) => {
+    if (q !== filters.q) {
+      updateURL({ q, page: 1 });
+    }
+  }, [updateURL, filters.q]);
 
-  const handleAcademicYearFilterChange = (academic_year: string) => {
-    updateURL({ academic_year, page: 1 });
-  };
+  const handleAcademicYearFilterChange = useCallback((academic_year: string) => {
+    if (academic_year !== filters.academic_year) {
+      updateURL({ academic_year, page: 1 });
+    }
+  }, [updateURL, filters.academic_year]);
 
-  const handleSemesterFilterChange = (semester: string) => {
-    updateURL({ semester, page: 1 });
-  };
+  const handleSemesterFilterChange = useCallback((semester: string) => {
+    if (semester !== filters.semester) {
+      updateURL({ semester, page: 1 });
+    }
+  }, [updateURL, filters.semester]);
 
-  const handleStatusFilterChange = (is_active: string) => {
-    updateURL({ is_active, page: 1 });
-  };
+  const handleStatusFilterChange = useCallback((is_active: string) => {
+    if (is_active !== filters.is_active) {
+      updateURL({ is_active, page: 1 });
+    }
+  }, [updateURL, filters.is_active]);
 
   const handlePageChange = (page: number) => {
     updateURL({ page });

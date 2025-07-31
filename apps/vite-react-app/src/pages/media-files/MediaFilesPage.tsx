@@ -145,8 +145,10 @@ const MediaFilesPage: React.FC = () => {
 
   // Handlers
   const handleSearchChange = useCallback((search: string) => {
-    updateURL({ search, page: 1 });
-  }, [updateURL]);
+    if (search !== filters.search) {
+      updateURL({ search, page: 1 });
+    }
+  }, [updateURL, filters.search]);
 
   const handleFiltersChange = useCallback((newFilters: Partial<MediaFileFilterParams>) => {
     const urlFilters: Partial<MediaFilePageFilters> = {

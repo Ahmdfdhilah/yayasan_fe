@@ -23,8 +23,11 @@ const SearchContainer: React.FC<SearchContainerProps> = ({
   const debouncedSearchQuery = useDebounce(inputValue, debounceDelay);
 
   useEffect(() => {
-    onSearchChange(debouncedSearchQuery);
-  }, [debouncedSearchQuery, onSearchChange]);
+    // Only call onSearchChange if the debounced value actually changed
+    if (debouncedSearchQuery !== searchQuery) {
+      onSearchChange(debouncedSearchQuery);
+    }
+  }, [debouncedSearchQuery, onSearchChange, searchQuery]);
 
   useEffect(() => {
     setInputValue(searchQuery);
