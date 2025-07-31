@@ -128,7 +128,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
 
   const loadPeriods = async () => {
     try {
-      const response = await periodService.getPeriods();
+      const response = await periodService.getPeriods({ page: 1, size: 100 });
       setPeriods(response.items || []);
     } catch (error) {
       console.error('Error loading periods:', error);
@@ -185,10 +185,20 @@ const RPPSubmissionDetailPage: React.FC = () => {
         throw new Error('No teacher or period specified');
       }
 
-      // Set current period - try to find from loaded periods first
-      let period = periods.find(p => p.id === targetPeriodId);
-
-      setCurrentPeriod(period ?? null);
+      // Get period by ID for display info
+      if (!currentPeriod || currentPeriod.id !== targetPeriodId) {
+        try {
+          const periodResponse = await periodService.getPeriodById(targetPeriodId);
+          setCurrentPeriod(periodResponse);
+        } catch (error) {
+          console.error('Error loading period by ID:', error);
+          // Fallback to find from periods list
+          const foundPeriod = periods.find(p => p.id === targetPeriodId);
+          if (foundPeriod) {
+            setCurrentPeriod(foundPeriod);
+          }
+        }
+      }
 
       // Load submission data
       let submissionData: RPPSubmissionResponse;
