@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { CarouselItem } from "@workspace/ui/components/ui/carousel";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { 
   HeroSection, 
@@ -7,7 +6,14 @@ import {
   AboutSection, 
   ArticlesSection, 
   SchoolsSection 
-} from '../../components/home';
+} from '../../components/Home';
+
+interface GalleryImage {
+  id: number;
+  imageUrl: string;
+  name: string;
+  description: string;
+}
 
 interface Article {
   id: number;
@@ -30,7 +36,7 @@ interface School {
 }
 
 const HomePage = () => {
-  const [galleryItems, setGalleryItems] = useState<CarouselItem[]>([]);
+  const [galleryItems, setGalleryItems] = useState<GalleryImage[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
   const [schools, setSchools] = useState<School[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,29 +46,67 @@ const HomePage = () => {
     const loadData = async () => {
       try {
         // Mock data - replace with actual API calls
-        const mockGallery: CarouselItem[] = [
+        const mockGallery: GalleryImage[] = [
           {
             id: 1,
-            title: "Kegiatan Belajar Mengajar",
-            description: "Suasana pembelajaran yang kondusif dan menyenangkan",
-            category: "Pendidikan",
-            imageUrl: "https://picsum.photos/1200/600?random=1",
-            badge: "Unggulan"
+            name: "Kegiatan Belajar Mengajar",
+            description: "Suasana pembelajaran yang kondusif dengan metode pengajaran modern yang menggabungkan pendidikan agama dan umum secara terpadu.",
+            imageUrl: "https://picsum.photos/1920/1080?random=1"
           },
           {
             id: 2,
-            title: "Fasilitas Sekolah Modern",
-            description: "Gedung dan fasilitas penunjang pendidikan yang lengkap",
-            category: "Fasilitas",
-            imageUrl: "https://picsum.photos/1200/600?random=2"
+            name: "Fasilitas Sekolah Modern",
+            description: "Gedung dan fasilitas penunjang pendidikan yang lengkap dan modern untuk mendukung proses pembelajaran yang berkualitas.",
+            imageUrl: "https://picsum.photos/1920/1080?random=2"
           },
           {
             id: 3,
-            title: "Kegiatan Ekstrakurikuler",
-            description: "Berbagai kegiatan pengembangan bakat dan minat siswa",
-            category: "Ekstrakurikuler",
-            imageUrl: "https://picsum.photos/1200/600?random=3"
+            name: "Kegiatan Ekstrakurikuler",
+            description: "Berbagai kegiatan pengembangan bakat dan minat siswa yang beragam untuk membentuk karakter dan potensi siswa secara maksimal.",
+            imageUrl: "https://picsum.photos/1920/1080?random=3"
           },
+          {
+            id: 4,
+            name: "Masjid dan Area Ibadah",
+            description: "Tempat ibadah yang luas dan nyaman untuk menunjang kegiatan spiritual dan pembentukan karakter islami yang kuat.",
+            imageUrl: "https://picsum.photos/1920/1080?random=4"
+          },
+          {
+            id: 5,
+            name: "Lapangan Olahraga",
+            description: "Fasilitas olahraga yang lengkap untuk mendukung pengembangan fisik dan kesehatan siswa dengan berbagai cabang olahraga.",
+            imageUrl: "https://picsum.photos/1920/1080?random=5"
+          },
+          {
+            id: 6,
+            name: "Perpustakaan",
+            description: "Pusat sumber belajar dengan koleksi buku yang lengkap dan suasana yang kondusif untuk menumbuhkan minat baca siswa.",
+            imageUrl: "https://picsum.photos/1920/1080?random=6"
+          },
+          {
+            id: 7,
+            name: "Laboratorium Komputer",
+            description: "Laboratorium komputer dengan perangkat modern untuk mendukung pembelajaran teknologi informasi dan komunikasi.",
+            imageUrl: "https://picsum.photos/1920/1080?random=7"
+          },
+          {
+            id: 8,
+            name: "Ruang Kelas",
+            description: "Ruang kelas yang nyaman dan dilengkapi dengan fasilitas pembelajaran modern untuk mendukung proses belajar mengajar yang efektif.",
+            imageUrl: "https://picsum.photos/1920/1080?random=8"
+          },
+          {
+            id: 9,
+            name: "Asrama Putra",
+            description: "Fasilitas asrama yang nyaman dan aman untuk siswa putra dengan pembinaan karakter dan kemandirian yang terintegrasi.",
+            imageUrl: "https://picsum.photos/1920/1080?random=9"
+          },
+          {
+            id: 10,
+            name: "Asrama Putri",
+            description: "Fasilitas asrama yang nyaman dan aman untuk siswi putri dengan pengawasan dan pembinaan yang sesuai dengan nilai-nilai islami.",
+            imageUrl: "https://picsum.photos/1920/1080?random=10"
+          }
         ];
 
         const mockArticles: Article[] = [
