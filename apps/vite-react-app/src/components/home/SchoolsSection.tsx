@@ -4,6 +4,8 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { ArrowRight, Users } from 'lucide-react';
+import { getOrganizationImageUrl } from '@/utils/imageUtils';
+import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import type { Organization } from '@/services/organizations/types';
 
 interface SchoolsSectionProps {
@@ -57,7 +59,7 @@ export const SchoolsSection = ({ organizations, loading }: SchoolsSectionProps) 
               <Card key={org.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
                 <div className="aspect-video relative overflow-hidden rounded-t-lg">
                   <img 
-                    src={org.img_url || `https://picsum.photos/400/240?random=${index + 10}`}
+                    src={getOrganizationImageUrl(org.img_url) || `https://picsum.photos/400/240?random=${index + 10}`}
                     alt={org.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -84,9 +86,14 @@ export const SchoolsSection = ({ organizations, loading }: SchoolsSectionProps) 
                   </div>
                 </CardHeader>
                 <CardContent className="pb-4">
-                  <p className="text-muted-foreground line-clamp-3 leading-relaxed">
-                    {org.description || org.excerpt || `Informasi tentang organisasi ${org.name}.`}
-                  </p>
+                  <div className="text-muted-foreground line-clamp-3 leading-relaxed">
+                    <RichTextDisplay 
+                      content={org.description || org.excerpt}
+                      fallback={`Informasi tentang organisasi ${org.name}.`}
+                      maxLength={120}
+                      className="text-muted-foreground"
+                    />
+                  </div>
                 </CardContent>
                 <CardFooter>
                   <Link to={`/organizations/${org.id}`} className="w-full">

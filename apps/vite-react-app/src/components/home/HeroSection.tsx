@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Badge } from "@workspace/ui/components/badge";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { getGalleryImageUrl } from '@/utils/imageUtils';
+import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import type { Gallery } from '@/services/galleries/types';
 
 interface HeroSectionProps {
@@ -49,7 +51,7 @@ export const HeroSection = ({ galleries, loading }: HeroSectionProps) => {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <img
-          src={currentGallery.img_url || `https://picsum.photos/1920/1080?random=${currentIndex + 1}`}
+          src={getGalleryImageUrl(currentGallery.img_url) || `https://picsum.photos/1920/1080?random=${currentIndex + 1}`}
           alt={currentGallery.title}
           className="w-full h-full object-cover transition-opacity duration-1000"
         />
@@ -68,9 +70,13 @@ export const HeroSection = ({ galleries, loading }: HeroSectionProps) => {
               {currentGallery.title}
             </h1>
             
-            <p className="text-lg md:text-xl mb-8 text-white/90 leading-relaxed max-w-2xl">
-              {currentGallery.excerpt || currentGallery.short_excerpt || "Pendidikan Islam Terpadu yang menggabungkan ilmu agama dan umum dengan pendekatan modern dan holistik."}
-            </p>
+            <div className="text-lg md:text-xl mb-8 text-white/90 leading-relaxed max-w-2xl">
+              <RichTextDisplay 
+                content={currentGallery.excerpt || currentGallery.short_excerpt}
+                fallback="Pendidikan Islam Terpadu yang menggabungkan ilmu agama dan umum dengan pendekatan modern dan holistik."
+                className="text-white/90"
+              />
+            </div>
           </div>
         </div>
       </div>

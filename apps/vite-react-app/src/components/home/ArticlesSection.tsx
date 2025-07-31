@@ -4,6 +4,8 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { ArrowRight, Calendar } from 'lucide-react';
+import { getNewsImageUrl } from '@/utils/imageUtils';
+import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import type { Article } from '@/services/articles/types';
 
 interface ArticlesSectionProps {
@@ -57,7 +59,7 @@ export const ArticlesSection = ({ articles, loading }: ArticlesSectionProps) => 
               <Card key={article.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
                 <div className="aspect-video relative overflow-hidden rounded-t-lg">
                   <img 
-                    src={article.img_url || `https://picsum.photos/400/240?random=${index + 1}`}
+                    src={getNewsImageUrl(article.img_url) || `https://picsum.photos/400/240?random=${index + 1}`}
                     alt={article.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -79,9 +81,14 @@ export const ArticlesSection = ({ articles, loading }: ArticlesSectionProps) => 
                   </div>
                 </CardHeader>
                 <CardContent className="pb-4">
-                  <p className="text-muted-foreground line-clamp-3 leading-relaxed">
-                    {article.display_excerpt || article.excerpt || 'Deskripsi artikel yang menarik dan informatif tentang berbagai topik pendidikan dan kegiatan yayasan.'}
-                  </p>
+                  <div className="text-muted-foreground line-clamp-3 leading-relaxed">
+                    <RichTextDisplay 
+                      content={article.display_excerpt || article.excerpt}
+                      fallback="Deskripsi artikel yang menarik dan informatif tentang berbagai topik pendidikan dan kegiatan yayasan."
+                      maxLength={120}
+                      className="text-muted-foreground"
+                    />
+                  </div>
                 </CardContent>
                 <CardFooter>
                   <Link to={`/articles/${article.slug}`} className="w-full">
