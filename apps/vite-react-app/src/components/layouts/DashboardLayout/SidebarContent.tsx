@@ -43,13 +43,13 @@ export function SidebarContent({
   }, [currentRole]);
 
   return (
-    <div className="flex h-full flex-col min-h-0">
+    <div className="flex h-full flex-col">
       <SidebarHeader 
         collapsed={collapsed} 
         onToggleCollapse={onToggleCollapse} 
       />
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden min-h-0">
         <ScrollArea className="h-full">
           <div className={cn("p-3 pb-2", collapsed && "px-2")}>
             <nav className="space-y-1">

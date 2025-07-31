@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Sheet, SheetContent } from '@workspace/ui/components/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@workspace/ui/components/sheet';
 
 interface GenericSidebarItem {
   title: string;
@@ -57,7 +57,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         "hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col transition-all duration-300",
         isCollapsed ? "lg:w-[5rem]" : "lg:w-[16rem]" 
       )}>
-        <div className="flex grow flex-col gap-y-0  bg-sidebar">
+        <div className="flex grow flex-col gap-y-0 border-r border-sidebar-border bg-sidebar min-h-full">
           <SidebarContent 
             collapsed={isCollapsed}
             expandedMenus={expandedMenus}
@@ -71,7 +71,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Mobile Sidebar */}
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-        <SheetContent side="left" className="p-0 w-64 max-w-[80vw]">
+        <SheetContent side="left" className="p-0 w-[16rem] max-w-[80vw]">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Navigation Menu</SheetTitle>
+            <SheetDescription>Application navigation and menu options</SheetDescription>
+          </SheetHeader>
           <SidebarContent 
             collapsed={false}
             expandedMenus={expandedMenus}
@@ -97,8 +101,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </main>
 
-        {/* Fixed Footer */}
-        <div className="mt-auto">
+        {/* Footer */}
+        <div className="mt-auto flex-shrink-0">
           <DashboardFooter />
         </div>
       </div>

@@ -13,6 +13,7 @@ import {
   Newspaper,
   Image,
   MessageSquare,
+  Settings,
 } from "lucide-react";
 
 // PKG System Role definitions
@@ -43,12 +44,12 @@ export const appMenuItems: SidebarItem[] = [
 
   // RPP Management - Teachers and Principals
   {
-    title: 'RPP Submissions',
+    title: 'RPP Guru',
     icon: FileText,
     allowedRoles: ['kepala_sekolah', 'admin', 'guru'],
     children: [
       {
-        title: 'Review RPP',
+        title: 'Daftar RPP',
         href: '/rpp-submissions',
         icon: ClipboardCheck,
         allowedRoles: ['kepala_sekolah', 'admin'],
@@ -81,12 +82,6 @@ export const appMenuItems: SidebarItem[] = [
         allowedRoles: ['guru', 'kepala_sekolah'],
       },
       {
-        title: 'Aspek Evaluasi',
-        href: '/evaluation-aspects',
-        icon: BookOpen,
-        allowedRoles: ['admin'],
-      },
-      {
         title: 'Laporan Evaluasi',
         href: '/evaluations/reports',
         icon: BarChart3,
@@ -95,29 +90,37 @@ export const appMenuItems: SidebarItem[] = [
     ],
   },
 
-
-  // Period Management - Admin only
+  // Management System - Admin only
   {
-    title: 'Periode',
-    href: '/periods',
-    icon: Calendar,
+    title: 'Manajemen Sistem',
+    icon: Settings,
     allowedRoles: ['admin'],
-  },
-
-  // Organization Management - Admin only
-  {
-    title: 'Sekolah',
-    href: '/organizations',
-    icon: Building,
-    allowedRoles: ['admin'],
-  },
-
-  // User Management - Admin only
-  {
-    title: 'Manajemen Pengguna',
-    href: '/users',
-    icon: Users,
-    allowedRoles: ['admin'],
+    children: [
+      {
+        title: 'Manajemen Aspek Evaluasi',
+        href: '/evaluation-aspects',
+        icon: BookOpen,
+        allowedRoles: ['admin'],
+      },
+      {
+        title: 'Manajemen Periode',
+        href: '/periods',
+        icon: Calendar,
+        allowedRoles: ['admin'],
+      },
+      {
+        title: 'Manajemen Sekolah',
+        href: '/organizations',
+        icon: Building,
+        allowedRoles: ['admin'],
+      },
+      {
+        title: 'Manajemen Pengguna',
+        href: '/users',
+        icon: Users,
+        allowedRoles: ['admin'],
+      },
+    ],
   },
 
   // Content Management - Admin only
