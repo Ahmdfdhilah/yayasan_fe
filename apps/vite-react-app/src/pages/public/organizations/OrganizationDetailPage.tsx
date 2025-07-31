@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/componen
 import { ArrowLeft, Users, Share2, Calendar } from 'lucide-react';
 import { getOrganizationImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
+import { StreamingGallery } from '@/components/common/StreamingGallery';
 import type { Organization } from '@/services/organizations/types';
 import { organizationService } from '@/services/organizations';
 
@@ -15,6 +16,7 @@ const OrganizationDetailPage = () => {
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [relatedOrganizations, setRelatedOrganizations] = useState<Organization[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -26,6 +28,17 @@ const OrganizationDetailPage = () => {
       try {
         const org = await organizationService.getOrganizationById(parseInt(id));
         setOrganization(org);
+        
+        // Load related organizations (exclude current one)
+        const orgResponse = await organizationService.getOrganizations({
+          size: 10
+        });
+        
+        const related = orgResponse.items
+          .filter(o => o.id !== org.id)
+          .slice(0, 6);
+        
+        setRelatedOrganizations(related);
       } catch (err) {
         console.error('Error loading organization:', err);
         setError('Gagal memuat informasi lembaga');
@@ -57,7 +70,7 @@ const OrganizationDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pt-24">
         <div className="mx-auto px-4 lg:px-12 py-12">
           <Skeleton className="h-8 w-32 mb-6" />
           <Skeleton className="h-10 w-3/4 mb-4" />
@@ -75,7 +88,7 @@ const OrganizationDetailPage = () => {
 
   if (error || !organization) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background pt-24 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">
             {error || 'Lembaga Tidak Ditemukan'}
@@ -95,10 +108,10 @@ const OrganizationDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-24">
       {/* Back Navigation */}
       <div className="border-b bg-muted/20">
-        <div className="mx-auto px-4 lg:px-12 py-">
+        <div className="mx-auto px-4 lg:px-12 py-8">
           <Link to="/schools">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -241,6 +254,52 @@ const OrganizationDetailPage = () => {
           </div>
         </footer>
       </div>
+
+      {/* Related Organizations */}
+      {relatedOrganizations.length > 0 && (
+        <section className="bg-muted/20 py-16">
+          <div className="mx-auto px-4 lg:px-12">
+            <StreamingGallery
+              items={relatedOrganizations}
+              title="Lembaga Lainnya"
+              itemsPerSlide={3}
+              gap="16px"
+              autoSlide={true}
+              slideInterval={4500}
+              renderItem={(relatedOrg, index) => (
+                <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group h-full">
+                  <div className="aspect-video relative overflow-hidden rounded-t-lg bg-muted">
+                    <img 
+                      src={getOrganizationImageUrl(relatedOrg.img_url) || `https://picsum.photos/320/180?random=${index + 200}`}
+                      alt={relatedOrg.name}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <CardContent className="p-4 flex flex-col h-32">
+                    <h3 className="font-medium text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors text-sm flex-grow">
+                      {relatedOrg.display_name}
+                    </h3>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
+                      {relatedOrg.user_count > 0 && (
+                        <div className="flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          <span>{relatedOrg.user_count} anggota</span>
+                        </div>
+                      )}
+                    </div>
+                    <Link to={`/schools/${relatedOrg.id}`} className="mt-auto">
+                      <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary text-xs">
+                        Lihat Detail
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              )}
+              className="mb-8"
+            />
+          </div>
+        </section>
+      )}
     </div>
   );
 };

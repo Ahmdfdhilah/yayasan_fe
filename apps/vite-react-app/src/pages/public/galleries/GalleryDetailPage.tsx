@@ -7,6 +7,7 @@ import { Card, CardContent } from "@workspace/ui/components/card";
 import { ArrowLeft, Share2, Calendar, Image, Download } from 'lucide-react';
 import { getGalleryImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
+import { StreamingGallery } from '@/components/common/StreamingGallery';
 import type { Gallery } from '@/services/galleries/types';
 import { galleryService } from '@/services/galleries';
 
@@ -88,7 +89,7 @@ const GalleryDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pt-24">
         <div className="mx-auto px-4 lg:px-12 py-8">
           <Skeleton className="h-8 w-32 mb-6" />
           <Skeleton className="h-10 w-3/4 mb-4" />
@@ -106,7 +107,7 @@ const GalleryDetailPage = () => {
 
   if (error || !gallery) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background pt-24 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">
             {error || 'Galeri Tidak Ditemukan'}
@@ -126,7 +127,7 @@ const GalleryDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-24">
       {/* Back Navigation */}
       <div className="border-b bg-muted/20">
         <div className="mx-auto px-4 lg:px-12 py-8">
@@ -266,42 +267,45 @@ const GalleryDetailPage = () => {
       {relatedGalleries.length > 0 && (
         <section className="bg-muted/20 py-16">
           <div className="mx-auto px-4 lg:px-12">
-            <h2 className="text-2xl font-bold text-foreground mb-8">
-              Galeri Lainnya
-            </h2>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3  gap-4">
-              {relatedGalleries.map((relatedGallery, index) => (
-                <Card key={relatedGallery.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
+            <StreamingGallery
+              items={relatedGalleries}
+              title="Galeri Lainnya"
+              itemsPerSlide={3}
+              gap="16px"
+              autoSlide={true}
+              slideInterval={3500}
+              renderItem={(relatedGallery, index) => (
+                <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group h-full">
                   <div className="aspect-square relative overflow-hidden rounded-t-lg bg-muted">
                     <img 
-                      src={getGalleryImageUrl(relatedGallery.img_url) || `https://picsum.photos/200/200?random=${index + 100}`}
+                      src={getGalleryImageUrl(relatedGallery.img_url) || `https://picsum.photos/280/280?random=${index + 100}`}
                       alt={relatedGallery.title}
                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
                   </div>
-                  <CardContent className="p-3">
-                    <h3 className="font-medium text-foreground mb-1 line-clamp-2 group-hover:text-primary transition-colors text-xs">
+                  <CardContent className="p-3 flex flex-col h-28">
+                    <h3 className="font-medium text-foreground mb-1 line-clamp-2 group-hover:text-primary transition-colors text-sm flex-grow">
                       {relatedGallery.title}
                     </h3>
                     <div className="text-muted-foreground line-clamp-1 text-xs mb-3">
                       <RichTextDisplay 
                         content={relatedGallery.excerpt || relatedGallery.short_excerpt}
                         fallback="Dokumentasi kegiatan..."
-                        maxLength={40}
+                        maxLength={30}
                         className="text-muted-foreground"
                       />
                     </div>
-                    <Link to={`/galleries/${relatedGallery.id}`}>
+                    <Link to={`/galleries/${relatedGallery.id}`} className="mt-auto">
                       <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary text-xs">
                         Lihat
                       </Button>
                     </Link>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
+              )}
+              className="mb-8"
+            />
           </div>
         </section>
       )}

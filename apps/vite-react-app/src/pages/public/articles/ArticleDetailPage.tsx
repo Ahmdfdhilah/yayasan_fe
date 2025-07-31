@@ -7,6 +7,7 @@ import { Card, CardContent } from "@workspace/ui/components/card";
 import { ArrowLeft, Calendar, Share2 } from 'lucide-react';
 import { getNewsImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
+import { StreamingGallery } from '@/components/common/StreamingGallery';
 import type { Article } from '@/services/articles/types';
 import { articleService } from '@/services/articles';
 
@@ -76,7 +77,7 @@ const ArticleDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pt-24">
         <div className="mx-auto px-4 lg:px-12 py-8">
           <Skeleton className="h-8 w-32 mb-6" />
           <Skeleton className="h-10 w-3/4 mb-4" />
@@ -94,7 +95,7 @@ const ArticleDetailPage = () => {
 
   if (error || !article) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background pt-24 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">
             {error || 'Artikel Tidak Ditemukan'}
@@ -114,7 +115,7 @@ const ArticleDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-24">
       {/* Back Navigation */}
       <div className="border-b bg-muted/20">
         <div className="px-4 lg:px-12 py-8">
@@ -217,13 +218,15 @@ const ArticleDetailPage = () => {
       {relatedArticles.length > 0 && (
         <section className="bg-muted/20 py-16">
           <div className="px-4 lg:px-12">
-            <h2 className="text-2xl font-bold text-foreground mb-8">
-              Artikel Terbaru
-            </h2>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {relatedArticles.map((relatedArticle, index) => (
-                <Card key={relatedArticle.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
+            <StreamingGallery
+              items={relatedArticles}
+              title="Artikel Terbaru"
+              itemsPerSlide={3}
+              gap="16px"
+              autoSlide={true}
+              slideInterval={4000}
+              renderItem={(relatedArticle, index) => (
+                <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group h-full">
                   <div className="aspect-video relative overflow-hidden rounded-t-lg bg-muted">
                     <img 
                       src={getNewsImageUrl(relatedArticle.img_url) || `https://picsum.photos/300/200?random=${index + 100}`}
@@ -234,8 +237,8 @@ const ArticleDetailPage = () => {
                       {relatedArticle.category}
                     </Badge>
                   </div>
-                  <CardContent className="p-3">
-                    <h3 className="font-medium text-foreground mb-1 line-clamp-2 group-hover:text-primary transition-colors text-xs">
+                  <CardContent className="p-3 flex flex-col h-32">
+                    <h3 className="font-medium text-foreground mb-1 line-clamp-2 group-hover:text-primary transition-colors text-sm flex-grow">
                       {relatedArticle.title}
                     </h3>
                     <div className="text-muted-foreground line-clamp-1 text-xs mb-3">
@@ -246,15 +249,16 @@ const ArticleDetailPage = () => {
                         className="text-muted-foreground"
                       />
                     </div>
-                    <Link to={`/articles/${relatedArticle.id}`}>
+                    <Link to={`/articles/${relatedArticle.id}`} className="mt-auto">
                       <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary text-xs">
                         Baca
                       </Button>
                     </Link>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
+              )}
+              className="mb-8"
+            />
           </div>
         </section>
       )}
