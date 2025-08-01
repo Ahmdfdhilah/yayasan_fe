@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -53,6 +53,7 @@ interface DetailPageFilters {
 
 const TeacherEvaluationDetailPage: React.FC = () => {
   const { teacherId } = useParams<{ teacherId: string }>();
+  const [searchParams] = useSearchParams();
   const { isAdmin, isKepalaSekolah } = useRole();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -116,6 +117,46 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       updateURL({ period_id: selectedPeriodId });
     }
   }, [activePeriod, periods, filters.period_id, updateURL]);
+
+  // Handle edit mode from URL and check permissions
+  useEffect(() => {
+    const editParam = searchParams.get('edit');
+    if (editParam === 'true' && evaluation && currentPeriod && activePeriod) {
+      // Check if user can edit this evaluation
+      const canEdit = canEditEvaluation(evaluation, currentPeriod, activePeriod);
+      if (canEdit) {
+        setMode('edit');
+      } else {
+        setMode('view');
+        toast({
+          title: "Akses Ditolak",
+          description: "Anda tidak memiliki izin untuk mengedit evaluasi ini.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      setMode('view');
+    }
+  }, [searchParams, evaluation, currentPeriod, activePeriod, isAdmin, isKepalaSekolah, user]);
+
+  // Check if user can edit specific evaluation
+  const canEditEvaluation = (evaluation: TeacherEvaluationDetailResponse, period: Period, activePeriod: Period) => {
+    // Must be in active period
+    if (period.id !== activePeriod.id) {
+      return false;
+    }
+
+    if (isAdmin()) {
+      return true;
+    }
+
+    if (isKepalaSekolah()) {
+      // Kepala sekolah can only edit evaluations in their organization
+      return evaluation.teacher?.organization_id === user?.organization_id;
+    }
+
+    return false;
+  };
 
   const loadPeriods = async () => {
     try {
@@ -316,11 +357,9 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   const toggleMode = () => {
     const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
     
-    // Check if this is a principal's own evaluation (teacher_id matches user_id)
-    const isPrincipalOwnEvaluation = isKepalaSekolah() && user?.id === Number(teacherId);
+    if (!evaluation || !currentPeriod || !activePeriod) return;
     
-    // Only admin can edit, or principal can edit others but not their own evaluation
-    const canEdit = isAdmin() || (isKepalaSekolah() && !isPrincipalOwnEvaluation);
+    const canEdit = canEditEvaluation(evaluation, currentPeriod, activePeriod);
     const finalCanEdit = canEdit && categoriesWithAspects.length > 0 && isActivePeriod;
 
     if (finalCanEdit) {
@@ -402,11 +441,10 @@ const TeacherEvaluationDetailPage: React.FC = () => {
 
   const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
   
-  // Check if this is a principal's own evaluation (teacher_id matches user_id)
-  const isPrincipalOwnEvaluation = isKepalaSekolah() && user?.id === Number(teacherId);
-  
-  // Only admin can edit, or principal can edit others but not their own evaluation
-  const canEdit = (isAdmin() || (isKepalaSekolah() && !isPrincipalOwnEvaluation)) && isActivePeriod;
+  // Check if user can edit - using the centralized permission function
+  const canEdit = evaluation && currentPeriod && activePeriod ? 
+    canEditEvaluation(evaluation, currentPeriod, activePeriod) && isActivePeriod : 
+    false;
 
   // Create evaluation data mapping for display
   const evaluationData: Record<string, string> = {};

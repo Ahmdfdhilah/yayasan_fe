@@ -16,6 +16,8 @@ interface TeacherEvaluationTableProps {
   loading?: boolean;
   onView: (evaluation: TeacherEvaluationResponse) => void;
   onEvaluate?: (evaluation: TeacherEvaluationResponse) => void;
+  onEdit?: (evaluation: TeacherEvaluationResponse) => void;
+  canEdit?: (evaluation: TeacherEvaluationResponse) => boolean;
   userRole: UserRole;
 }
 
@@ -24,17 +26,22 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
   loading = false,
   onView,
   onEvaluate,
+  onEdit,
+  canEdit,
   userRole
 }) => {
 
   const getActionProps = (evaluation: TeacherEvaluationResponse) => {
-    const canEvaluate = userRole !== 'guru' && !!onEvaluate;
+    const canEvaluateItem = userRole !== 'guru' && !!onEvaluate;
+    const canEditItem = !!onEdit && !!canEdit && canEdit(evaluation);
 
     return {
       onView: () => onView(evaluation),
-      onEdit: canEvaluate ? () => onEvaluate!(evaluation) : undefined,
+      onEdit: canEditItem ? () => onEdit!(evaluation) : undefined,
+      onEvaluate: canEvaluateItem ? () => onEvaluate!(evaluation) : undefined,
       showView: true,
-      showEdit: canEvaluate,
+      showEdit: canEditItem,
+      showEvaluate: canEvaluateItem,
       showDelete: false
     };
   };

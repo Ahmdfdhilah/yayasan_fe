@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
+import { useAuth } from '@/components/Auth/AuthProvider';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { Organization } from '@/services/organizations/types';
@@ -41,6 +42,7 @@ interface EvaluationPageFilters {
 
 const TeacherEvaluationsPage: React.FC = () => {
   const { currentRole, isAdmin, isKepalaSekolah } = useRole();
+  const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -87,11 +89,15 @@ const TeacherEvaluationsPage: React.FC = () => {
         limit: filters.size,
       };
 
-      // Period filtering
+      // Period filtering - only allow active period for non-admin users
       if (filters.period_id === 'active' && activePeriod) {
         params.period_id = activePeriod.id;
-      } else if (filters.period_id !== 'active' && filters.period_id !== 'all') {
+      } else if (filters.period_id !== 'active' && isAdmin()) {
+        // Only admin can view other periods
         params.period_id = Number(filters.period_id);
+      } else if (!isAdmin()) {
+        // Non-admin users can only see active period
+        params.period_id = activePeriod?.id;
       }
 
       // Handle search filter
@@ -195,6 +201,32 @@ const TeacherEvaluationsPage: React.FC = () => {
     navigate(`/teacher-evaluations/${teacherId}?period_id=${currentPeriodId}`);
   };
 
+  const handleEditEvaluation = (evaluation: TeacherEvaluationResponse) => {
+    // Navigate to evaluation detail page in edit mode
+    const currentPeriodId = filters.period_id === 'active' && activePeriod ? activePeriod.id : filters.period_id;
+    const teacherId = evaluation.teacher_id || evaluation.teacher?.id;
+    navigate(`/teacher-evaluations/${teacherId}?period_id=${currentPeriodId}&edit=true`);
+  };
+
+  // Check if user can edit specific evaluation
+  const canEditEvaluation = (evaluation: TeacherEvaluationResponse) => {
+    // Must be in active period
+    if (!activePeriod || evaluation.period_id !== activePeriod.id) {
+      return false;
+    }
+
+    if (isAdmin()) {
+      return true;
+    }
+
+    if (isKepalaSekolah()) {
+      // Kepala sekolah can only edit evaluations in their organization
+      return evaluation.teacher?.organization_id === user?.organization_id;
+    }
+
+    return false;
+  };
+
 
   const handleAssignSuccess = () => {
     fetchEvaluations(); // Refresh the evaluations list
@@ -235,7 +267,7 @@ const TeacherEvaluationsPage: React.FC = () => {
     // Period filter
     if (filters.period_id === 'active') {
       activeFilters.push("Periode Aktif");
-    } else if (filters.period_id !== 'all') {
+    } else if (isAdmin() && filters.period_id !== 'active') {
       const period = periods.find(p => p.id === Number(filters.period_id));
       if (period) {
         activeFilters.push(`${period.academic_year} - ${period.semester}`);
@@ -298,8 +330,7 @@ const TeacherEvaluationsPage: React.FC = () => {
               <SelectValue placeholder="Pilih periode" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Periode</SelectItem>
-              {periods.map((period) => (
+              {isAdmin() && periods.map((period) => (
                 <SelectItem key={period.id} value={period.id.toString()}>
                   {period.academic_year} - {period.semester}
                   {period.is_active ? ' (Aktif)' : ''}
@@ -350,6 +381,8 @@ const TeacherEvaluationsPage: React.FC = () => {
                 evaluations={evaluations}
                 loading={loading}
                 onView={handleViewEvaluation}
+                onEdit={handleEditEvaluation}
+                canEdit={canEditEvaluation}
                 userRole={currentRole as any}
               />
             </div>
@@ -360,6 +393,8 @@ const TeacherEvaluationsPage: React.FC = () => {
                 evaluations={evaluations}
                 loading={loading}
                 onView={handleViewEvaluation}
+                onEdit={handleEditEvaluation}
+                canEdit={canEditEvaluation}
                 userRole={currentRole as any}
               />
             </div>
