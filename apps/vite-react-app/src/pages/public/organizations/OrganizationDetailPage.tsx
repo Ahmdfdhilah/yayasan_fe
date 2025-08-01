@@ -4,7 +4,7 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
-import { ArrowLeft, Users, Share2, Calendar } from 'lucide-react';
+import { ArrowLeft, Users, Calendar } from 'lucide-react';
 import { getOrganizationImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { StreamingGallery } from '@/components/common/StreamingGallery';

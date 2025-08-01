@@ -39,6 +39,7 @@ import OrganizationDetailPage from './pages/public/organizations/OrganizationDet
 import GalleriesListPage from './pages/public/galleries/GalleriesListPage';
 import GalleryDetailPage from './pages/public/galleries/GalleryDetailPage';
 import AboutPage from './pages/public/about/AboutPage';
+import ContactPage from './pages/public/contact/ContactPage';
 
 // Simple redirect component for My Evaluations
 const MyEvaluationsRedirect = () => {
@@ -75,6 +76,9 @@ function App() {
                     
                     {/* About Page */}
                     <Route path='about' element={<AboutPage />} />
+                    
+                    {/* Contact Page */}
+                    <Route path='contact' element={<ContactPage />} />
                     
                     <Route path='login' element={
                       <PublicRoute>
