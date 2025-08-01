@@ -54,7 +54,7 @@ const RPPSubmissionsPage: React.FC = () => {
     defaults: {
       search: '',
       organization_id: 'all',
-      period_id: 'all',
+      period_id: 'active',
       status: 'all',
       page: 1,
       size: 10,
@@ -86,9 +86,15 @@ const RPPSubmissionsPage: React.FC = () => {
         offset: (filters.page - 1) * filters.size,
       };
 
-      // Handle period filter
-      if (filters.period_id !== 'all') {
+      // Period filtering - only allow active period for non-admin users
+      if (filters.period_id === 'active' && activePeriod) {
+        params.period_id = activePeriod.id;
+      } else if (filters.period_id !== 'active' && isAdmin()) {
+        // Only admin can view other periods
         params.period_id = Number(filters.period_id);
+      } else if (!isAdmin()) {
+        // Non-admin users can only see active period
+        params.period_id = activePeriod?.id;
       }
 
       // Handle status filter
@@ -172,6 +178,13 @@ const RPPSubmissionsPage: React.FC = () => {
     }
   }, [hasAccess]);
 
+  // Auto-select active period if no period is selected or if "active" is selected
+  useEffect(() => {
+    if (activePeriod && (filters.period_id === 'active' || !filters.period_id)) {
+      updateURL({ period_id: activePeriod.id.toString() });
+    }
+  }, [activePeriod]);
+
   useEffect(() => {
     if (hasAccess) {
       fetchSubmissions();
@@ -243,7 +256,10 @@ const RPPSubmissionsPage: React.FC = () => {
       activeFilters.push(statusLabels[filters.status as keyof typeof statusLabels]);
     }
 
-    if (filters.period_id !== 'all') {
+    // Period filter
+    if (filters.period_id === 'active') {
+      activeFilters.push("Periode Aktif");
+    } else if (isAdmin() && filters.period_id !== 'active') {
       const period = periods.find(p => p.id === Number(filters.period_id));
       if (period) {
         activeFilters.push(`${period.academic_year} - ${period.semester}`);
@@ -298,15 +314,15 @@ const RPPSubmissionsPage: React.FC = () => {
       {/*  Filtering */}
       <div className="space-y-4">
         <Filtering>
+          {/* Period Filter */}
           <div className="space-y-2">
             <Label htmlFor="period-filter">Periode</Label>
             <Select value={filters.period_id} onValueChange={handlePeriodChange}>
               <SelectTrigger id="period-filter">
-                <SelectValue placeholder="Filter berdasarkan periode" />
+                <SelectValue placeholder="Pilih periode" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Semua Periode</SelectItem>
-                {periods.map((period) => (
+                {isAdmin() && periods.map((period) => (
                   <SelectItem key={period.id} value={period.id.toString()}>
                     {period.academic_year} - {period.semester}
                     {period.is_active ? ' (Aktif)' : ''}
