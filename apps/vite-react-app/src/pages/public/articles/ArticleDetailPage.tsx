@@ -35,13 +35,13 @@ const ArticleDetailPage = () => {
           // Load latest articles (exclude current one)
           const latestResponse = await articleService.getArticles({
             is_published: true,
-            size: 7, // Get 7 to have 6 after filtering current
+            size: 10, // Get more items for seamless infinite scroll
             sort_by: 'published_at',
             sort_order: 'desc'
           });
           
           // Filter out current article
-          const latest = latestResponse.items.filter(a => a.id !== foundArticle.id).slice(0, 6);
+          const latest = latestResponse.items.filter(a => a.id !== foundArticle.id).slice(0, 9);
           setRelatedArticles(latest);
         } else {
           setError('Artikel tidak ditemukan');

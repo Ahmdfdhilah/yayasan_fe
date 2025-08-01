@@ -31,12 +31,12 @@ const OrganizationDetailPage = () => {
         
         // Load related organizations (exclude current one)
         const orgResponse = await organizationService.getOrganizations({
-          size: 10
+          size: 12
         });
         
         const related = orgResponse.items
           .filter(o => o.id !== org.id)
-          .slice(0, 6);
+          .slice(0, 9);
         
         setRelatedOrganizations(related);
       } catch (err) {

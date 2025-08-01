@@ -28,38 +28,71 @@ export function StreamingGallery<T>({
   itemsPerSlide = 3
 }: StreamingGalleryProps<T>) {
   const [isPaused, setIsPaused] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Calculate slides based on itemsPerSlide
-  const totalSlides = Math.ceil(items.length / itemsPerSlide);
-  const visibleItems = items.slice(currentSlide * itemsPerSlide, (currentSlide + 1) * itemsPerSlide);
+  // Triple the items for seamless infinite scroll
+  const tripleItems = [...items, ...items, ...items];
+  const startIndex = items.length; // Start from middle set
+
+  // Initialize to start index once
+  useEffect(() => {
+    if (items.length > 0) {
+      setCurrentIndex(startIndex);
+    }
+  }, [items.length, startIndex]);
 
   useEffect(() => {
-    if (!autoSlide || isPaused || items.length === 0 || totalSlides <= 1) return;
+    if (!autoSlide || isPaused || items.length === 0) return;
 
     const interval = setInterval(() => {
-      setCurrentSlide(prev => (prev + 1) % totalSlides);
+      setCurrentIndex(prev => prev + 1);
     }, slideInterval);
 
     return () => clearInterval(interval);
-  }, [autoSlide, isPaused, slideInterval, items.length, totalSlides]);
+  }, [autoSlide, isPaused, slideInterval, items.length]);
 
   useEffect(() => {
     if (!scrollRef.current || items.length === 0) return;
 
     const container = scrollRef.current;
+    // Each item takes (100/itemsPerSlide)% of viewport, so moving by that amount shows next item
+    const itemWidthPercent = 100 / itemsPerSlide;
+    const scrollAmount = currentIndex * itemWidthPercent;
+
+    // Smooth transition
     container.style.transition = 'transform 0.5s ease-in-out';
-    container.style.transform = `translateX(-${currentSlide * 100}%)`;
-  }, [currentSlide]);
+    container.style.transform = `translateX(-${scrollAmount}%)`;
+
+    // Reset position for seamless loop
+    const resetThreshold = items.length * 2; // End of second set
+    if (currentIndex >= resetThreshold) {
+      setTimeout(() => {
+        container.style.transition = 'none';
+        const resetPosition = items.length * itemWidthPercent;
+        container.style.transform = `translateX(-${resetPosition}%)`;
+        setCurrentIndex(items.length);
+      }, 500);
+    }
+    
+    // Reset when going backwards past first set
+    if (currentIndex < items.length) {
+      setTimeout(() => {
+        container.style.transition = 'none';
+        const resetPosition = (items.length + currentIndex) * itemWidthPercent;
+        container.style.transform = `translateX(-${resetPosition}%)`;
+        setCurrentIndex(items.length + currentIndex);
+      }, 500);
+    }
+  }, [currentIndex, items.length, itemsPerSlide]);
 
   const handlePrevious = () => {
-    setCurrentSlide(prev => prev === 0 ? totalSlides - 1 : prev - 1);
+    setCurrentIndex(prev => prev - 1);
   };
 
   const handleNext = () => {
-    setCurrentSlide(prev => (prev + 1) % totalSlides);
+    setCurrentIndex(prev => prev + 1);
   };
 
   if (items.length === 0) {
@@ -76,7 +109,7 @@ export function StreamingGallery<T>({
       
       <div 
         ref={containerRef}
-        className="relative overflow-hidden"
+        className="relative overflow-hidden h-auto"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
@@ -84,36 +117,26 @@ export function StreamingGallery<T>({
           ref={scrollRef}
           className="flex"
           style={{ 
-            width: `${totalSlides * 100}%`,
-            transform: `translateX(-${currentSlide * (100 / totalSlides)}%)`
+            width: `${tripleItems.length * (100 / itemsPerSlide)}%`,
+            gap
           }}
         >
-          {Array.from({ length: totalSlides }).map((_, slideIndex) => (
+          {tripleItems.map((item, index) => (
             <div 
-              key={slideIndex}
-              className="flex"
+              key={`${index}-${Math.floor(index / items.length)}`}
+              className="flex-shrink-0"
               style={{ 
-                width: `${100 / totalSlides}%`,
-                gap,
-                paddingLeft: slideIndex === 0 ? '0' : gap,
-                paddingRight: slideIndex === totalSlides - 1 ? '0' : gap
+                width: `${100 / itemsPerSlide}%`,
+                minWidth: `${100 / itemsPerSlide}%`
               }}
             >
-              {items.slice(slideIndex * itemsPerSlide, (slideIndex + 1) * itemsPerSlide).map((item, itemIndex) => (
-                <div 
-                  key={slideIndex * itemsPerSlide + itemIndex}
-                  className="flex-1"
-                  style={{ minWidth: '0' }}
-                >
-                  {renderItem(item, slideIndex * itemsPerSlide + itemIndex)}
-                </div>
-              ))}
+              {renderItem(item, index % items.length)}
             </div>
           ))}
         </div>
 
         {/* Navigation Controls */}
-        {showControls && totalSlides > 1 && (
+        {showControls && items.length > 0 && (
           <>
             <Button
               variant="secondary"
@@ -136,17 +159,17 @@ export function StreamingGallery<T>({
         )}
 
         {/* Progress Indicators */}
-        {totalSlides > 1 && (
+        {items.length > itemsPerSlide && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            {Array.from({ length: totalSlides }).map((_, index) => (
+            {items.map((_, index) => (
               <button
                 key={index}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  currentSlide === index 
+                  ((currentIndex - startIndex) % items.length) === index 
                     ? 'bg-primary' 
                     : 'bg-white/50 hover:bg-white/70'
                 }`}
-                onClick={() => setCurrentSlide(index)}
+                onClick={() => setCurrentIndex(startIndex + index)}
               />
             ))}
           </div>

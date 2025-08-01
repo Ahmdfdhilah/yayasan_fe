@@ -41,7 +41,7 @@ const GalleryDetailPage = () => {
           const related = response.items
             .filter(g => g.id !== foundGallery.id)
             .sort((a, b) => a.display_order - b.display_order)
-            .slice(0, 6);
+            .slice(0, 9);
           
           setRelatedGalleries(related);
         } else {
