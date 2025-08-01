@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/componen
 import { ArrowLeft, Users, Calendar } from 'lucide-react';
 import { getOrganizationImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
-import { StreamingGallery } from '@/components/common/StreamingGallery';
+import { AutoScrollCarousel } from '@/components/common/AutoScrollCarousel';
 import { DetailPageHeader } from '@/components/common/DetailPageHeader';
 import { DetailPageFooter } from '@/components/common/DetailPageFooter';
 import { useShareHandler } from '@/hooks/useShareHandler';
@@ -231,13 +231,22 @@ const OrganizationDetailPage = () => {
       {relatedOrganizations.length > 0 && (
         <section className="bg-muted/20 py-16">
           <div className="mx-auto px-4 lg:px-12">
-            <StreamingGallery
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-foreground mb-4">
+                Lembaga Lainnya
+              </h2>
+            </div>
+            <AutoScrollCarousel
               items={relatedOrganizations}
-              title="Lembaga Lainnya"
-              itemsPerSlide={3}
-              gap="16px"
-              autoSlide={true}
-              slideInterval={4500}
+              autoScrollInterval={4500}
+              showControls={true}
+              itemsPerView={{
+                mobile: 1,
+                tablet: 2,
+                desktop: 3,
+                large: 3
+              }}
+              className="mb-8"
               renderItem={(relatedOrg, index) => (
                 <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group h-full">
                   <div className="aspect-video relative overflow-hidden rounded-t-lg bg-muted">
@@ -267,7 +276,6 @@ const OrganizationDetailPage = () => {
                   </CardContent>
                 </Card>
               )}
-              className="mb-8"
             />
           </div>
         </section>

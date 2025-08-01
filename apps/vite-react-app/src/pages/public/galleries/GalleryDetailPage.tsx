@@ -7,7 +7,7 @@ import { Card, CardContent } from "@workspace/ui/components/card";
 import { ArrowLeft, Share2, Calendar, Image } from 'lucide-react';
 import { getGalleryImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
-import { StreamingGallery } from '@/components/common/StreamingGallery';
+import { AutoScrollCarousel } from '@/components/common/AutoScrollCarousel';
 import { DetailPageHeader } from '@/components/common/DetailPageHeader';
 import { DetailPageFooter } from '@/components/common/DetailPageFooter';
 import { useShareHandler } from '@/hooks/useShareHandler';
@@ -203,13 +203,22 @@ const GalleryDetailPage = () => {
       {relatedGalleries.length > 0 && (
         <section className="bg-muted/20 py-16">
           <div className="mx-auto px-4 lg:px-12">
-            <StreamingGallery
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-foreground mb-4">
+                Galeri Lainnya
+              </h2>
+            </div>
+            <AutoScrollCarousel
               items={relatedGalleries}
-              title="Galeri Lainnya"
-              itemsPerSlide={3}
-              gap="16px"
-              autoSlide={true}
-              slideInterval={3500}
+              autoScrollInterval={3500}
+              showControls={true}
+              itemsPerView={{
+                mobile: 1,
+                tablet: 2,
+                desktop: 3,
+                large: 3
+              }}
+              className="mb-8"
               renderItem={(relatedGallery, index) => (
                 <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group h-full">
                   <div className="aspect-square relative overflow-hidden rounded-t-lg bg-muted">
@@ -240,7 +249,6 @@ const GalleryDetailPage = () => {
                   </CardContent>
                 </Card>
               )}
-              className="mb-8"
             />
           </div>
         </section>

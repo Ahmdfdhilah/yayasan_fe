@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
 import { Badge } from "@workspace/ui/components/badge";
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { HeroCarousel } from '@/components/common/HeroCarousel';
 import { getGalleryImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import type { Gallery } from '@/services/galleries/types';
@@ -11,28 +10,6 @@ interface HeroSectionProps {
 }
 
 export const HeroSection = ({ galleries, loading }: HeroSectionProps) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    if (!galleries.length) return;
-    
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => 
-        prevIndex === galleries.length - 1 ? 0 : prevIndex + 1
-      );
-    }, 5000);
-
-    return () => clearInterval(timer);
-  }, [galleries.length]);
-
-  const goToPrevious = () => {
-    setCurrentIndex(currentIndex === 0 ? galleries.length - 1 : currentIndex - 1);
-  };
-
-  const goToNext = () => {
-    setCurrentIndex(currentIndex === galleries.length - 1 ? 0 : currentIndex + 1);
-  };
-
   if (loading || !galleries.length) {
     return (
       <section className="relative h-screen flex items-center justify-center bg-muted/20">
@@ -44,15 +21,13 @@ export const HeroSection = ({ galleries, loading }: HeroSectionProps) => {
     );
   }
 
-  const currentGallery = galleries[currentIndex];
-
-  return (
-    <section className="relative h-screen overflow-hidden">
+  const renderHeroItem = (gallery: Gallery, index: number) => (
+    <div className="relative h-screen overflow-hidden">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <img
-          src={getGalleryImageUrl(currentGallery.img_url) || `https://picsum.photos/1920/1080?random=${currentIndex + 1}`}
-          alt={currentGallery.title}
+          src={getGalleryImageUrl(gallery.img_url) || `https://picsum.photos/1920/1080?random=${index + 1}`}
+          alt={gallery.title}
           className="w-full h-full object-cover transition-opacity duration-1000"
         />
         <div className="absolute inset-0 bg-black/20" />
@@ -67,12 +42,12 @@ export const HeroSection = ({ galleries, loading }: HeroSectionProps) => {
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              {currentGallery.title}
+              {gallery.title}
             </h1>
             
             <div className="text-lg md:text-xl mb-8 text-white/90 leading-relaxed max-w-2xl">
               <RichTextDisplay 
-                content={currentGallery.excerpt || currentGallery.short_excerpt}
+                content={gallery.excerpt || gallery.short_excerpt}
                 fallback="Pendidikan Islam Terpadu yang menggabungkan ilmu agama dan umum dengan pendekatan modern dan holistik."
                 className="text-white/90"
               />
@@ -80,45 +55,19 @@ export const HeroSection = ({ galleries, loading }: HeroSectionProps) => {
           </div>
         </div>
       </div>
+    </div>
+  );
 
-      {/* Navigation Arrows */}
-      {galleries.length > 1 && (
-        <>
-          <button
-            onClick={goToPrevious}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-black/20 hover:bg-black/40 text-white p-2 rounded-full transition-all duration-200"
-            aria-label="Gambar sebelumnya"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          
-          <button
-            onClick={goToNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-black/20 hover:bg-black/40 text-white p-2 rounded-full transition-all duration-200"
-            aria-label="Gambar selanjutnya"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
-        </>
-      )}
-
-      {/* Dots Indicator */}
-      {galleries.length > 1 && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex space-x-2">
-          {galleries.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                index === currentIndex 
-                  ? 'bg-white' 
-                  : 'bg-white/40 hover:bg-white/60'
-              }`}
-              aria-label={`Pergi ke slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      )}
-    </section>
+  return (
+    <HeroCarousel
+      items={galleries}
+      renderItem={renderHeroItem}
+      autoScrollInterval={5000}
+      showControls={true}
+      showDots={true}
+      pauseOnHover={true}
+      fadeTransition={false}
+      className="h-screen"
+    />
   );
 };

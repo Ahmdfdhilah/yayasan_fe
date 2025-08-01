@@ -7,7 +7,7 @@ import { Card, CardContent } from "@workspace/ui/components/card";
 import { ArrowLeft, Calendar } from 'lucide-react';
 import { getNewsImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
-import { StreamingGallery } from '@/components/common/StreamingGallery';
+import { AutoScrollCarousel } from '@/components/common/AutoScrollCarousel';
 import { DetailPageHeader } from '@/components/common/DetailPageHeader';
 import { DetailPageFooter } from '@/components/common/DetailPageFooter';
 import { useShareHandler } from '@/hooks/useShareHandler';
@@ -188,13 +188,22 @@ const ArticleDetailPage = () => {
       {relatedArticles.length > 0 && (
         <section className="bg-muted/20 py-16">
           <div className="px-4 lg:px-12">
-            <StreamingGallery
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-foreground mb-4">
+                Artikel Terbaru
+              </h2>
+            </div>
+            <AutoScrollCarousel
               items={relatedArticles}
-              title="Artikel Terbaru"
-              itemsPerSlide={3}
-              gap="16px"
-              autoSlide={true}
-              slideInterval={4000}
+              autoScrollInterval={4000}
+              showControls={true}
+              itemsPerView={{
+                mobile: 1,
+                tablet: 2,
+                desktop: 3,
+                large: 3
+              }}
+              className="mb-8"
               renderItem={(relatedArticle, index) => (
                 <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group h-full">
                   <div className="aspect-video relative overflow-hidden rounded-t-lg bg-muted">
@@ -227,7 +236,6 @@ const ArticleDetailPage = () => {
                   </CardContent>
                 </Card>
               )}
-              className="mb-8"
             />
           </div>
         </section>

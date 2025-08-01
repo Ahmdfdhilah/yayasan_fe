@@ -1,8 +1,8 @@
 // src/components/ui/auto-swipe-gallery/index.jsx
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from "@workspace/ui/components/card";
-import { Button } from "@workspace/ui/components/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@workspace/ui/components/carousel";
+import { ChevronRight } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 import HeaderSection from '@workspace/ui/components/ui/header-section';
 
@@ -45,45 +45,35 @@ const AutoSwipeGallery = ({
   variant = 'news',
   renderItem
 }: AutoSwipeGalleryProps) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isHovering, setIsHovering] = useState(false);
-  const [visibleItems, setVisibleItems] = useState(itemsToShow);
-  const [isMobile, setIsMobile] = useState(false);
+  const [api, setApi] = useState<CarouselApi>();
   const timerRef = useRef<number | null>(null);
-  const touchStartX = useRef<number | null>(null);
+  const [isHovering, setIsHovering] = useState(false);
 
-  const totalItems = items.length;
-  const maxIndex = Math.max(0, totalItems - visibleItems);
-
-  // Responsive logic
-  useEffect(() => {
-    const handleResize = () => {
+  // Get responsive items to show based on screen size
+  const getResponsiveItemsToShow = () => {
+    if (typeof window !== 'undefined') {
       const width = window.innerWidth;
-      setIsMobile(width < 640);
-      if (width < 640) {
-        setVisibleItems(1);
-      } else if (width < 1024) {
-        setVisibleItems(Math.min(2, itemsToShow));
-      } else {
-        setVisibleItems(itemsToShow);
-      }
-    };
+      if (width < 640) return 1;
+      if (width < 1024) return Math.min(2, itemsToShow);
+      return itemsToShow;
+    }
+    return itemsToShow;
+  };
 
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [itemsToShow]);
-
-  // Auto swipe logic (only if not mobile)
+  // Auto-swipe functionality
   useEffect(() => {
+    if (!api) return;
+
     const startTimer = () => {
       if (timerRef.current !== null) clearTimeout(timerRef.current);
 
       timerRef.current = window.setTimeout(() => {
-        if (!isHovering && !isMobile && totalItems > visibleItems) {
-          setCurrentIndex(prevIndex =>
-            prevIndex >= maxIndex ? 0 : prevIndex + 1
-          );
+        if (!isHovering && items.length > getResponsiveItemsToShow()) {
+          if (api.canScrollNext()) {
+            api.scrollNext();
+          } else {
+            api.scrollTo(0);
+          }
         }
         startTimer();
       }, autoSwipeInterval);
@@ -93,33 +83,7 @@ const AutoSwipeGallery = ({
     return () => {
       if (timerRef.current !== null) clearTimeout(timerRef.current);
     };
-  }, [currentIndex, isHovering, isMobile, totalItems, visibleItems, autoSwipeInterval, maxIndex]);
-
-  const goToNext = () => {
-    setCurrentIndex(prevIndex => (prevIndex >= maxIndex ? 0 : prevIndex + 1));
-  };
-
-  const goToPrev = () => {
-    setCurrentIndex(prevIndex => (prevIndex <= 0 ? maxIndex : prevIndex - 1));
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0]?.clientX || null;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null) return;
-    const touchEndX = e.changedTouches[0]?.clientX || null;
-    const diff = touchStartX.current - (touchEndX || 0);
-    if (diff > 50) goToNext();
-    else if (diff < -50) goToPrev();
-    touchStartX.current = null;
-  };
-
-  const indicators = [];
-  for (let i = 0; i <= maxIndex; i++) {
-    indicators.push(i);
-  }
+  }, [api, isHovering, autoSwipeInterval, items.length, itemsToShow]);
 
   // Default news/services item rendering
   const renderDefaultItem = (item: GalleryItem) => (
@@ -166,81 +130,40 @@ const AutoSwipeGallery = ({
       <HeaderSection title={title} badgeText={badgeText} subtitle={subtitle}/>
 
       <div
-        className="relative"
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
       >
-        <div className={cn(!isMobile && "overflow-hidden")}>
-          <div
-            className={cn(
-              "flex gap-4",
-              isMobile && "overflow-x-auto scroll-snap-x snap-x scroll-smooth"
-            )}
-            style={
-              !isMobile
-                ? {
-                  transform: `translateX(-${(currentIndex * 100) / visibleItems}%)`,
-                  width: `${(totalItems / visibleItems) * 100}%`,
-                  transition: "transform 0.5s ease-in-out",
-                }
-                : {}
-            }
-          >
+        <Carousel
+          setApi={setApi}
+          opts={{
+            align: "start",
+            loop: true,
+            skipSnaps: false,
+            dragFree: true,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
             {items.map((item) => (
-              <div
-                key={item.id}
+              <CarouselItem 
+                key={item.id} 
                 className={cn(
-                  "shrink-0 px-2",
-                  isMobile ? "snap-start w-[calc(100%-1rem)]" : ""
+                  "pl-2 md:pl-4",
+                  // Responsive basis classes
+                  "basis-full sm:basis-1/2",
+                  itemsToShow >= 3 && "lg:basis-1/3",
+                  itemsToShow >= 4 && "xl:basis-1/4"
                 )}
-                style={
-                  !isMobile ? { width: `${100 / totalItems}%` } : undefined
-                }
               >
                 {renderItem ? renderItem(item) : renderDefaultItem(item)}
-              </div>
+              </CarouselItem>
             ))}
-          </div>
-        </div>
-
-        {/* Navigation arrows */}
-        {!isMobile && totalItems > visibleItems && (
-          <>
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full bg-white shadow-md border-gray-200 hover:bg-gray-100 z-10"
-              onClick={goToPrev}
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 rounded-full bg-white shadow-md border-gray-200 hover:bg-gray-100 z-10"
-              onClick={goToNext}
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          </>
-        )}
-
-        {/* Indicators */}
-        {!isMobile && indicators.length > 1 && (
-          <div className="flex justify-center mt-4 gap-1.5">
-            {indicators.map((i) => (
-              <button
-                key={i}
-                className={`h-2 rounded-full transition-all ${i === currentIndex ? 'w-6 bg-primary' : 'w-2 bg-gray-300 hover:bg-gray-400'
-                  }`}
-                onClick={() => setCurrentIndex(i)}
-                aria-label={`Go to slide ${i + 1}`}
-              />
-            ))}
-          </div>
-        )}
+          </CarouselContent>
+          
+          {/* Navigation arrows - hidden on mobile */}
+          <CarouselPrevious className="hidden md:flex -left-6" />
+          <CarouselNext className="hidden md:flex -right-6" />
+        </Carousel>
       </div>
     </div>
   );
