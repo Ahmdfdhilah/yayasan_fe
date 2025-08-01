@@ -8,6 +8,9 @@ import { ArrowLeft, Calendar, Share2 } from 'lucide-react';
 import { getNewsImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { StreamingGallery } from '@/components/common/StreamingGallery';
+import { DetailPageHeader } from '@/components/common/DetailPageHeader';
+import { DetailPageFooter } from '@/components/common/DetailPageFooter';
+import { useShareHandler } from '@/hooks/useShareHandler';
 import type { Article } from '@/services/articles/types';
 import { articleService } from '@/services/articles';
 
@@ -17,6 +20,7 @@ const ArticleDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
+  const handleShare = useShareHandler();
 
   useEffect(() => {
     if (!id) return;
@@ -57,21 +61,12 @@ const ArticleDetailPage = () => {
     loadArticle();
   }, [id]);
 
-  const handleShare = async () => {
-    if (navigator.share && article) {
-      try {
-        await navigator.share({
-          title: article.title,
-          text: article.display_excerpt || article.excerpt,
-          url: window.location.href,
-        });
-      } catch (err) {
-        // Fallback to copying URL
-        navigator.clipboard.writeText(window.location.href);
-      }
-    } else {
-      // Fallback to copying URL
-      navigator.clipboard.writeText(window.location.href);
+  const onShare = () => {
+    if (article) {
+      handleShare({
+        title: article.title,
+        text: article.display_excerpt || article.excerpt,
+      });
     }
   };
 
@@ -117,16 +112,11 @@ const ArticleDetailPage = () => {
   return (
     <div className="min-h-screen bg-background pt-24">
       {/* Back Navigation */}
-      <div className="border-b bg-muted/20">
-        <div className="px-4 lg:px-12 py-8">
-          <Link to="/articles">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Kembali ke Artikel
-            </Button>
-          </Link>
-        </div>
-      </div>
+      <DetailPageHeader 
+        backLabel="Kembali ke Artikel"
+        backPath="/articles"
+        onShare={onShare}
+      />
 
       {/* Article Content */}
       <article className="px-4 lg:px-12 py-8">
@@ -136,15 +126,6 @@ const ArticleDetailPage = () => {
             <Badge variant="secondary" className="bg-primary/10 text-primary">
               {article.category}
             </Badge>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleShare}
-              className="ml-auto"
-            >
-              <Share2 className="w-4 h-4 mr-2" />
-              Bagikan
-            </Button>
           </div>
 
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -195,23 +176,12 @@ const ArticleDetailPage = () => {
         </div>
 
         {/* Article Footer */}
-        <footer className="border-t pt-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Bagikan:</span>
-              <Button variant="outline" size="sm" onClick={handleShare}>
-                <Share2 className="w-4 h-4 mr-2" />
-                Bagikan Artikel
-              </Button>
-            </div>
-            
-            <Link to="/articles">
-              <Button variant="outline">
-                Lihat Artikel Lainnya
-              </Button>
-            </Link>
-          </div>
-        </footer>
+        <DetailPageFooter 
+          onShare={onShare}
+          shareLabel="Bagikan Artikel"
+          backPath="/articles"
+          backLabel="Lihat Artikel Lainnya"
+        />
       </article>
 
       {/* Latest Articles */}

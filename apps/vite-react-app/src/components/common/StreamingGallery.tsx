@@ -8,7 +8,6 @@ interface StreamingGalleryProps<T> {
   title?: string;
   autoSlide?: boolean;
   slideInterval?: number;
-  itemWidth?: string;
   gap?: string;
   showControls?: boolean;
   className?: string;
@@ -21,7 +20,6 @@ export function StreamingGallery<T>({
   title,
   autoSlide = true,
   slideInterval = 3000,
-  itemWidth = "300px",
   gap = "16px",
   showControls = true,
   className = "",

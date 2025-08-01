@@ -8,6 +8,9 @@ import { ArrowLeft, Share2, Calendar, Image, Download } from 'lucide-react';
 import { getGalleryImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { StreamingGallery } from '@/components/common/StreamingGallery';
+import { DetailPageHeader } from '@/components/common/DetailPageHeader';
+import { DetailPageFooter } from '@/components/common/DetailPageFooter';
+import { useShareHandler } from '@/hooks/useShareHandler';
 import type { Gallery } from '@/services/galleries/types';
 import { galleryService } from '@/services/galleries';
 
@@ -18,6 +21,7 @@ const GalleryDetailPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [relatedGalleries, setRelatedGalleries] = useState<Gallery[]>([]);
   const [imageLoading, setImageLoading] = useState(true);
+  const handleShare = useShareHandler();
 
   useEffect(() => {
     if (!id) return;
@@ -58,32 +62,12 @@ const GalleryDetailPage = () => {
     loadGallery();
   }, [id]);
 
-  const handleShare = async () => {
-    if (navigator.share && gallery) {
-      try {
-        await navigator.share({
-          title: gallery.title,
-          text: gallery.excerpt || gallery.short_excerpt,
-          url: window.location.href,
-        });
-      } catch (err) {
-        // Fallback to copying URL
-        navigator.clipboard.writeText(window.location.href);
-      }
-    } else {
-      // Fallback to copying URL
-      navigator.clipboard.writeText(window.location.href);
-    }
-  };
-
-  const handleDownload = () => {
-    if (gallery?.img_url) {
-      const link = document.createElement('a');
-      link.href = getGalleryImageUrl(gallery.img_url);
-      link.download = `${gallery.title}.jpg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+  const onShare = () => {
+    if (gallery) {
+      handleShare({
+        title: gallery.title,
+        text: gallery.excerpt || gallery.short_excerpt,
+      });
     }
   };
 
@@ -129,16 +113,11 @@ const GalleryDetailPage = () => {
   return (
     <div className="min-h-screen bg-background pt-24">
       {/* Back Navigation */}
-      <div className="border-b bg-muted/20">
-        <div className="mx-auto px-4 lg:px-12 py-8">
-          <Link to="/galleries">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Kembali ke Galeri
-            </Button>
-          </Link>
-        </div>
-      </div>
+      <DetailPageHeader 
+        backLabel="Kembali ke Galeri"
+        backPath="/galleries"
+        onShare={onShare}
+      />
 
       {/* Gallery Content */}
       <article className="mx-auto px-4 lg:px-12 py-8">
@@ -149,24 +128,6 @@ const GalleryDetailPage = () => {
               <Image className="w-3 h-3 mr-1" />
               Galeri Foto
             </Badge>
-            <div className="ml-auto flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleDownload}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Unduh
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleShare}
-              >
-                <Share2 className="w-4 h-4 mr-2" />
-                Bagikan
-              </Button>
-            </div>
           </div>
 
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -221,15 +182,7 @@ const GalleryDetailPage = () => {
             <Button
               size="sm"
               variant="secondary"
-              onClick={handleDownload}
-              className="bg-black/50 hover:bg-black/70 text-white border-0"
-            >
-              <Download className="w-4 h-4" />
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={handleShare}
+              onClick={onShare}
               className="bg-black/50 hover:bg-black/70 text-white border-0"
             >
               <Share2 className="w-4 h-4" />
@@ -238,29 +191,12 @@ const GalleryDetailPage = () => {
         </div>
 
         {/* Gallery Footer */}
-        <footer className="border-t pt-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Bagikan:</span>
-              <Button variant="outline" size="sm" onClick={handleShare}>
-                <Share2 className="w-4 h-4 mr-2" />
-                Bagikan Galeri
-              </Button>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={handleDownload}>
-                <Download className="w-4 h-4 mr-2" />
-                Unduh Gambar
-              </Button>
-              <Link to="/galleries">
-                <Button variant="outline">
-                  Lihat Galeri Lainnya
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </footer>
+        <DetailPageFooter 
+          onShare={onShare}
+          shareLabel="Bagikan Galeri"
+          backPath="/galleries"
+          backLabel="Lihat Galeri Lainnya"
+        />
       </article>
 
       {/* Related Galleries */}

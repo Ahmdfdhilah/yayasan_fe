@@ -8,6 +8,9 @@ import { ArrowLeft, Users, Share2, Calendar } from 'lucide-react';
 import { getOrganizationImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { StreamingGallery } from '@/components/common/StreamingGallery';
+import { DetailPageHeader } from '@/components/common/DetailPageHeader';
+import { DetailPageFooter } from '@/components/common/DetailPageFooter';
+import { useShareHandler } from '@/hooks/useShareHandler';
 import type { Organization } from '@/services/organizations/types';
 import { organizationService } from '@/services/organizations';
 
@@ -17,6 +20,7 @@ const OrganizationDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [relatedOrganizations, setRelatedOrganizations] = useState<Organization[]>([]);
+  const handleShare = useShareHandler();
 
   useEffect(() => {
     if (!id) return;
@@ -50,21 +54,12 @@ const OrganizationDetailPage = () => {
     loadOrganization();
   }, [id]);
 
-  const handleShare = async () => {
-    if (navigator.share && organization) {
-      try {
-        await navigator.share({
-          title: organization.display_name,
-          text: organization.description || organization.excerpt,
-          url: window.location.href,
-        });
-      } catch (err) {
-        // Fallback to copying URL
-        navigator.clipboard.writeText(window.location.href);
-      }
-    } else {
-      // Fallback to copying URL
-      navigator.clipboard.writeText(window.location.href);
+  const onShare = () => {
+    if (organization) {
+      handleShare({
+        title: organization.display_name,
+        text: organization.description || organization.excerpt,
+      });
     }
   };
 
@@ -110,16 +105,11 @@ const OrganizationDetailPage = () => {
   return (
     <div className="min-h-screen bg-background pt-24">
       {/* Back Navigation */}
-      <div className="border-b bg-muted/20">
-        <div className="mx-auto px-4 lg:px-12 py-8">
-          <Link to="/schools">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Kembali ke Lembaga
-            </Button>
-          </Link>
-        </div>
-      </div>
+      <DetailPageHeader 
+        backLabel="Kembali ke Lembaga"
+        backPath="/schools"
+        onShare={onShare}
+      />
 
       {/* Organization Content */}
       <div className="mx-auto px-4 lg:px-12 py-8">
@@ -129,15 +119,6 @@ const OrganizationDetailPage = () => {
             <Badge variant="secondary" className="bg-primary/10 text-primary">
               Lembaga Pendidikan
             </Badge>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleShare}
-              className="ml-auto"
-            >
-              <Share2 className="w-4 h-4 mr-2" />
-              Bagikan
-            </Button>
           </div>
 
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -236,23 +217,14 @@ const OrganizationDetailPage = () => {
         </div>
 
         {/* Footer */}
-        <footer className="border-t pt-8 mt-12">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Bagikan:</span>
-              <Button variant="outline" size="sm" onClick={handleShare}>
-                <Share2 className="w-4 h-4 mr-2" />
-                Bagikan Lembaga
-              </Button>
-            </div>
-            
-            <Link to="/schools">
-              <Button variant="outline">
-                Lihat Lembaga Lainnya
-              </Button>
-            </Link>
-          </div>
-        </footer>
+        <div className="mt-12">
+          <DetailPageFooter 
+            onShare={onShare}
+            shareLabel="Bagikan Lembaga"
+            backPath="/schools"
+            backLabel="Lihat Lembaga Lainnya"
+          />
+        </div>
       </div>
 
       {/* Related Organizations */}
