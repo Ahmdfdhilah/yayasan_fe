@@ -2,13 +2,16 @@ import { Button } from "@workspace/ui/components/button";
 import { NavMenu } from "./NavbarMenu";
 import { NavigationSheet } from "./NavigationSheet";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
+import { ScrollToTopLink } from "@/components/common/ScrollToTopLink";
 import logo from '@/assets/logo.png';
 
 const Navbar = () => {
   return (
     <nav className="fixed top-6 inset-x-4 h-16 bg-card/95 backdrop-blur-sm border border-border shadow-lg max-w-screen-xl mx-auto rounded-full z-50">
       <div className="h-full flex items-center justify-between mx-auto px-6">
-        <img src={logo} alt="Yayasan Baitul Muslim" className="h-8 w-auto" />
+        <ScrollToTopLink to="/">
+          <img src={logo} alt="Yayasan Baitul Muslim" className="h-8 w-auto" />
+        </ScrollToTopLink>
 
         {/* Desktop Menu */}
         <NavMenu className="hidden md:block" />
