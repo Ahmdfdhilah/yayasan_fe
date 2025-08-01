@@ -1,7 +1,8 @@
 
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@workspace/ui/lib/utils';
+import { ScrollToTopLink } from '@/components/common/ScrollToTopLink';
 
 // Generic SidebarItem interface that supports both menu types
 interface GenericSidebarItem {
@@ -72,7 +73,7 @@ export function SidebarMenuItem({
         {!collapsed && hasChildren && isExpanded && (
           <div className="ml-6 mt-1 space-y-1">
             {item.children!.map((child) => (
-              <Link
+              <ScrollToTopLink
                 key={child.href}
                 to={child.href!}
                 className={cn(
@@ -85,7 +86,7 @@ export function SidebarMenuItem({
               >
                 <child.icon className="h-4 w-4 flex-shrink-0" />
                 <span>{child.title}</span>
-              </Link>
+              </ScrollToTopLink>
             ))}
           </div>
         )}
@@ -95,7 +96,7 @@ export function SidebarMenuItem({
 
   return (
     <div className="mb-2">
-      <Link
+      <ScrollToTopLink
         to={item.href!}
         className={cn(
           'flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
@@ -109,7 +110,7 @@ export function SidebarMenuItem({
       >
         <item.icon className={cn("flex-shrink-0", collapsed ? "h-4 w-4" : "h-5 w-5")} />
         {!collapsed && <span>{item.title}</span>}
-      </Link>
+      </ScrollToTopLink>
     </div>
   );
 }

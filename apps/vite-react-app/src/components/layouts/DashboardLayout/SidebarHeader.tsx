@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom';
 import { Button } from '@workspace/ui/components/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@workspace/ui/lib/utils';
+import { ScrollToTopLink } from '@/components/common/ScrollToTopLink';
 import logo from '@/assets/logo.png';
 
 interface SidebarHeaderProps {
@@ -14,13 +14,13 @@ export function SidebarHeader({ collapsed, onToggleCollapse }: SidebarHeaderProp
   return (
     <>
       <div className={cn("flex h-14 lg:h-16 items-center flex-shrink-0", collapsed ? "px-2 lg:px-3 justify-center" : "px-4 lg:px-6 justify-between")}>
-        <Link to="/admin" className={cn("flex items-center", collapsed ? "justify-center" : "space-x-2")}>
+        <ScrollToTopLink to="/dashboard" className={cn("flex items-center", collapsed ? "justify-center" : "space-x-2")}>
           <img 
             src={logo} 
             className={cn("transition-all duration-300 object-contain", collapsed ? "w-8 h-8" : "w-10 h-10 lg:w-12 lg:h-12")} 
             alt="logo okoce" 
           />
-        </Link>
+        </ScrollToTopLink>
         {!collapsed && (
           <Button
             variant="ghost"

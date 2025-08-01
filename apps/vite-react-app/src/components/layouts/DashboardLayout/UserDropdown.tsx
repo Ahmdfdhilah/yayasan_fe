@@ -1,6 +1,7 @@
 // apps/vite-react-app/src/components/layouts/DashboardLayout/UserDropdown.tsx
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@workspace/ui/components/button';
+import { ScrollToTopLink } from '@/components/common/ScrollToTopLink';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import {
   DropdownMenu,
@@ -154,10 +155,10 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
           <DropdownMenuSeparator />
 
           <DropdownMenuItem asChild>
-            <Link to="/profile" className="flex items-center">
+            <ScrollToTopLink to="/profile" className="flex items-center">
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
-            </Link>
+            </ScrollToTopLink>
           </DropdownMenuItem>
 
           <DropdownMenuItem className="flex items-center justify-between" onClick={(e) => e.preventDefault()}>

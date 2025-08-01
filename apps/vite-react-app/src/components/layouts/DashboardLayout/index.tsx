@@ -1,6 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@workspace/ui/components/sheet';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface GenericSidebarItem {
   title: string;
@@ -24,6 +25,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
+  const scrollToTop = useScrollToTop();
 
   const toggleSubmenu = (title: string) => {
     setExpandedMenus(prev =>
@@ -48,6 +50,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const handleLinkClick = () => {
     setIsSidebarOpen(false);
+    scrollToTop();
   };
 
   return (
