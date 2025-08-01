@@ -1,20 +1,13 @@
 import { useState } from 'react';
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
+import { Card, CardContent} from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { Label } from "@workspace/ui/components/label";
-import { 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Clock, 
-  Send, 
+import {
+  Send,
   CheckCircle,
-  Building,
-  Globe,
-  Users
 } from 'lucide-react';
 import { messageService } from '@/services/messages';
 import type { MessageCreate } from '@/services/messages/types';
@@ -36,7 +29,7 @@ const ContactPage = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const toast =  useToast()
+  const toast = useToast()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -48,7 +41,7 @@ const ContactPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Basic validation
     if (!formData.name.trim() || !formData.email.trim() || !formData.title.trim() || !formData.message.trim()) {
       toast.error('Semua field harus diisi');
@@ -73,7 +66,7 @@ const ContactPage = () => {
       };
 
       await messageService.submitMessage(messageData);
-      
+
       setIsSubmitted(true);
       setFormData({
         name: '',
@@ -81,7 +74,7 @@ const ContactPage = () => {
         title: '',
         message: ''
       });
-      
+
       toast.success('Pesan berhasil dikirim! Kami akan segera merespons.');
     } catch (error) {
       console.error('Error submitting message:', error);
@@ -100,61 +93,6 @@ const ContactPage = () => {
       message: ''
     });
   };
-
-  const contactInfo = [
-    {
-      icon: MapPin,
-      title: 'Alamat',
-      details: [
-        'Jl. Ir. H. Djuanda No. 19',
-        'Way Jepara, Lampung Timur',
-        'Lampung 34192, Indonesia'
-      ]
-    },
-    {
-      icon: Phone,
-      title: 'Telepon',
-      details: [
-        '+62 725 123456',
-        '+62 812 3456 7890'
-      ]
-    },
-    {
-      icon: Mail,
-      title: 'Email',
-      details: [
-        'info@baitulmuslim.ac.id',
-        'admin@baitulmuslim.ac.id'
-      ]
-    },
-    {
-      icon: Clock,
-      title: 'Jam Operasional',
-      details: [
-        'Senin - Jumat: 07:00 - 16:00',
-        'Sabtu: 07:00 - 12:00',
-        'Minggu: Tutup'
-      ]
-    }
-  ];
-
-  const quickStats = [
-    {
-      icon: Building,
-      title: '5 Jenjang',
-      description: 'Pendidikan Tersedia'
-    },
-    {
-      icon: Users,
-      title: '30+ Tahun',
-      description: 'Melayani Pendidikan'
-    },
-    {
-      icon: Globe,
-      title: 'Terakreditasi',
-      description: 'Lembaga Terpercaya'
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -177,11 +115,11 @@ const ContactPage = () => {
               <Badge variant="secondary" className="mb-6 bg-white/10 text-white border-white/20 hover:bg-white/20">
                 Yayasan Baitul Muslim Lampung Timur
               </Badge>
-              
+
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
                 Kontak Kami
               </h1>
-              
+
               <p className="text-lg md:text-xl mb-8 text-white/90 leading-relaxed max-w-2xl">
                 Hubungi kami untuk informasi lebih lanjut tentang pendidikan, program, atau pertanyaan lainnya
               </p>
@@ -190,30 +128,11 @@ const ContactPage = () => {
         </div>
       </section>
 
-      {/* Quick Stats */}
-      <section className="py-12 bg-primary/5">
-        <div className="max-w-screen-xl mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8">
-            {quickStats.map((stat, index) => {
-              const IconComponent = stat.icon;
-              return (
-                <div key={index} className="text-center">
-                  <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <IconComponent className="w-8 h-8 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">{stat.title}</h3>
-                  <p className="text-muted-foreground">{stat.description}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
       {/* Contact Section */}
       <section className="py-16">
-        <div className="max-w-screen-xl mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12">
+        <div className="px-4 lg:px-8 mx-auto px-4">
+          <div className="flex flex-col gap-12">
             {/* Contact Form */}
             <div>
               <div className="mb-8">
@@ -238,7 +157,7 @@ const ContactPage = () => {
                     <p className="text-green-700 mb-6">
                       Terima kasih telah menghubungi kami. Pesan Anda telah berhasil dikirim dan akan segera kami proses.
                     </p>
-                    <Button 
+                    <Button
                       onClick={resetForm}
                       variant="outline"
                       className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
@@ -279,7 +198,7 @@ const ContactPage = () => {
                           />
                         </div>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="title">Subjek *</Label>
                         <Input
@@ -293,7 +212,7 @@ const ContactPage = () => {
                           disabled={isSubmitting}
                         />
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="message">Pesan *</Label>
                         <Textarea
@@ -307,10 +226,10 @@ const ContactPage = () => {
                           rows={6}
                         />
                       </div>
-                      
-                      <Button 
-                        type="submit" 
-                        className="w-full" 
+
+                      <Button
+                        type="submit"
+                        className="w-full"
                         disabled={isSubmitting}
                       >
                         {isSubmitting ? (
@@ -329,64 +248,6 @@ const ContactPage = () => {
                   </CardContent>
                 </Card>
               )}
-            </div>
-
-            {/* Contact Information */}
-            <div>
-              <div className="mb-8">
-                <Badge variant="outline" className="mb-4 border-primary text-primary">
-                  Informasi Kontak
-                </Badge>
-                <h2 className="text-3xl font-bold mb-4 text-foreground">
-                  Temukan Kami
-                </h2>
-                <p className="text-lg text-muted-foreground">
-                  Berbagai cara untuk menghubungi dan menemukan kami.
-                </p>
-              </div>
-
-              <div className="space-y-6">
-                {contactInfo.map((info, index) => {
-                  const IconComponent = info.icon;
-                  return (
-                    <Card key={index} className="hover:shadow-lg transition-all duration-300">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="flex items-center gap-3">
-                          <div className="bg-primary/10 p-2 rounded-lg">
-                            <IconComponent className="w-5 h-5 text-primary" />
-                          </div>
-                          {info.title}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="space-y-1">
-                          {info.details.map((detail, idx) => (
-                            <p key={idx} className="text-muted-foreground">
-                              {detail}
-                            </p>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-
-              {/* Map Placeholder */}
-              <Card className="mt-6">
-                <CardContent className="p-0">
-                  <div 
-                    className="w-full h-64 bg-muted rounded-lg flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors"
-                    onClick={() => window.open('https://maps.google.com/?q=Way+Jepara+Lampung+Timur', '_blank')}
-                  >
-                    <div className="text-center">
-                      <MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-muted-foreground font-medium">Lihat di Google Maps</p>
-                      <p className="text-sm text-muted-foreground">Klik untuk membuka peta</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </div>

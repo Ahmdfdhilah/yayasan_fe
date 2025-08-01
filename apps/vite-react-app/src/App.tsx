@@ -61,25 +61,27 @@ function App() {
                   <Route path="/" element={<DefaultLayout />}>
                     <Route index element={<HomePage />} />
                     <Route path='home' element={<HomePage />} />
-                    
+
                     {/* Public Articles Routes */}
                     <Route path='articles' element={<ArticlesListPage />} />
                     <Route path='articles/:id' element={<ArticleDetailPage />} />
-                    
+
                     {/* Public Organizations Routes - using /schools to avoid conflict with CMS */}
                     <Route path='schools' element={<OrganizationsListPage />} />
                     <Route path='schools/:id' element={<OrganizationDetailPage />} />
-                    
+
                     {/* Public Galleries Routes */}
                     <Route path='galleries' element={<GalleriesListPage />} />
                     <Route path='galleries/:id' element={<GalleryDetailPage />} />
-                    
+
                     {/* About Page */}
                     <Route path='about' element={<AboutPage />} />
-                    
+
                     {/* Contact Page */}
                     <Route path='contact' element={<ContactPage />} />
-                    
+                  </Route>
+
+                  <Route path='/'>
                     <Route path='login' element={
                       <PublicRoute>
                         <LoginPage />
@@ -101,6 +103,7 @@ function App() {
                       </PublicRoute>
                     } />
                   </Route>
+
 
                   {/* Protected routes */}
                   <Route path="/" element={
@@ -197,7 +200,7 @@ function App() {
                         <MediaFilesPage />
                       </RoleProtectedRoute>
                     } />
-                    
+
                     {/* Specific User Media Files - Admin and Kepala Sekolah can view others' files */}
                     <Route path="media-files/:uploaderId" element={
                       <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
@@ -214,7 +217,7 @@ function App() {
 
                     <Route path="cms/articles" element={
                       <RoleProtectedRoute allowedRoles={['admin']}>
-                        <ArticlesPage/>
+                        <ArticlesPage />
                       </RoleProtectedRoute>
                     } />
 
