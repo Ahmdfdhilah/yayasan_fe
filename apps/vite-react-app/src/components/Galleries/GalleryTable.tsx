@@ -24,7 +24,7 @@ export const GalleryTable: React.FC<GalleryTableProps> = ({
           <TableRow>
             <TableHead>Gambar</TableHead>
             <TableHead>Judul</TableHead>
-            <TableHead>Urutan</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Dibuat</TableHead>
             <TableHead className="text-right">Aksi</TableHead>
           </TableRow>
@@ -51,12 +51,16 @@ export const GalleryTable: React.FC<GalleryTableProps> = ({
                 <TableCell>
                   <div className="font-medium">{gallery.title}</div>
                   {gallery.excerpt && (
-                    <div className="text-xs text-muted-foreground line-clamp-1">
+                    <div className="text-xs text-muted-foreground line-clamp-1 mt-1">
                       {gallery.short_excerpt}
                     </div>
                   )}
                 </TableCell>
-                <TableCell>{gallery.display_order}</TableCell>
+                <TableCell>
+                  <span className="text-sm">
+                    {gallery.is_highlight ? 'Unggulan' : 'Normal'}
+                  </span>
+                </TableCell>
                 <TableCell>
                   {format(new Date(gallery.created_at), 'dd MMM yyyy', { locale: id })}
                 </TableCell>

@@ -8,7 +8,7 @@ export interface Gallery {
   img_url: string;
   title: string;
   excerpt?: string;
-  display_order: number;
+  is_highlight: boolean;
   created_at: string;
   updated_at?: string;
   created_by?: number;
@@ -20,22 +20,18 @@ export interface Gallery {
 export interface GalleryCreate {
   title: string;
   excerpt?: string;
-  display_order?: number;
+  is_highlight?: boolean;
 }
 
 export interface GalleryUpdate {
   title?: string;
   excerpt?: string;
-  display_order?: number;
+  is_highlight?: boolean;
 }
 
-export interface GalleryOrderUpdate {
+export interface GalleryHighlightUpdate {
   gallery_id: number;
-  new_order: number;
-}
-
-export interface GalleryBulkOrderUpdate {
-  items: GalleryOrderUpdate[];
+  is_highlight: boolean;
 }
 
 // Response Types
@@ -47,30 +43,16 @@ export interface GallerySummary {
   id: number;
   img_url: string;
   title: string;
-  display_order: number;
+  is_highlight: boolean;
 }
 
-export interface OrderUpdateResult {
-  gallery_id: number;
-  old_order: number;
-  new_order: number;
-  success: boolean;
-  message?: string;
-}
-
-export interface BulkOrderUpdateResponse {
-  successful_updates: OrderUpdateResult[];
-  failed_updates: OrderUpdateResult[];
-  total_processed: number;
-  success_count: number;
-  failure_count: number;
-}
 
 // Filter Types
 export interface GalleryFilterParams {
   page?: number;
   size?: number;
   search?: string;
+  is_highlighted?: boolean;
   sort_by?: string;
   sort_order?: "asc" | "desc";
 }
@@ -78,7 +60,8 @@ export interface GalleryFilterParams {
 // Statistics Types
 export interface GalleryStatistics {
   total_galleries: number;
-  order_conflicts?: number;
+  highlighted_galleries: number;
+  non_highlighted_galleries: number;
 }
 
 // Response wrapper for single operations

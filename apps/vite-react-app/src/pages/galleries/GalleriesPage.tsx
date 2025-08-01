@@ -6,8 +6,9 @@ import { Gallery, GalleryFilterParams } from '@/services/galleries/types';
 import { galleryService } from '@/services/galleries';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent } from '@workspace/ui/components/card';
-import { Plus } from 'lucide-react';
+import { Plus, Filter } from 'lucide-react';
 import { Label } from '@workspace/ui/components/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
 import { GalleryTable } from '@/components/Galleries/GalleryTable';
 import { GalleryCards } from '@/components/Galleries/GalleryCards';
 import { GalleryDialog } from '@/components/Galleries/GalleryDialog';
@@ -23,6 +24,7 @@ interface GalleryPageFilters {
   search: string;
   page: number;
   size: number;
+  is_highlighted?: string;
   [key: string]: string | number;
 }
 
@@ -31,7 +33,7 @@ const GalleriesPage: React.FC = () => {
   const { toast } = useToast();
   
   const { updateURL, getCurrentFilters } = useURLFilters<GalleryPageFilters>({
-    defaults: { search: '', page: 1, size: 10 },
+    defaults: { search: '', page: 1, size: 10, is_highlighted: '' },
     cleanDefaults: true,
   });
 
@@ -55,6 +57,7 @@ const GalleriesPage: React.FC = () => {
         page: filters.page,
         size: filters.size,
         search: filters.search || undefined,
+        is_highlighted: filters.is_highlighted === 'true' ? true : filters.is_highlighted === 'false' ? false : undefined,
       };
 
       const response = await galleryService.getGalleries(params);
@@ -77,7 +80,7 @@ const GalleriesPage: React.FC = () => {
     if (hasAccess) {
       fetchGalleries();
     }
-  }, [filters.page, filters.size, filters.search, hasAccess]);
+  }, [filters.page, filters.size, filters.search, filters.is_highlighted, hasAccess]);
 
 
   const handleView = (gallery: Gallery) => {
@@ -158,12 +161,17 @@ const GalleriesPage: React.FC = () => {
     }
   };
 
+
   // Filter handlers
   const handleSearchChange = useCallback((search: string) => {
     if (search !== filters.search) {
       updateURL({ search, page: 1 });
     }
   }, [updateURL, filters.search]);
+
+  const handleHighlightFilterChange = useCallback((value: string) => {
+    updateURL({ is_highlighted: value === 'all' ? '' : value, page: 1 });
+  }, [updateURL]);
 
   if (!hasAccess) {
     return (
@@ -182,7 +190,7 @@ const GalleriesPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Manajemen Galeri"
-        description="Kelola galeri foto dan atur urutan tampilan"
+        description="Kelola galeri foto dan status unggulan"
         actions={
           <Button onClick={handleCreate}>
             <Plus className="w-4 h-4 mr-2" />
@@ -197,14 +205,34 @@ const GalleriesPage: React.FC = () => {
           <div className="space-y-4">
             <ListHeaderComposite
               title="Daftar Galeri"
-              subtitle="Kelola galeri foto dan atur urutan tampilan"
+              subtitle="Kelola galeri foto dan status unggulan"
             />
 
-            <SearchContainer
-              searchQuery={filters.search}
-              onSearchChange={handleSearchChange}
-              placeholder="Cari galeri berdasarkan judul..."
-            />
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <SearchContainer
+                  searchQuery={filters.search}
+                  onSearchChange={handleSearchChange}
+                  placeholder="Cari galeri berdasarkan judul..."
+                />
+              </div>
+              <div className="w-full sm:w-48">
+                <Select
+                  value={filters.is_highlighted || 'all'}
+                  onValueChange={handleHighlightFilterChange}
+                >
+                  <SelectTrigger>
+                    <Filter className="w-4 h-4 mr-2" />
+                    <SelectValue placeholder="Filter status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Galeri</SelectItem>
+                    <SelectItem value="true">Hanya Unggulan</SelectItem>
+                    <SelectItem value="false">Tidak Unggulan</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
             <div className="hidden lg:block">
               <GalleryTable
@@ -269,6 +297,12 @@ const GalleriesPage: React.FC = () => {
                   <Label>Judul</Label>
                   <div className="p-2 bg-muted rounded text-sm">
                     {viewingGallery.title}
+                  </div>
+                </div>
+                <div>
+                  <Label>Status</Label>
+                  <div className="p-2 bg-muted rounded text-sm">
+                    {viewingGallery.is_highlight ? 'Unggulan' : 'Normal'}
                   </div>
                 </div>
               </div>

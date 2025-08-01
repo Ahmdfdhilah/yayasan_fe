@@ -53,7 +53,9 @@ export const GalleryCards: React.FC<GalleryCardsProps> = ({
                 <div className="flex-1">
                   <h3 className="font-medium text-sm">{gallery.title}</h3>
                   <div className="mt-1">
-                    <span className="text-xs text-muted-foreground">Urutan: {gallery.display_order}</span>
+                    <span className="text-xs text-muted-foreground">
+                      Status: {gallery.is_highlight ? 'Unggulan' : 'Normal'}
+                    </span>
                   </div>
                 </div>
               </div>

@@ -24,11 +24,12 @@ import {
 } from '@workspace/ui/components/form';
 import FileUpload from '@/components/common/FileUpload';
 import { Gallery, GalleryCreate, GalleryUpdate } from '@/services/galleries/types';
+import { Switch } from '@workspace/ui/components/switch';
 
 const galleryFormSchema = z.object({
   title: z.string().min(1, 'Judul wajib diisi').max(255, 'Judul maksimal 255 karakter'),
   excerpt: z.string().optional().or(z.literal('')),
-  display_order: z.number().min(0, 'Urutan tidak boleh negatif'),
+  is_highlight: z.boolean().default(false),
 });
 
 type GalleryFormData = z.infer<typeof galleryFormSchema>;
@@ -56,7 +57,7 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
     defaultValues: {
       title: '',
       excerpt: '',
-      display_order: 0,
+      is_highlight: false,
     },
   });
 
@@ -66,13 +67,13 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
         form.reset({
           title: editingGallery.title,
           excerpt: editingGallery.excerpt || '',
-          display_order: editingGallery.display_order,
+          is_highlight: editingGallery.is_highlight,
         });
       } else {
         form.reset({
           title: '',
           excerpt: '',
-          display_order: 0,
+          is_highlight: false,
         });
       }
       setSelectedFiles([]);
@@ -92,7 +93,7 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
       const submitData = {
         title: data.title,
         excerpt: data.excerpt || undefined,
-        display_order: data.display_order,
+        is_highlight: data.is_highlight,
       };
 
       const imageFile = selectedFiles.length > 0 ? selectedFiles[0] : undefined;
@@ -182,27 +183,24 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
 
             <FormField
               control={form.control}
-              name="display_order"
+              name="is_highlight"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Urutan Tampilan</FormLabel>
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Jadikan galeri unggulan
+                    </FormLabel>
+                    <FormDescription>
+                      Galeri unggulan akan ditampilkan di posisi teratas
+                    </FormDescription>
+                  </div>
                   <FormControl>
-                    <Input
-                      type="number"
-                      min="0"
-                      placeholder="0"
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
                       disabled={loading}
-                      {...field}
-                      onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                      onFocus={(e) => {
-                        if (e.target.value === '0') {
-                          e.target.select();
-                        }
-                      }}
                     />
                   </FormControl>
-                  <FormDescription>Urutan tampilan galeri (0 = paling atas)</FormDescription>
-                  <FormMessage />
                 </FormItem>
               )}
             />

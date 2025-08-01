@@ -63,9 +63,26 @@ class GalleryService extends BaseService {
     return this.get("/statistics");
   }
 
-  // Get order conflicts (admin only)
-  async getOrderConflicts(): Promise<any> {
-    return this.get("/order-conflicts");
+  // Get highlighted galleries
+  async getHighlightedGalleries(limit?: number): Promise<GalleryResponse[]> {
+    const queryParams = new URLSearchParams();
+    if (limit) {
+      queryParams.append("limit", limit.toString());
+    }
+    
+    const endpoint = queryParams.toString() ? `/highlighted?${queryParams.toString()}` : "/highlighted";
+    return this.get(endpoint);
+  }
+
+  // Get non-highlighted galleries
+  async getNonHighlightedGalleries(limit?: number): Promise<GalleryResponse[]> {
+    const queryParams = new URLSearchParams();
+    if (limit) {
+      queryParams.append("limit", limit.toString());
+    }
+    
+    const endpoint = queryParams.toString() ? `/non-highlighted?${queryParams.toString()}` : "/non-highlighted";
+    return this.get(endpoint);
   }
 
   // Get gallery summaries
@@ -135,14 +152,14 @@ class GalleryService extends BaseService {
   }
 
 
-  // ===== ORDERING METHODS =====
+  // ===== HIGHLIGHT METHODS =====
 
-  // Update single gallery order (admin only)
-  async updateGalleryOrder(
+  // Toggle gallery highlight status (admin only)
+  async toggleGalleryHighlight(
     galleryId: number,
-    newOrder: number
+    isHighlight: boolean
   ): Promise<GalleryResponse> {
-    return this.patch(`/${galleryId}/order`, { new_order: newOrder });
+    return this.patch(`/${galleryId}/highlight`, isHighlight);
   }
 }
 
