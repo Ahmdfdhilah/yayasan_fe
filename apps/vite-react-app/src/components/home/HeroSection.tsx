@@ -59,7 +59,7 @@ export const HeroSection = ({ galleries, loading }: HeroSectionProps) => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 h-full flex items-center">
+      <div className="relative z-10 h-full flex items-center pt-24">
         <div className="max-w-screen-xl mx-auto px-4 w-full">
           <div className="max-w-3xl text-white">
             <Badge variant="secondary" className="mb-6 bg-white/10 text-white border-white/20 hover:bg-white/20">

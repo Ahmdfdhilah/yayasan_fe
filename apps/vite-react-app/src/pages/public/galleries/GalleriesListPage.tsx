@@ -130,22 +130,37 @@ const GalleriesListPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-primary/5 py-16">
-        <div className="max-w-screen-xl mx-auto px-4">
-          <div className="text-center">
-            <Badge variant="outline" className="mb-4 border-primary text-primary">
-              Galeri
-            </Badge>
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
-              Galeri Foto
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Kumpulan foto dan dokumentasi kegiatan Yayasan Baitul Muslim Lampung Timur
-            </p>
+      {/* Hero Section */}
+      <section className="relative h-96 overflow-hidden">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0">
+          <img
+            src="https://picsum.photos/1920/600?random=galleries"
+            alt="Galeri Foto"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 h-full flex items-center pt-24">
+          <div className="max-w-screen-xl mx-auto px-4 w-full">
+            <div className="max-w-3xl text-white">
+              <Badge variant="secondary" className="mb-6 bg-white/10 text-white border-white/20 hover:bg-white/20">
+                Yayasan Baitul Muslim Lampung Timur
+              </Badge>
+              
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+                Galeri Foto
+              </h1>
+              
+              <p className="text-lg md:text-xl mb-8 text-white/90 leading-relaxed max-w-2xl">
+                Kumpulan foto dan dokumentasi kegiatan Yayasan Baitul Muslim Lampung Timur
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Filters */}
       <div className="py-8 border-b bg-muted/20">
