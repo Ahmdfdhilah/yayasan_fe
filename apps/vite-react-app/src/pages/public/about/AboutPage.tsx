@@ -14,7 +14,7 @@ const LeadershipSkeleton = () => (
     <div className="grid gap-8 mb-8">
       <div className="max-w-sm mx-auto w-full">
         <Card>
-          <div className="aspect-video relative overflow-hidden rounded-t-lg bg-muted">
+          <div className="relative overflow-hidden rounded-t-lg bg-muted h-80">
             <Skeleton className="w-full h-full" />
           </div>
           <CardContent className="p-6 text-center">
@@ -30,7 +30,7 @@ const LeadershipSkeleton = () => (
     <div className="grid md:grid-cols-2 gap-8">
       {Array.from({ length: 2 }).map((_, index) => (
         <Card key={index}>
-          <div className="aspect-video relative overflow-hidden rounded-t-lg bg-muted">
+          <div className="relative overflow-hidden rounded-t-lg bg-muted h-80">
             <Skeleton className="w-full h-full" />
           </div>
           <CardContent className="p-6 text-center">
@@ -70,10 +70,10 @@ const AboutPage = () => {
 
   const renderLeadershipCard = (member: BoardMember, isCenter: boolean = false) => (
     <Card key={member.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group w-full">
-      {/* Image Section - Half Card */}
-      <div className="aspect-video relative overflow-hidden rounded-t-lg bg-muted">
+      {/* Image Section - Flexible aspect ratio */}
+      <div className="relative overflow-hidden rounded-t-lg bg-muted h-80">
         <img
-          src={getBoardImageUrl(member.img_url) || `https://picsum.photos/400/240?random=${member.id}`}
+          src={getBoardImageUrl(member.img_url) || `https://picsum.photos/400/500?random=${member.id}`}
           alt={member.name}
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
         />

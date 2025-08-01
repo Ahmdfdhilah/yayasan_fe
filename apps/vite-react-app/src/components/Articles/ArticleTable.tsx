@@ -10,6 +10,7 @@ import {
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
+import { getArticleImageUrl } from '@/utils/imageUtils';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -63,13 +64,11 @@ export const ArticleTable: React.FC<ArticleTableProps> = ({
               <TableRow key={article.id}>
                 <TableCell>
                   <div className="flex items-center space-x-3">
-                    {article.img_url && (
-                      <img 
-                        src={article.img_url} 
-                        alt={article.title}
-                        className="w-8 h-8 rounded object-cover"
-                      />
-                    )}
+                    <img 
+                      src={getArticleImageUrl(article.img_url)} 
+                      alt={article.title}
+                      className="w-8 h-8 rounded object-cover"
+                    />
                     <div>
                       <div className="font-medium">{article.title}</div>
                       <div className="text-xs text-muted-foreground">

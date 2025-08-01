@@ -65,6 +65,16 @@ export const getOrganizationImageUrl = (imageUrl?: string | null): string => {
 };
 
 /**
+ * Get article image URL specifically for articles
+ * 
+ * @param imageUrl - Article image URL from API
+ * @returns Full image URL or article placeholder
+ */
+export const getArticleImageUrl = (imageUrl?: string | null): string => {
+  return getImageUrl(imageUrl, '/placeholder-article.jpg');
+};
+
+/**
  * Get board member image URL specifically for board/team members
  * 
  * @param imageUrl - Board member image URL from API

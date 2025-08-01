@@ -208,30 +208,32 @@ function App() {
                       </RoleProtectedRoute>
                     } />
 
-                    {/* Content Management Routes - Admin only */}
-                    <Route path="board-members" element={
-                      <RoleProtectedRoute allowedRoles={['admin']}>
-                        <BoardMembersPage />
-                      </RoleProtectedRoute>
-                    } />
+                    <Route path='/cms'>
+                      {/* Content Management Routes - Admin only */}
+                      <Route path="board-members" element={
+                        <RoleProtectedRoute allowedRoles={['admin']}>
+                          <BoardMembersPage />
+                        </RoleProtectedRoute>
+                      } />
 
-                    <Route path="cms/articles" element={
-                      <RoleProtectedRoute allowedRoles={['admin']}>
-                        <ArticlesPage />
-                      </RoleProtectedRoute>
-                    } />
+                      <Route path="articles" element={
+                        <RoleProtectedRoute allowedRoles={['admin']}>
+                          <ArticlesPage />
+                        </RoleProtectedRoute>
+                      } />
 
-                    <Route path="cms/galleries" element={
-                      <RoleProtectedRoute allowedRoles={['admin']}>
-                        <GalleriesPage />
-                      </RoleProtectedRoute>
-                    } />
+                      <Route path="galleries" element={
+                        <RoleProtectedRoute allowedRoles={['admin']}>
+                          <GalleriesPage />
+                        </RoleProtectedRoute>
+                      } />
 
-                    <Route path="messages" element={
-                      <RoleProtectedRoute allowedRoles={['admin']}>
-                        <MessagesPage />
-                      </RoleProtectedRoute>
-                    } />
+                      <Route path="messages" element={
+                        <RoleProtectedRoute allowedRoles={['admin']}>
+                          <MessagesPage />
+                        </RoleProtectedRoute>
+                      } />
+                    </Route>
                   </Route>
                 </Routes>
               </AuthProvider>

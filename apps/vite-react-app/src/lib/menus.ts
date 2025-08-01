@@ -109,12 +109,6 @@ export const appMenuItems: SidebarItem[] = [
         allowedRoles: ['admin'],
       },
       {
-        title: 'Sekolah',
-        href: '/organizations',
-        icon: Building,
-        allowedRoles: ['admin'],
-      },
-      {
         title: 'Pengguna',
         href: '/users',
         icon: Users,
@@ -131,25 +125,31 @@ export const appMenuItems: SidebarItem[] = [
     children: [
       {
         title: 'Pengurus',
-        href: '/board-members',
+        href: '/cms/board-members',
         icon: UserCheck,
         allowedRoles: ['admin'],
       },
       {
+        title: 'Sekolah',
+        href: '/cms/organizations',
+        icon: Building,
+        allowedRoles: ['admin'],
+      },
+      {
         title: 'Artikel',
-        href: '/articles',
+        href: '/cms/articles',
         icon: Newspaper,
         allowedRoles: ['admin'],
       },
       {
         title: 'Galeri',
-        href: '/galleries',
+        href: '/cms/galleries',
         icon: Image,
         allowedRoles: ['admin'],
       },
       {
         title: 'Pesan',
-        href: '/messages',
+        href: '/cms/messages',
         icon: MessageSquare,
         allowedRoles: ['admin'],
       },

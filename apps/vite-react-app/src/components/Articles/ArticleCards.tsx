@@ -3,6 +3,7 @@ import { Article } from '@/services/articles/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
+import { getArticleImageUrl } from '@/utils/imageUtils';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -60,13 +61,11 @@ export const ArticleCards: React.FC<ArticleCardsProps> = ({
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-start space-x-3 mb-2">
-                  {article.img_url && (
-                    <img 
-                      src={article.img_url} 
-                      alt={article.title}
-                      className="w-12 h-12 rounded object-cover"
-                    />
-                  )}
+                  <img 
+                    src={getArticleImageUrl(article.img_url)} 
+                    alt={article.title}
+                    className="w-12 h-12 rounded object-cover"
+                  />
                   <div className="flex-1">
                     <h3 className="font-medium text-sm line-clamp-2">{article.title}</h3>
                     <div className="text-xs text-muted-foreground mt-1">
