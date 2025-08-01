@@ -75,6 +75,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
   const [activePeriod, setActivePeriod] = useState<Period | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
+  const [isLoadingSubmission, setIsLoadingSubmission] = useState(false);
 
   // Determine if this is user's own submission (teacher or principal)
   const isOwnSubmission = (isGuru() || isKepalaSekolah()) && currentUser?.id?.toString() === teacherId;
@@ -156,9 +157,15 @@ const RPPSubmissionDetailPage: React.FC = () => {
   };
 
   const loadSubmissionDetail = async () => {
+    // Prevent multiple concurrent calls
+    if (isLoadingSubmission) {
+      return;
+    }
+
+    setIsLoadingSubmission(true);
+
     try {
       let targetPeriodId: number;
-      console.log(teacherId);
 
       if (periodId) {
         // Direct period access (from my-submission route)
@@ -166,7 +173,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
       } else if (teacherId) {
         // Teacher selection route - determine period from filters
         if (periods.length === 0) {
-          console.log('Periods not loaded yet, waiting...');
+          setIsLoadingSubmission(false);
           return;
         }
 
@@ -202,7 +209,6 @@ const RPPSubmissionDetailPage: React.FC = () => {
 
       // Load submission data
       let submissionData: RPPSubmissionResponse;
-      console.log("hhhh");
 
       if (isOwnSubmission || periodId) {
         // Teacher viewing own submission or direct period access
@@ -210,28 +216,28 @@ const RPPSubmissionDetailPage: React.FC = () => {
           submissionData = await rppSubmissionService.getMySubmissionForPeriod(targetPeriodId);
         } catch (error: any) {
           // If teacher doesn't have submission for this period, handle gracefully
-          if (error.message?.includes('not found') || error.status === 404) {
+          if (error.message?.includes('Pengajuan tidak ditemukan')) {
             setSubmission(null);
+            setIsLoadingSubmission(false);
             return;
           }
           throw error; // Re-throw other errors
         }
       } else if (teacherId) {
         // Admin/kepala sekolah viewing teacher's submission
-        // We need to find the submission for this teacher and period
         const submissionsResponse = await rppSubmissionService.getSubmissions({
           teacher_id: Number(teacherId),
           period_id: targetPeriodId,
           limit: 1,
           offset: 0
         });
-        console.log(submissionsResponse);
 
         if (submissionsResponse.items && submissionsResponse.items.length > 0) {
           submissionData = submissionsResponse.items[0];
         } else {
           // No submission found - this is not an error, just no data
           setSubmission(null);
+          setIsLoadingSubmission(false);
           return;
         }
       } else {
@@ -241,11 +247,12 @@ const RPPSubmissionDetailPage: React.FC = () => {
       setSubmission(submissionData);
     } catch (error: any) {
       console.error('Error loading submission detail:', error);
-      toast({
-        title: 'Error',
-        description: error.message || 'Gagal memuat detail RPP submission.',
-        variant: 'destructive'
-      });
+
+      setSubmission(null);
+
+      // Error handling is done in base service, no need to show toast here
+    } finally {
+      setIsLoadingSubmission(false);
     }
   };
 
@@ -401,13 +408,16 @@ const RPPSubmissionDetailPage: React.FC = () => {
 
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Submission Tidak Ditemukan</h2>
+          <h2 className="text-xl font-semibold mb-2">RPP Submission Belum Ada</h2>
           <p className="text-muted-foreground mb-4">
-            Submission RPP untuk periode ini tidak ditemukan.
+            {currentPeriod?.academic_year && currentPeriod?.semester
+              ? `Belum ada RPP submission untuk periode ${currentPeriod.academic_year} - ${currentPeriod.semester}.`
+              : 'Belum ada RPP submission untuk periode ini.'
+            }
           </p>
           {teacherId && !periodId && periods.length > 0 && (
             <p className="text-sm text-muted-foreground">
-              Coba pilih periode lain menggunakan filter di atas untuk mencari submission RPP.
+              Pilih periode lain menggunakan filter di atas untuk mencari RPP submission.
             </p>
           )}
         </div>

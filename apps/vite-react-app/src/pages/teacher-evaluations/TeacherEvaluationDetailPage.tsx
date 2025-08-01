@@ -77,6 +77,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [mode, setMode] = useState<'view' | 'edit'>('view');
+  const [isLoadingEvaluation, setIsLoadingEvaluation] = useState(false);
 
   const form = useForm<EvaluationFormData>({
     resolver: zodResolver(evaluationFormSchema),
@@ -168,11 +169,18 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   };
 
   const loadEvaluationDetail = async () => {
+    // Prevent multiple concurrent calls
+    if (isLoadingEvaluation) {
+      return;
+    }
+
+    setIsLoadingEvaluation(true);
+
     try {
       setLoading(true);
 
       if (!filters.period_id) {
-        console.log('No period_id in filters, skipping load');
+        setIsLoadingEvaluation(false);
         return;
       }
 
@@ -217,13 +225,18 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     } catch (error) {
       console.error('Error loading evaluation detail:', error);
       
-      toast({
-        title: 'Error',
-        description: 'Gagal memuat detail evaluasi. Silakan coba lagi.',
-        variant: 'destructive'
-      });
+      // Handle evaluation not found errors
+      if ((error as any)?.message?.includes('tidak ditemukan') || 
+          (error as any)?.message?.includes('not found')) {
+        setEvaluation(null);
+        setIsLoadingEvaluation(false);
+        return;
+      }
+      
+      // Error handling is done in base service, no need to show toast here
     } finally {
       setLoading(false);
+      setIsLoadingEvaluation(false);
     }
   };
 
@@ -565,8 +578,26 @@ const TeacherEvaluationDetailPage: React.FC = () => {
         </Card>
       )}
 
+      {/* No evaluation found message - when aspects exist but no evaluation data */}
+      {!loading && categoriesWithAspects.length > 0 && !evaluation && (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold mb-2">Evaluasi Guru Belum Ada</h2>
+            <p className="text-muted-foreground mb-4">
+              {currentPeriod?.academic_year && currentPeriod?.semester
+                ? `Belum ada evaluasi untuk periode ${currentPeriod.academic_year} - ${currentPeriod.semester}.`
+                : 'Belum ada evaluasi untuk periode ini.'
+              }
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Pilih periode lain menggunakan filter di atas untuk mencari evaluasi guru.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Evaluation Info Card - Show basic info even without evaluations */}
-      {categoriesWithAspects.length > 0 && (
+      {categoriesWithAspects.length > 0 && evaluation && (
         <Card>
           <CardHeader>
             <CardTitle>Informasi Evaluasi</CardTitle>
@@ -626,8 +657,8 @@ const TeacherEvaluationDetailPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Evaluation Form - Show form based on aspects, not evaluations */}
-      {categoriesWithAspects.length > 0 && (
+      {/* Evaluation Form - Show form only when evaluation exists or can create new */}
+      {categoriesWithAspects.length > 0 && evaluation && (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {sortedCategories.map((categoryData, index) => (
