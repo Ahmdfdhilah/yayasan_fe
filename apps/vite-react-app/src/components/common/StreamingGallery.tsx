@@ -57,9 +57,9 @@ export function StreamingGallery<T>({
     if (!scrollRef.current || items.length === 0) return;
 
     const container = scrollRef.current;
-    // Each item takes (100/itemsPerSlide)% of viewport, so moving by that amount shows next item
-    const itemWidthPercent = 100 / itemsPerSlide;
-    const scrollAmount = currentIndex * itemWidthPercent;
+    // Simple calculation: each item is 33.333% + gap, so we move by that amount
+    const itemWidth = 33.333 + (parseInt(gap) / container.parentElement!.offsetWidth * 100);
+    const scrollAmount = currentIndex * itemWidth;
 
     // Smooth transition
     container.style.transition = 'transform 0.5s ease-in-out';
@@ -70,7 +70,7 @@ export function StreamingGallery<T>({
     if (currentIndex >= resetThreshold) {
       setTimeout(() => {
         container.style.transition = 'none';
-        const resetPosition = items.length * itemWidthPercent;
+        const resetPosition = items.length * itemWidth;
         container.style.transform = `translateX(-${resetPosition}%)`;
         setCurrentIndex(items.length);
       }, 500);
@@ -80,12 +80,12 @@ export function StreamingGallery<T>({
     if (currentIndex < items.length) {
       setTimeout(() => {
         container.style.transition = 'none';
-        const resetPosition = (items.length + currentIndex) * itemWidthPercent;
+        const resetPosition = (items.length + currentIndex) * itemWidth;
         container.style.transform = `translateX(-${resetPosition}%)`;
         setCurrentIndex(items.length + currentIndex);
       }, 500);
     }
-  }, [currentIndex, items.length, itemsPerSlide]);
+  }, [currentIndex, items.length, gap]);
 
   const handlePrevious = () => {
     setCurrentIndex(prev => prev - 1);
@@ -117,7 +117,6 @@ export function StreamingGallery<T>({
           ref={scrollRef}
           className="flex"
           style={{ 
-            width: `${tripleItems.length * (100 / itemsPerSlide)}%`,
             gap
           }}
         >
@@ -126,8 +125,7 @@ export function StreamingGallery<T>({
               key={`${index}-${Math.floor(index / items.length)}`}
               className="flex-shrink-0"
               style={{ 
-                width: `${100 / itemsPerSlide}%`,
-                minWidth: `${100 / itemsPerSlide}%`
+                width: 'calc(33.333% - 11px)'
               }}
             >
               {renderItem(item, index % items.length)}
