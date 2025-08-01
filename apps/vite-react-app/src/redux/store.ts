@@ -8,7 +8,7 @@ import { rootReducer } from './reducers';
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth', 'theme', 'role']
+  whitelist: ['auth', 'theme'] 
 };
 
 // Create persisted reducer

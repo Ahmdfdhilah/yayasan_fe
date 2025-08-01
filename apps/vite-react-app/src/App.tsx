@@ -8,6 +8,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './redux/store';
 import { Toaster } from "@workspace/ui/components/sonner";
 import { AuthProvider, useAuth } from './components/Auth/AuthProvider';
+import { ThemeProvider } from './components/ThemeProvider';
 import { DashboardLayout } from './components/layouts/DashboardLayout';
 import { LoginPage } from './pages/auth/LoginPage';
 import { DefaultLayout } from './components/layouts';
@@ -53,9 +54,10 @@ function App() {
       <Provider store={store}>
         <TooltipProvider>
           <PersistGate loading={null} persistor={persistor}>
-            <BrowserRouter>
-              <AuthProvider>
-                <Toaster />
+            <ThemeProvider>
+              <BrowserRouter>
+                <AuthProvider>
+                  <Toaster />
                 <Routes>
                   {/* Public routes */}
                   <Route path="/" element={<DefaultLayout />}>
@@ -236,8 +238,9 @@ function App() {
                     </Route>
                   </Route>
                 </Routes>
-              </AuthProvider>
-            </BrowserRouter>
+                </AuthProvider>
+              </BrowserRouter>
+            </ThemeProvider>
           </PersistGate>
         </TooltipProvider>
       </Provider>

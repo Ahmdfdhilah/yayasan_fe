@@ -4,8 +4,6 @@ import { ScrollArea, ScrollBar } from "@workspace/ui/components/scroll-area";
 import { Menu } from "lucide-react";
 import logo from '@/assets/logo.png';
 import { Button } from "@workspace/ui/components/button";
-import { ThemeToggle } from "@/components/common/ThemeToggle";
-import { Separator } from "@workspace/ui/components/separator";
 import { MobileNavLink } from "@/components/common/MobileNavLink";
 import { Link } from "react-router-dom";
 
@@ -82,15 +80,6 @@ export const NavigationSheet = () => {
                     Kontak
                   </MobileNavLink>
                 </nav>
-
-                <Separator className="my-4" />
-                
-                <div className="px-3 py-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Tema</span>
-                    <ThemeToggle />
-                  </div>
-                </div>
               </div>
               <ScrollBar orientation="vertical" />
             </ScrollArea>

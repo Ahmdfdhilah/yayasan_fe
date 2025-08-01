@@ -1,7 +1,6 @@
 import { Button } from "@workspace/ui/components/button";
 import { NavMenu } from "./NavbarMenu";
 import { NavigationSheet } from "./NavigationSheet";
-import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { ScrollToTopLink } from "@/components/common/ScrollToTopLink";
 import logo from '@/assets/logo.png';
 import { Link } from "react-router-dom";
@@ -18,9 +17,6 @@ const Navbar = () => {
         <NavMenu className="hidden md:block" />
 
         <div className="flex items-center gap-3">
-          {/* Theme Toggle */}
-          <ThemeToggle className="hidden sm:flex" />
-
           <Link to='/login'>
             <Button
               className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
