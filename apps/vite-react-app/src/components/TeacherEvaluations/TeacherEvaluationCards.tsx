@@ -85,6 +85,11 @@ export const TeacherEvaluationCards: React.FC<TeacherEvaluationCardsProps> = ({
                   <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   <span className="font-medium truncate">{evaluation.teacher?.full_name || 'N/A'}</span>
                 </div>
+                {evaluation.teacher?.profile?.position && (
+                  <div className="text-sm text-muted-foreground ml-6">
+                    {evaluation.teacher.profile.position}
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <ActionDropdown {...getActionProps(evaluation)} />
@@ -96,23 +101,6 @@ export const TeacherEvaluationCards: React.FC<TeacherEvaluationCardsProps> = ({
                 <Building className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">
                   {evaluation.organization_name || 'N/A'}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">
-                  {evaluation.period ? 
-                    `${evaluation.period.academic_year} - ${evaluation.period.semester}` : 
-                    'N/A'
-                  }
-                </span>
-              </div>
-              
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <GraduationCap className="h-4 w-4" />
-                <span>
-                  Total Aspek: {evaluation.items?.length || 0}
                 </span>
               </div>
 

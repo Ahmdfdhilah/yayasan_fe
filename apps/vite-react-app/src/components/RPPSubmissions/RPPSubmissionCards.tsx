@@ -2,11 +2,8 @@ import React from 'react';
 import { RPPSubmissionResponse, RPPSubmissionStatus } from '@/services/rpp-submissions/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 import { 
   FileText, 
-  Calendar,
   BarChart3,
 } from 'lucide-react';
 import { rppSubmissionService } from '@/services';
@@ -58,9 +55,9 @@ export const RPPSubmissionCards: React.FC<RPPSubmissionCardsProps> = ({
                   <FileText className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-sm">{submission.period_name}</h3>
+                  <h3 className="font-medium text-sm">{submission.teacher_name || 'Tidak ada guru'}</h3>
                   <div className="text-sm text-muted-foreground mt-1">
-                    {submission.teacher_name || 'Tidak ada guru'}
+                    {submission.teacher_position || 'Jabatan tidak tersedia'}
                   </div>
                 </div>
               </div>
@@ -85,51 +82,35 @@ export const RPPSubmissionCards: React.FC<RPPSubmissionCardsProps> = ({
               />
             </div>
 
-            {/* Status */}
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
-              <FileText className="w-4 h-4" />
-              <span>Status: {rppSubmissionService.getStatusDisplayName(submission.status)}</span>
-            </div>
+            <div className="space-y-2">
+              {/* School */}
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                <FileText className="w-4 h-4" />
+                <span>Sekolah: {submission.organization_name || 'Tidak tersedia'}</span>
+              </div>
 
-            {/* Progress */}
-            <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-2">
-              <BarChart3 className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              <div className="flex-1">
-                <div className="flex justify-between items-center mb-1">
-                  <span>Progress</span>
-                  <span>{submission.completion_percentage.toFixed(1)}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full" 
-                    style={{ width: `${submission.completion_percentage}%` }}
-                  ></div>
+              {/* Status */}
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                <FileText className="w-4 h-4" />
+                <span>Status: {rppSubmissionService.getStatusDisplayName(submission.status)}</span>
+              </div>
+
+              {/* Progress */}
+              <div className="flex items-start space-x-2 text-sm text-muted-foreground">
+                <BarChart3 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <div className="flex justify-between items-center mb-1">
+                    <span>Progress</span>
+                    <span>{submission.completion_percentage.toFixed(1)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full" 
+                      style={{ width: `${submission.completion_percentage}%` }}
+                    ></div>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            {/* Submitted Date */}
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
-              <Calendar className="w-4 h-4" />
-              <span>
-                {submission.submitted_at 
-                  ? `Dikirim: ${format(new Date(submission.submitted_at), 'dd MMM yyyy', { locale: id })}`
-                  : 'Belum dikirim'
-                }
-              </span>
-            </div>
-
-            {/* Created At */}
-            <div className="flex items-center space-x-2 text-xs text-muted-foreground pt-2 border-t">
-              <Calendar className="w-3 h-3" />
-              <span>
-                Dibuat: {format(new Date(submission.created_at), 'dd MMM yyyy', { locale: id })}
-              </span>
-              {submission.updated_at && (
-                <span className="ml-auto">
-                  Diperbarui: {format(new Date(submission.updated_at), 'dd MMM', { locale: id })}
-                </span>
-              )}
             </div>
           </CardContent>
         </Card>

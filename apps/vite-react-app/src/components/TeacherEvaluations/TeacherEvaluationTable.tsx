@@ -53,19 +53,18 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
           <TableHeader>
             <TableRow>
               <TableHead>Guru</TableHead>
+              <TableHead>Jabatan</TableHead>
               <TableHead>Sekolah</TableHead>
               <TableHead>Evaluator</TableHead>
-              <TableHead>Periode</TableHead>
-              <TableHead>Total Aspek</TableHead>
-              <TableHead>Rata-rata Skor</TableHead>
-              <TableHead>Nilai Final</TableHead>
-              <TableHead className="w-[100px]">Aksi</TableHead>
+              <TableHead className="text-center">Rata-rata Skor</TableHead>
+              <TableHead className="text-center">Nilai Final</TableHead>
+              <TableHead className="w-[100px] text-center">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {[1, 2, 3, 4, 5].map((i) => (
               <TableRow key={i}>
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((j) => (
+                {[1, 2, 3, 4, 5, 6, 7].map((j) => (
                   <TableCell key={j}>
                     <div className="h-4 bg-muted animate-pulse rounded"></div>
                   </TableCell>
@@ -84,20 +83,19 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>Guru</TableHead>
+            <TableHead>Jabatan</TableHead>
             <TableHead>Sekolah</TableHead>
             <TableHead>Evaluator</TableHead>
-            <TableHead>Periode</TableHead>
-            <TableHead>Total Aspek</TableHead>
-            <TableHead>Rata-rata Skor</TableHead>
-            <TableHead>Nilai Final</TableHead>
-            <TableHead className="w-[100px]">Aksi</TableHead>
+            <TableHead className="text-center">Rata-rata Skor</TableHead>
+            <TableHead className="text-center">Nilai Final</TableHead>
+            <TableHead className="w-[100px] text-center">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {evaluations.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={8}
+                colSpan={7}
                 className="h-24 text-center text-muted-foreground"
               >
                 Tidak ada data evaluasi guru.
@@ -110,27 +108,21 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
                   {evaluation.teacher?.full_name || 'N/A'}
                 </TableCell>
                 <TableCell>
+                  {evaluation.teacher?.profile?.position || '-'}
+                </TableCell>
+                <TableCell>
                   {evaluation.organization_name || 'N/A'}
                 </TableCell>
                 <TableCell>
                   {evaluation.evaluator?.full_name || 'N/A'}
                 </TableCell>
-                <TableCell>
-                  {evaluation.period ?
-                    `${evaluation.period.academic_year} - ${evaluation.period.semester}` :
-                    'N/A'
-                  }
+                <TableCell className="text-center">
+                  {evaluation.average_score.toFixed(2)}
                 </TableCell>
-                <TableCell>
-                  <div className="text-center">{evaluation.items?.length || 0}</div>
+                <TableCell className="text-center">
+                  {evaluation.final_grade.toFixed(1)}
                 </TableCell>
-                <TableCell>
-                  <div className="text-center">{evaluation.average_score.toFixed(2)}</div>
-                </TableCell>
-                <TableCell>
-                  <div className="text-center">{evaluation.final_grade.toFixed(1)}</div>
-                </TableCell>
-                <TableCell>
+                <TableCell className="text-center">
                   <ActionDropdown {...getActionProps(evaluation)} />
                 </TableCell>
               </TableRow>

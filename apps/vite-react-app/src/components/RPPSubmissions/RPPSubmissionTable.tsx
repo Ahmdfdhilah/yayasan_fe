@@ -9,8 +9,6 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 import { rppSubmissionService } from '@/services';
 
 interface RPPSubmissionTableProps {
@@ -38,11 +36,11 @@ export const RPPSubmissionTable: React.FC<RPPSubmissionTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>Guru</TableHead>
-            <TableHead>Periode</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Progress</TableHead>
-            <TableHead>Tanggal Kirim</TableHead>
-            <TableHead className="text-right">Aksi</TableHead>
+            <TableHead>Jabatan</TableHead>
+            <TableHead>Sekolah</TableHead>
+            <TableHead className="text-center">Status</TableHead>
+            <TableHead className="text-center">Progress</TableHead>
+            <TableHead className="text-center">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -62,17 +60,20 @@ export const RPPSubmissionTable: React.FC<RPPSubmissionTableProps> = ({
             submissions.map((submission) => (
               <TableRow key={submission.id}>
                 <TableCell>
-                  <div className="text-sm">{submission.teacher_name || '-'}</div>
+                  {submission.teacher_name || '-'}
                 </TableCell>
                 <TableCell>
-                  <div className="font-medium">{submission.period_name}</div>
+                  {submission.teacher_position || '-'}
                 </TableCell>
                 <TableCell>
+                  {submission.organization_name || '-'}
+                </TableCell>
+                <TableCell className="text-center">
                   {rppSubmissionService.getStatusDisplayName(submission.status)}
                 </TableCell>
-                <TableCell>
+                <TableCell className="text-center">
                   <div className="space-y-1">
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2 max-w-24 mx-auto">
                       <div
                         className="bg-blue-600 h-2 rounded-full"
                         style={{ width: `${submission.completion_percentage}%` }}
@@ -83,13 +84,7 @@ export const RPPSubmissionTable: React.FC<RPPSubmissionTableProps> = ({
                     </span>
                   </div>
                 </TableCell>
-                <TableCell>
-                  {submission.submitted_at
-                    ? format(new Date(submission.submitted_at), 'dd MMM yyyy', { locale: id })
-                    : 'Belum dikirim'
-                  }
-                </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-center">
                   <ActionDropdown
                     onView={() => onView(submission)}
                     onEdit={onEdit ? () => onEdit(submission) : undefined}

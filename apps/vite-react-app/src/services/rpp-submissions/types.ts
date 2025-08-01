@@ -79,6 +79,8 @@ export interface RPPSubmissionResponse extends RPPSubmissionBase {
   
   // Nested data
   teacher_name?: string | null;
+  teacher_position?: string | null;
+  organization_name?: string | null;
   reviewer_name?: string | null;
   period_name?: string | null;
   items: RPPSubmissionItemResponse[];
