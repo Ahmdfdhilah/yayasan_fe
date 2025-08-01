@@ -313,7 +313,7 @@ const TeacherEvaluationsPage: React.FC = () => {
         actions={
           isAdmin() && (
             <AssignTeachersToPeriodDialog
-              periods={periods}
+              activePeriod={activePeriod}
               onSuccess={handleAssignSuccess}
             />
           )

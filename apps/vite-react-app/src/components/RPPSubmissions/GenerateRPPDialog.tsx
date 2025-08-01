@@ -23,26 +23,26 @@ import { Period } from '@/services/periods/types';
 import { rppSubmissionService } from '@/services';
 
 interface GenerateRPPDialogProps {
-  periods: Period[];
+  activePeriod?: Period | null;
   onSuccess?: () => void;
   triggerButton?: React.ReactNode;
 }
 
 const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
-  periods,
+  activePeriod,
   onSuccess,
   triggerButton
 }) => {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState<string>('');
+  // No need for selectedPeriod state since we always use activePeriod
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleGenerateSubmissions = async () => {
-    if (!selectedPeriod) {
+    if (!activePeriod) {
       toast({
         title: 'Error',
-        description: 'Pilih periode terlebih dahulu.',
+        description: 'Tidak ada periode aktif yang tersedia.',
         variant: 'destructive'
       });
       return;
@@ -51,7 +51,7 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
     try {
       setIsGenerating(true);
       const result = await rppSubmissionService.generateSubmissionsForPeriod({
-        period_id: Number(selectedPeriod)
+        period_id: activePeriod.id
       });
 
       toast({
@@ -64,9 +64,8 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
         onSuccess();
       }
       
-      // Close dialog and reset
+      // Close dialog
       setIsOpen(false);
-      setSelectedPeriod('');
     } catch (error: any) {
       console.error('Error generating RPP submissions:', error);
       toast({
@@ -81,9 +80,6 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
-    if (!open) {
-      setSelectedPeriod('');
-    }
   };
 
   const defaultTriggerButton = (
@@ -102,30 +98,40 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Buat RPP Submissions</DialogTitle>
           <DialogDescription>
-            Pilih periode untuk membuat RPP submissions untuk semua guru. 
-            Sistem akan membuat template RPP kosong yang dapat diisi oleh masing-masing guru.
+            {activePeriod ? (
+              <>
+                Membuat RPP submissions untuk semua guru di periode aktif: <strong>{activePeriod.academic_year} - {activePeriod.semester}</strong>. 
+                Sistem akan membuat template RPP kosong yang dapat diisi oleh masing-masing guru.
+              </>
+            ) : (
+              'Tidak ada periode aktif yang tersedia. Pastikan ada periode yang sedang aktif untuk membuat RPP submissions.'
+            )}
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="period-generate">Periode</Label>
-            <Select 
-              value={selectedPeriod} 
-              onValueChange={setSelectedPeriod}
-            >
-              <SelectTrigger id="period-generate">
-                <SelectValue placeholder="Pilih periode untuk membuat RPP submissions" />
-              </SelectTrigger>
-              <SelectContent>
-                {periods.map((period) => (
-                  <SelectItem key={period.id} value={period.id.toString()}>
-                    {period.academic_year} - {period.semester}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {activePeriod ? (
+            <div className="space-y-2">
+              <Label>Periode Aktif</Label>
+              <div className="p-3 bg-primary/10 border border-primary/20 rounded-md">
+                <div className="font-medium text-primary">
+                  {activePeriod.academic_year} - {activePeriod.semester}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  RPP akan otomatis dibuat untuk periode yang sedang aktif
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+              <div className="font-medium text-destructive">
+                Tidak ada periode aktif
+              </div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Pastikan ada periode yang sedang aktif untuk membuat RPP submissions
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter>
@@ -138,7 +144,7 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
           </Button>
           <Button
             onClick={handleGenerateSubmissions}
-            disabled={!selectedPeriod || isGenerating}
+            disabled={!activePeriod || isGenerating}
           >
             {isGenerating ? (
               <>

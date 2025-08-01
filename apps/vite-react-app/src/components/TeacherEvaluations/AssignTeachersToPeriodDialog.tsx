@@ -24,26 +24,26 @@ import { AssignTeachersToEvaluationPeriodResponse } from '@/services/teacher-eva
 import { teacherEvaluationService } from '@/services';
 
 interface AssignTeachersToPeriodDialogProps {
-  periods: Period[];
+  activePeriod?: Period | null;
   onSuccess?: () => void;
   triggerButton?: React.ReactNode;
 }
 
 const AssignTeachersToPeriodDialog: React.FC<AssignTeachersToPeriodDialogProps> = ({
-  periods,
+  activePeriod,
   onSuccess,
   triggerButton
 }) => {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState<string>('');
+  // No need for selectedPeriod state since we always use activePeriod
   const [isAssigning, setIsAssigning] = useState(false);
 
   const handleAssignTeachers = async () => {
-    if (!selectedPeriod) {
+    if (!activePeriod) {
       toast({
         title: 'Error',
-        description: 'Pilih periode terlebih dahulu.',
+        description: 'Tidak ada periode aktif yang tersedia.',
         variant: 'destructive'
       });
       return;
@@ -52,7 +52,7 @@ const AssignTeachersToPeriodDialog: React.FC<AssignTeachersToPeriodDialogProps> 
     try {
       setIsAssigning(true);
       const result: AssignTeachersToEvaluationPeriodResponse = await teacherEvaluationService.assignTeachersToPeriod({
-        period_id: Number(selectedPeriod)
+        period_id: activePeriod.id
       });
 
       toast({
@@ -65,9 +65,8 @@ const AssignTeachersToPeriodDialog: React.FC<AssignTeachersToPeriodDialogProps> 
         onSuccess();
       }
       
-      // Close dialog and reset
+      // Close dialog
       setIsOpen(false);
-      setSelectedPeriod('');
     } catch (error: any) {
       console.error('Error assigning teachers to period:', error);
       toast({
@@ -82,9 +81,6 @@ const AssignTeachersToPeriodDialog: React.FC<AssignTeachersToPeriodDialogProps> 
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
-    if (!open) {
-      setSelectedPeriod('');
-    }
   };
 
   const defaultTriggerButton = (
@@ -103,31 +99,40 @@ const AssignTeachersToPeriodDialog: React.FC<AssignTeachersToPeriodDialogProps> 
         <DialogHeader>
           <DialogTitle>Tetapkan Guru ke Periode</DialogTitle>
           <DialogDescription>
-            Pilih periode untuk membuat evaluasi kosong untuk semua guru. 
-            Sistem akan otomatis membuat aspek evaluasi untuk semua guru aktif dalam periode tersebut.
+            {activePeriod ? (
+              <>
+                Membuat evaluasi kosong untuk semua guru di periode aktif: <strong>{activePeriod.academic_year} - {activePeriod.semester}</strong>. 
+                Sistem akan otomatis membuat aspek evaluasi untuk semua guru aktif dalam periode tersebut.
+              </>
+            ) : (
+              'Tidak ada periode aktif yang tersedia. Pastikan ada periode yang sedang aktif untuk melakukan penetapan guru.'
+            )}
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="period-assign">Periode</Label>
-            <Select 
-              value={selectedPeriod} 
-              onValueChange={setSelectedPeriod}
-            >
-              <SelectTrigger id="period-assign">
-                <SelectValue placeholder="Pilih periode untuk tetapkan guru" />
-              </SelectTrigger>
-              <SelectContent>
-                {periods.map((period) => (
-                  <SelectItem key={period.id} value={period.id.toString()}>
-                    {period.academic_year} - {period.semester}
-                    {period.is_active && ' (Aktif)'}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {activePeriod ? (
+            <div className="space-y-2">
+              <Label>Periode Aktif</Label>
+              <div className="p-3 bg-primary/10 border border-primary/20 rounded-md">
+                <div className="font-medium text-primary">
+                  {activePeriod.academic_year} - {activePeriod.semester}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  Evaluasi akan otomatis dibuat untuk periode yang sedang aktif
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+              <div className="font-medium text-destructive">
+                Tidak ada periode aktif
+              </div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Pastikan ada periode yang sedang aktif untuk melakukan penetapan guru
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter>
@@ -140,7 +145,7 @@ const AssignTeachersToPeriodDialog: React.FC<AssignTeachersToPeriodDialogProps> 
           </Button>
           <Button
             onClick={handleAssignTeachers}
-            disabled={!selectedPeriod || isAssigning}
+            disabled={!activePeriod || isAssigning}
           >
             {isAssigning ? (
               <>

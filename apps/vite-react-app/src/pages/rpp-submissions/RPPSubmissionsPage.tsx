@@ -68,6 +68,7 @@ const RPPSubmissionsPage: React.FC = () => {
   const [submissions, setSubmissions] = useState<RPPSubmissionResponse[]>([]);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [periods, setPeriods] = useState<Period[]>([]);
+  const [activePeriod, setActivePeriod] = useState<Period | null>(null);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -135,10 +136,30 @@ const RPPSubmissionsPage: React.FC = () => {
   // Load periods
   const loadPeriods = async () => {
     try {
-      const response = await periodService.getPeriods();
+      const response = await periodService.getPeriods({ page: 1, size: 100 });
       setPeriods(response.items || []);
     } catch (error) {
       console.error('Error loading periods:', error);
+    }
+  };
+
+  // Load active period
+  const loadActivePeriod = async () => {
+    try {
+      const activeResponse = await periodService.getActivePeriod();
+      setActivePeriod(activeResponse);
+    } catch (error) {
+      console.error('Error loading active period:', error);
+      // If no active period, try to find one manually
+      try {
+        const allPeriodsResponse = await periodService.getPeriods({ is_active: true, page: 1, size: 100 });
+        const activePeriods = allPeriodsResponse.items || [];
+        if (activePeriods.length > 0) {
+          setActivePeriod(activePeriods[0]);
+        }
+      } catch (fallbackError) {
+        console.error('Error in fallback active period load:', fallbackError);
+      }
     }
   };
 
@@ -147,6 +168,7 @@ const RPPSubmissionsPage: React.FC = () => {
     if (hasAccess) {
       loadOrganizations();
       loadPeriods();
+      loadActivePeriod();
     }
   }, [hasAccess]);
 
@@ -266,67 +288,71 @@ const RPPSubmissionsPage: React.FC = () => {
         actions={
           isAdmin() && (
             <GenerateRPPDialog
-              periods={periods}
+              activePeriod={activePeriod}
               onSuccess={handleGenerateSuccess}
             />
           )
         }
       />
 
-      <Filtering>
-        <div className="space-y-2">
-          <Label htmlFor="period-filter">Periode</Label>
-          <Select value={filters.period_id} onValueChange={handlePeriodChange}>
-            <SelectTrigger id="period-filter">
-              <SelectValue placeholder="Filter berdasarkan periode" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Periode</SelectItem>
-              {periods.map((period) => (
-                <SelectItem key={period.id} value={period.id.toString()}>
-                  {period.academic_year} - {period.semester}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="status-filter">Status</Label>
-          <Select value={filters.status} onValueChange={handleStatusChange}>
-            <SelectTrigger id="status-filter">
-              <SelectValue placeholder="Filter berdasarkan status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Status</SelectItem>
-              <SelectItem value="DRAFT">Draft</SelectItem>
-              <SelectItem value="PENDING">Menunggu Review</SelectItem>
-              <SelectItem value="APPROVED">Disetujui</SelectItem>
-              <SelectItem value="REJECTED">Ditolak</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Only show organization filter for admin */}
-        {isAdmin() && (
+      {/*  Filtering */}
+      <div className="space-y-4">
+        <Filtering>
           <div className="space-y-2">
-            <Label htmlFor="organization-filter">Sekolah</Label>
-            <Select value={filters.organization_id} onValueChange={handleOrganizationChange}>
-              <SelectTrigger id="organization-filter">
-                <SelectValue placeholder="Filter berdasarkan Sekolah" />
+            <Label htmlFor="period-filter">Periode</Label>
+            <Select value={filters.period_id} onValueChange={handlePeriodChange}>
+              <SelectTrigger id="period-filter">
+                <SelectValue placeholder="Filter berdasarkan periode" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Semua Sekolah</SelectItem>
-                {organizations.map((org) => (
-                  <SelectItem key={org.id} value={org.id.toString()}>
-                    {org.name}
+                <SelectItem value="all">Semua Periode</SelectItem>
+                {periods.map((period) => (
+                  <SelectItem key={period.id} value={period.id.toString()}>
+                    {period.academic_year} - {period.semester}
+                    {period.is_active ? ' (Aktif)' : ''}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-        )}
-      </Filtering>
+
+          <div className="space-y-2">
+            <Label htmlFor="status-filter">Status</Label>
+            <Select value={filters.status} onValueChange={handleStatusChange}>
+              <SelectTrigger id="status-filter">
+                <SelectValue placeholder="Filter berdasarkan status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Status</SelectItem>
+                <SelectItem value="DRAFT">Draft</SelectItem>
+                <SelectItem value="PENDING">Menunggu Review</SelectItem>
+                <SelectItem value="APPROVED">Disetujui</SelectItem>
+                <SelectItem value="REJECTED">Ditolak</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Only show organization filter for admin */}
+          {isAdmin() && (
+            <div className="space-y-2">
+              <Label htmlFor="organization-filter">Sekolah</Label>
+              <Select value={filters.organization_id} onValueChange={handleOrganizationChange}>
+                <SelectTrigger id="organization-filter">
+                  <SelectValue placeholder="Filter berdasarkan Sekolah" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Sekolah</SelectItem>
+                  {organizations.map((org) => (
+                    <SelectItem key={org.id} value={org.id.toString()}>
+                      {org.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+        </Filtering>
+      </div>
 
       <Card>
         <CardContent>
