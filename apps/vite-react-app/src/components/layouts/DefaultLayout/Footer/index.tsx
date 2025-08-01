@@ -1,9 +1,32 @@
+import { useState, useEffect } from 'react';
 import { Separator } from "@workspace/ui/components/separator";
-import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Facebook, Instagram } from "lucide-react";
+import { ScrollToTopLink } from "@/components/common/ScrollToTopLink";
+import { organizationService } from '@/services/organizations';
+import type { Organization } from '@/services/organizations/types';
 import logo from '@/assets/logo.png';
 
 const Footer = () => {
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+
+  useEffect(() => {
+    const loadOrganizations = async () => {
+      try {
+        const response = await organizationService.getOrganizations({
+          page: 1,
+          size: 5,
+          sort_by: 'name',
+          sort_order: 'asc'
+        });
+        setOrganizations(response.items);
+      } catch (error) {
+        console.error('Error loading organizations for footer:', error);
+      }
+    };
+
+    loadOrganizations();
+  }, []);
+
   return (
     <footer className="bg-card border-t border-border">
       <div className="max-w-screen-xl mx-auto px-4 py-12">
@@ -11,17 +34,20 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Logo & Description */}
           <div className="space-y-4">
-            <img src={logo} alt="Yayasan Baitul Muslim" className="h-10 w-auto" />
+            <div className="flex items-center gap-3">
+              <img src={logo} alt="Yayasan Baitul Muslim" className="h-10 w-auto" />
+              <h3 className="font-semibold text-foreground text-lg">Yayasan Baitul Muslim</h3>
+            </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Yayasan pendidikan dan dakwah Islam yang menyelenggarakan pendidikan terpadu berkualitas sejak 1993.
             </p>
             <div className="flex items-center space-x-3">
-              <Link to="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <ScrollToTopLink to="#" className="text-muted-foreground hover:text-primary transition-colors">
                 <Facebook className="w-4 h-4" />
-              </Link>
-              <Link to="#" className="text-muted-foreground hover:text-primary transition-colors">
+              </ScrollToTopLink>
+              <ScrollToTopLink to="#" className="text-muted-foreground hover:text-primary transition-colors">
                 <Instagram className="w-4 h-4" />
-              </Link>
+              </ScrollToTopLink>
             </div>
           </div>
 
@@ -30,24 +56,34 @@ const Footer = () => {
             <h3 className="font-semibold text-foreground">Tautan Cepat</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                <ScrollToTopLink to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   Beranda
-                </Link>
+                </ScrollToTopLink>
               </li>
               <li>
-                <Link to="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Tentang Kami
-                </Link>
+                <ScrollToTopLink to="/articles" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Artikel
+                </ScrollToTopLink>
               </li>
               <li>
-                <Link to="/schools" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Lembaga Pendidikan
-                </Link>
+                <ScrollToTopLink to="/galleries" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Galeri
+                </ScrollToTopLink>
               </li>
               <li>
-                <Link to="/articles" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Artikel & Berita
-                </Link>
+                <ScrollToTopLink to="/schools" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Sekolah
+                </ScrollToTopLink>
+              </li>
+              <li>
+                <ScrollToTopLink to="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Tentang
+                </ScrollToTopLink>
+              </li>
+              <li>
+                <ScrollToTopLink to="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Kontak
+                </ScrollToTopLink>
               </li>
             </ul>
           </div>
@@ -56,31 +92,36 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="font-semibold text-foreground">Jenjang Pendidikan</h3>
             <ul className="space-y-2">
-              <li>
-                <Link to="/schools/tkit" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  TKIT Baitul Muslim
-                </Link>
-              </li>
-              <li>
-                <Link to="/schools/sdit" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  SDIT Baitul Muslim
-                </Link>
-              </li>
-              <li>
-                <Link to="/schools/smpit" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  SMPIT Baitul Muslim
-                </Link>
-              </li>
-              <li>
-                <Link to="/schools/smait" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  SMAIT Baitul Muslim
-                </Link>
-              </li>
-              <li>
-                <Link to="/schools/pesantren" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Pondok Pesantren
-                </Link>
-              </li>
+              {organizations.length > 0 ? (
+                organizations.map((org) => (
+                  <li key={org.id}>
+                    <ScrollToTopLink
+                      to={`/schools/${org.id}`}
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {org.display_name}
+                    </ScrollToTopLink>
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li>
+                    <ScrollToTopLink to="/schools" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                      TKIT Baitul Muslim
+                    </ScrollToTopLink>
+                  </li>
+                  <li>
+                    <ScrollToTopLink to="/schools" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                      SDIT Baitul Muslim
+                    </ScrollToTopLink>
+                  </li>
+                  <li>
+                    <ScrollToTopLink to="/schools" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                      SMPIT Baitul Muslim
+                    </ScrollToTopLink>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
 
@@ -119,15 +160,9 @@ const Footer = () => {
             © {new Date().getFullYear()} Yayasan Baitul Muslim Lampung Timur. Hak cipta dilindungi.
           </p>
           <div className="flex items-center space-x-4">
-            <Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Kebijakan Privasi
-            </Link>
-            <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Syarat & Ketentuan
-            </Link>
-            <Link to="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            <ScrollToTopLink to="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Kontak
-            </Link>
+            </ScrollToTopLink>
           </div>
         </div>
       </div>
