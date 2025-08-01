@@ -38,6 +38,7 @@ import OrganizationsListPage from './pages/public/organizations/OrganizationsLis
 import OrganizationDetailPage from './pages/public/organizations/OrganizationDetailPage';
 import GalleriesListPage from './pages/public/galleries/GalleriesListPage';
 import GalleryDetailPage from './pages/public/galleries/GalleryDetailPage';
+import AboutPage from './pages/public/about/AboutPage';
 
 // Simple redirect component for My Evaluations
 const MyEvaluationsRedirect = () => {
@@ -71,6 +72,9 @@ function App() {
                     {/* Public Galleries Routes */}
                     <Route path='galleries' element={<GalleriesListPage />} />
                     <Route path='galleries/:id' element={<GalleryDetailPage />} />
+                    
+                    {/* About Page */}
+                    <Route path='about' element={<AboutPage />} />
                     
                     <Route path='login' element={
                       <PublicRoute>
