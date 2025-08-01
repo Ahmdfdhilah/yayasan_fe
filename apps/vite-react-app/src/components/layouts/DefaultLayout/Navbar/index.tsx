@@ -4,6 +4,7 @@ import { NavigationSheet } from "./NavigationSheet";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { ScrollToTopLink } from "@/components/common/ScrollToTopLink";
 import logo from '@/assets/logo.png';
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
@@ -19,16 +20,13 @@ const Navbar = () => {
         <div className="flex items-center gap-3">
           {/* Theme Toggle */}
           <ThemeToggle className="hidden sm:flex" />
-          
-          <Button
-            variant="outline"
-            className="hidden sm:inline-flex rounded-full border-border hover:bg-accent hover:text-accent-foreground"
-          >
-            Masuk
-          </Button>
-          <Button className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
-            Daftar
-          </Button>
+
+          <Link to='/login'>
+            <Button
+              className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
+              Masuk
+            </Button>
+          </Link>
 
           {/* Mobile Menu */}
           <div className="md:hidden">

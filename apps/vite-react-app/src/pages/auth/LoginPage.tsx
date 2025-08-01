@@ -136,7 +136,7 @@ export function LoginPage() {
           <div className="absolute top-8 left-8 text-white flex items-center space-x-4">
             <img src={logo} alt="Logo" className="w-16 h-16 object-contain" />
             <div>
-              <h2 className="text-2xl font-bold mb-2">Yayasan Baitul Muslim Lampung Timur</h2>
+              <h2 className="text-2xl font-bold mb-2">Sistem Informasi Yayasan Baitul Muslim Lampung Timur</h2>
               <p className="text-white/90 max-w-md">
                 Yayasan pendidikan dan dakwah Islam yang menyelenggarakan pendidikan terpadu berkualitas sejak 1993
               </p>
@@ -155,7 +155,7 @@ export function LoginPage() {
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">Selamat Datang</h1>
                 <p className="text-muted-foreground">
-                  Login dengan Email yang terdaftar untuk masuk ke sistem PKG Yayasan
+                  Login dengan Email yang terdaftar untuk masuk ke Sistem Informasi Yayasan
                 </p>
               </div>
             </div>
@@ -315,7 +315,7 @@ export function LoginPage() {
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Selamat Datang</h1>
               <p className="text-muted-foreground">
-                Login dengan Email yang terdaftar untuk masuk ke sistem PKG Yayasan
+                Login dengan Email yang terdaftar untuk masuk ke Sistem Informasi Yayasan
               </p>
             </div>
           </div>
