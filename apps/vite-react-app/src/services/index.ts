@@ -15,6 +15,7 @@ export { mediaFileService } from "./media-files";
 export { dashboardService } from "./dashboard";
 export { mitraService } from "./mitra";
 export { programService } from "./program";
+export { statisticService } from "./statistics";
 
 // Export types with explicit imports to avoid conflicts
 export type {
@@ -148,3 +149,12 @@ export type {
   ProgramListResponse,
   ProgramFilterParams,
 } from "./program";
+
+export type {
+  Statistic,
+  StatisticCreate,
+  StatisticUpdate,
+  StatisticResponse,
+  StatisticListResponse,
+  StatisticFilterParams,
+} from "./statistics";

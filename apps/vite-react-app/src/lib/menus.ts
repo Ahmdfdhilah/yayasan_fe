@@ -166,6 +166,12 @@ export const appMenuItems: SidebarItem[] = [
         icon: Target,
         allowedRoles: ['admin'],
       },
+      {
+        title: 'Statistik',
+        href: '/cms/statistik',
+        icon: BarChart3,
+        allowedRoles: ['admin'],
+      },
     ],
   }
 ];

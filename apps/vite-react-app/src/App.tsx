@@ -41,6 +41,7 @@ import OrganizationDetailPage from './pages/public/organizations/OrganizationDet
 import GalleriesListPage from './pages/public/galleries/GalleriesListPage';
 import AboutPage from './pages/public/about/AboutPage';
 import ContactPage from './pages/public/contact/ContactPage';
+import { StatisticsPage } from './pages/statistics';
 
 // Simple redirect component for My Evaluations
 const MyEvaluationsRedirect = () => {
@@ -229,6 +230,11 @@ function App() {
                         <Route path="program" element={
                           <RoleProtectedRoute allowedRoles={['admin']}>
                             <ProgramPage />
+                          </RoleProtectedRoute>
+                        } />
+                        <Route path="statistik" element={
+                          <RoleProtectedRoute allowedRoles={['admin']}>
+                            <StatisticsPage />
                           </RoleProtectedRoute>
                         } />
                       </Route>
