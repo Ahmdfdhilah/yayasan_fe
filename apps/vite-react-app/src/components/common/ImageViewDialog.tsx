@@ -28,7 +28,7 @@ export const ImageViewDialog: React.FC<ImageViewDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-scroll p-0">
+      <DialogContent className="max-h-[90vh] overflow-y-scroll p-0">
         {/* Header */}
         <DialogHeader className="p-6 pb-0">
           <div className="flex items-center justify-between">

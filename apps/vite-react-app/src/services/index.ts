@@ -13,6 +13,8 @@ export { teacherEvaluationService } from "./teacher-evaluations";
 export { rppSubmissionService } from "./rpp-submissions";
 export { mediaFileService } from "./media-files";
 export { dashboardService } from "./dashboard";
+export { mitraService } from "./mitra";
+export { programService } from "./program";
 
 // Export types with explicit imports to avoid conflicts
 export type {
@@ -128,3 +130,21 @@ export type {
   SystemOverview,
   SystemActivity,
 } from "./dashboard";
+
+export type {
+  Mitra,
+  MitraCreate,
+  MitraUpdate,
+  MitraResponse,
+  MitraListResponse,
+  MitraFilterParams,
+} from "./mitra";
+
+export type {
+  Program,
+  ProgramCreate,
+  ProgramUpdate,
+  ProgramResponse,
+  ProgramListResponse,
+  ProgramFilterParams,
+} from "./program";

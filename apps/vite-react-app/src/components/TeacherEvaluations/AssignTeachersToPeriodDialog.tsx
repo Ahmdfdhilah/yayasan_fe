@@ -10,13 +10,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@workspace/ui/components/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@workspace/ui/components/select';
 import { Label } from '@workspace/ui/components/label';
 import { Users, RotateCcw } from 'lucide-react';
 import { Period } from '@/services/periods/types';

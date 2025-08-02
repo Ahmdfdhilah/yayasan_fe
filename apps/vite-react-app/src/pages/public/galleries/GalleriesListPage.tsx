@@ -6,9 +6,10 @@ import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Input } from "@workspace/ui/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
-import { Search, Image } from 'lucide-react';
+import { Search, Image, Fullscreen } from 'lucide-react';
 import { getGalleryImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
+import ImageViewDialog from '@/components/common/ImageViewDialog';
 import Pagination from '@/components/common/Pagination';
 import type { Gallery } from '@/services/galleries/types';
 import { galleryService } from '@/services/galleries';
@@ -20,6 +21,15 @@ const GalleriesListPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(parseInt(searchParams.get('size') || '10'));
+  
+  // Image view state
+  const [selectedImage, setSelectedImage] = useState<{
+    src: string;
+    alt: string;
+    title?: string;
+  } | null>(null);
+  const [selectedDescription, setSelectedDescription] = useState<string>('');
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
   
   // Get params from URL
   const currentPage = parseInt(searchParams.get('page') || '1');
@@ -69,6 +79,34 @@ const GalleriesListPage = () => {
 
     loadGalleries();
   }, [currentPage, searchQuery, sortBy, sortOrder, itemsPerPage]);
+
+  // Handle image click to open dialog
+  const handleImageClick = (gallery: Gallery) => {
+    const imageUrl = getGalleryImageUrl(gallery.img_url) || `https://picsum.photos/800/600?random=${gallery.id}`;
+    
+    setSelectedImage({
+      src: imageUrl,
+      alt: gallery.title,
+      title: gallery.title
+    });
+    
+    setSelectedDescription(
+      gallery.excerpt || 
+      gallery.short_excerpt || 
+      'Dokumentasi kegiatan Yayasan Baitul Muslim Lampung Timur'
+    );
+    
+    setIsImageDialogOpen(true);
+  };
+
+  // Handle dialog close
+  const handleDialogClose = (open: boolean) => {
+    setIsImageDialogOpen(open);
+    if (!open) {
+      setSelectedImage(null);
+      setSelectedDescription('');
+    }
+  };
 
   // Update URL params
   const updateParams = (newParams: Record<string, string | null>) => {
@@ -216,7 +254,7 @@ const GalleriesListPage = () => {
           </div>
 
           {/* Galleries Grid */}
-          <div className="grid sm:grid-cols-2 md:grid-cols-3  gap-6 mb-12">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
             {loading ? (
               Array.from({ length: itemsPerPage }).map((_, index) => (
                 <GalleryCardSkeleton key={index} />
@@ -224,13 +262,21 @@ const GalleriesListPage = () => {
             ) : galleries.length > 0 ? (
               galleries.map((gallery, index) => (
                 <Card key={gallery.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
-                  <div className="aspect-square relative overflow-hidden rounded-t-lg bg-muted">
+                  <div 
+                    className="aspect-square relative overflow-hidden rounded-t-lg bg-muted cursor-pointer"
+                    onClick={() => handleImageClick(gallery)}
+                  >
                     <img 
                       src={getGalleryImageUrl(gallery.img_url) || `https://picsum.photos/300/300?random=${index + 1}`}
                       alt={gallery.title}
                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <Fullscreen className="w-8 h-8 text-white" />
+                      </div>
+                    </div>
                     <Badge className="absolute top-3 left-3 bg-primary hover:bg-primary/90">
                       <Image className="w-3 h-3 mr-1" />
                       Foto
@@ -282,6 +328,16 @@ const GalleriesListPage = () => {
           )}
         </div>
       </div>
+
+      {/* Image View Dialog */}
+      {selectedImage && (
+        <ImageViewDialog
+          open={isImageDialogOpen}
+          onOpenChange={handleDialogClose}
+          image={selectedImage}
+          description={selectedDescription}
+        />
+      )}
     </div>
   );
 };
