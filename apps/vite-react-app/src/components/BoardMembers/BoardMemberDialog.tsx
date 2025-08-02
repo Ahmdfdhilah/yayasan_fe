@@ -14,6 +14,13 @@ import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Textarea } from '@workspace/ui/components/textarea';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@workspace/ui/components/select';
+import {
   Form,
   FormControl,
   FormField,
@@ -23,13 +30,14 @@ import {
   FormDescription,
 } from '@workspace/ui/components/form';
 import FileUpload from '@/components/common/FileUpload';
-import { BoardMember, BoardMemberCreate, BoardMemberUpdate } from '@/services/board-members/types';
+import { BoardMember, BoardMemberCreate, BoardMemberUpdate, BoardGroup } from '@/services/board-members/types';
 
 const boardMemberFormSchema = z.object({
   name: z.string().min(1, 'Nama wajib diisi').max(255, 'Nama maksimal 255 karakter'),
   position: z.string().min(1, 'Posisi wajib diisi').max(255, 'Posisi maksimal 255 karakter'),
+  group_id: z.number().min(1, 'Grup wajib dipilih'),
   description: z.string().optional().or(z.literal('')),
-  display_order: z.number().min(0, 'Urutan tidak boleh negatif'),
+  member_order: z.number().min(0, 'Urutan tidak boleh negatif'),
 });
 
 type BoardMemberFormData = z.infer<typeof boardMemberFormSchema>;
@@ -39,26 +47,32 @@ interface BoardMemberDialogProps {
   onOpenChange: (open: boolean) => void;
   editingBoardMember: BoardMember | null;
   onSave: (data: BoardMemberCreate | BoardMemberUpdate, image?: File) => void;
+  mode?: 'create' | 'edit' | 'view';
+  boardGroups: BoardGroup[];
 }
 
 export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
   open,
   onOpenChange,
   editingBoardMember,
-  onSave
+  onSave,
+  mode = 'create',
+  boardGroups
 }) => {
   const { error: toastError, success: toastSuccess } = useToast();
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const isEdit = !!editingBoardMember;
+  const isEdit = mode === 'edit';
+  const isView = mode === 'view';
 
   const form = useForm<BoardMemberFormData>({
     resolver: zodResolver(boardMemberFormSchema),
     defaultValues: {
       name: '',
       position: '',
+      group_id: 0,
       description: '',
-      display_order: 0,
+      member_order: 0,
     },
   });
 
@@ -68,15 +82,17 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
         form.reset({
           name: editingBoardMember.name,
           position: editingBoardMember.position,
+          group_id: editingBoardMember.group_id || 0,
           description: editingBoardMember.description || '',
-          display_order: editingBoardMember.display_order,
+          member_order: editingBoardMember.member_order,
         });
       } else {
         form.reset({
           name: '',
           position: '',
+          group_id: 0,
           description: '',
-          display_order: 0,
+          member_order: 0,
         });
       }
       setSelectedFiles([]);
@@ -96,8 +112,9 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
       const submitData = {
         name: data.name,
         position: data.position,
+        group_id: data.group_id,
         description: data.description || undefined,
-        display_order: data.display_order,
+        member_order: data.member_order,
       };
 
       const imageFile = selectedFiles.length > 0 ? selectedFiles[0] : undefined;
@@ -135,7 +152,7 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? 'Edit Pengurus' : 'Tambah Pengurus Baru'}
+            {isView ? 'Detail Anggota Dewan' : isEdit ? 'Edit Pengurus' : 'Tambah Pengurus Baru'}
           </DialogTitle>
         </DialogHeader>
 
@@ -153,7 +170,7 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
                       <Input
                         placeholder="Masukkan nama lengkap"
                         {...field}
-                        disabled={loading}
+                        disabled={loading || isView}
                       />
                     </FormControl>
                     <FormMessage />
@@ -171,7 +188,7 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
                       <Input
                         placeholder="Masukkan posisi/jabatan"
                         {...field}
-                        disabled={loading}
+                        disabled={loading || isView}
                       />
                     </FormControl>
                     <FormMessage />
@@ -179,6 +196,39 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
                 )}
               />
             </div>
+
+            {/* Group Selection */}
+            <FormField
+              control={form.control}
+              name="group_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Grup Dewan</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(parseInt(value))}
+                    value={field.value?.toString()}
+                    disabled={loading || isView}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih grup dewan" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {boardGroups.map((group) => (
+                        <SelectItem key={group.id} value={group.id.toString()}>
+                          {group.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Pilih grup dewan untuk anggota ini
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Image Upload */}
             <div>
@@ -225,7 +275,7 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
             {/* Display Order */}
             <FormField
               control={form.control}
-              name="display_order"
+              name="member_order"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Urutan Tampil</FormLabel>
@@ -259,11 +309,13 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
                 onClick={() => onOpenChange(false)}
                 disabled={loading}
               >
-                Batal
+                {isView ? 'Tutup' : 'Batal'}
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? 'Menyimpan...' : (isEdit ? 'Perbarui' : 'Simpan')}
-              </Button>
+              {!isView && (
+                <Button type="submit" disabled={loading}>
+                  {loading ? 'Menyimpan...' : (isEdit ? 'Perbarui' : 'Simpan')}
+                </Button>
+              )}
             </DialogFooter>
           </form>
         </Form>

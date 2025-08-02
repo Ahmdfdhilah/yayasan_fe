@@ -1,22 +1,20 @@
 import React from 'react';
-import { BoardMember, BoardGroup } from '@/services/board-members/types';
+import { BoardGroup } from '@/services/board-members/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { getThumbnailUrl } from '@/utils/imageUtils';
 
-interface BoardMemberCardsProps {
-  boardMembers: BoardMember[];
-  loading?: boolean;
-  onEdit: (boardMember: BoardMember) => void;
-  onDelete: (boardMember: BoardMember) => void;
-  onView: (boardMember: BoardMember) => void;
+interface BoardGroupCardsProps {
   boardGroups: BoardGroup[];
+  loading?: boolean;
+  onEdit: (boardGroup: BoardGroup) => void;
+  onDelete: (boardGroup: BoardGroup) => void;
+  onView: (boardGroup: BoardGroup) => void;
 }
 
-export const BoardMemberCards: React.FC<BoardMemberCardsProps> = ({
-  boardMembers,
+export const BoardGroupCards: React.FC<BoardGroupCardsProps> = ({
+  boardGroups,
   loading = false,
   onEdit,
   onDelete,
@@ -40,11 +38,11 @@ export const BoardMemberCards: React.FC<BoardMemberCardsProps> = ({
     );
   }
 
-  if (boardMembers.length === 0) {
+  if (boardGroups.length === 0) {
     return (
       <Card>
         <CardContent className="p-8 text-center text-muted-foreground">
-          Tidak ada Anggota Dewan ditemukan
+          Tidak ada Grup Dewan ditemukan
         </CardContent>
       </Card>
     );
@@ -52,51 +50,38 @@ export const BoardMemberCards: React.FC<BoardMemberCardsProps> = ({
 
   return (
     <div className="grid gap-4">
-      {boardMembers.map((boardMember) => (
-        <Card key={boardMember.id}>
+      {boardGroups.map((boardGroup) => (
+        <Card key={boardGroup.id}>
           <CardContent className="p-4">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-2">
-                  {boardMember.img_url && (
-                    <img 
-                      src={getThumbnailUrl(boardMember.img_url, 64)} 
-                      alt={boardMember.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
+                <div className="mb-2">
+                  <h3 className="font-medium text-sm">{boardGroup.title}</h3>
+                  {boardGroup.description && (
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                      {boardGroup.description}
+                    </p>
                   )}
-                  <div>
-                    <h3 className="font-medium text-sm">{boardMember.name}</h3>
-                    <p className="text-xs text-muted-foreground">{boardMember.position}</p>
-                  </div>
                 </div>
                 
                 <div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Urutan:</span>
-                    <span>{boardMember.member_order}</span>
+                    <span>{boardGroup.display_order}</span>
                   </div>
                   
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Dibuat:</span>
-                    <span>{format(new Date(boardMember.created_at), 'dd MMM yyyy', { locale: id })}</span>
+                    <span>{format(new Date(boardGroup.created_at), 'dd MMM yyyy', { locale: id })}</span>
                   </div>
-                  
-                  {boardMember.description && (
-                    <div className="mt-2">
-                      <p className="text-xs text-muted-foreground line-clamp-2">
-                        {boardMember.short_description}
-                      </p>
-                    </div>
-                  )}
                 </div>
               </div>
               
               <div className="ml-2">
                 <ActionDropdown
-                  onView={() => onView(boardMember)}
-                  onEdit={() => onEdit(boardMember)}
-                  onDelete={() => onDelete(boardMember)}
+                  onView={() => onView(boardGroup)}
+                  onEdit={() => onEdit(boardGroup)}
+                  onDelete={() => onDelete(boardGroup)}
                 />
               </div>
             </div>

@@ -2,15 +2,22 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRole } from '@/hooks/useRole';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
-import { BoardMember, BoardMemberFilterParams } from '@/services/board-members/types';
+import { 
+  BoardGroup, 
+  BoardGroupFilterParams,
+  BoardMember, 
+  BoardMemberFilterParams 
+} from '@/services/board-members/types';
 import { boardMemberService } from '@/services/board-members';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Plus } from 'lucide-react';
-import { Label } from '@workspace/ui/components/label';
 import { BoardMemberTable } from '@/components/BoardMembers/BoardMemberTable';
 import { BoardMemberCards } from '@/components/BoardMembers/BoardMemberCards';
 import { BoardMemberDialog } from '@/components/BoardMembers/BoardMemberDialog';
+import { BoardGroupTable } from '@/components/BoardGroups/BoardGroupTable';
+import { BoardGroupCards } from '@/components/BoardGroups/BoardGroupCards';
+import { BoardGroupDialog } from '@/components/BoardGroups/BoardGroupDialog';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import SearchContainer from '@/components/common/SearchContainer';
@@ -25,13 +32,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@workspace/ui/components/alert-dialog';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@workspace/ui/components/dialog';
-import { getBoardImageUrl } from '@/utils/imageUtils';
 
 interface BoardMemberPageFilters {
   search: string;
@@ -57,12 +57,22 @@ const BoardMembersPage: React.FC = () => {
   // Get current filters from URL
   const filters = getCurrentFilters();
   
+  // Board Groups State
+  const [boardGroups, setBoardGroups] = useState<BoardGroup[]>([]);
+  const [groupsLoading, setGroupsLoading] = useState(true);
+  const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
+  const [isGroupViewDialogOpen, setIsGroupViewDialogOpen] = useState(false);
+  const [editingBoardGroup, setEditingBoardGroup] = useState<BoardGroup | null>(null);
+  const [viewingBoardGroup, setViewingBoardGroup] = useState<BoardGroup | null>(null);
+  const [boardGroupToDelete, setBoardGroupToDelete] = useState<BoardGroup | null>(null);
+
+  // Board Members State
   const [boardMembers, setBoardMembers] = useState<BoardMember[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [totalItems, setTotalItems] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [membersLoading, setMembersLoading] = useState(true);
+  const [membersTotalItems, setMembersTotalItems] = useState(0);
+  const [membersTotalPages, setMembersTotalPages] = useState(0);
+  const [isMemberDialogOpen, setIsMemberDialogOpen] = useState(false);
+  const [isMemberViewDialogOpen, setIsMemberViewDialogOpen] = useState(false);
   const [editingBoardMember, setEditingBoardMember] = useState<BoardMember | null>(null);
   const [viewingBoardMember, setViewingBoardMember] = useState<BoardMember | null>(null);
   const [boardMemberToDelete, setBoardMemberToDelete] = useState<BoardMember | null>(null);
@@ -70,9 +80,32 @@ const BoardMembersPage: React.FC = () => {
   // Calculate access control
   const hasAccess = useMemo(() => isAdmin(), [isAdmin]);
 
+  // Fetch board groups function
+  const fetchBoardGroups = useCallback(async () => {
+    setGroupsLoading(true);
+    try {
+      const params: BoardGroupFilterParams = {
+        page: 1,
+        size: 50, // Get more groups since usually not many
+      };
+
+      const response = await boardMemberService.getBoardGroups(params);
+      setBoardGroups(response.items);
+    } catch (error) {
+      console.error('Failed to fetch board groups:', error);
+      toast({
+        title: 'Error',
+        description: 'Gagal memuat data Grup Dewan. Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    } finally {
+      setGroupsLoading(false);
+    }
+  }, []);
+
   // Fetch board members function
   const fetchBoardMembers = useCallback(async () => {
-    setLoading(true);
+    setMembersLoading(true);
     try {
       const params: BoardMemberFilterParams = {
         page: filters.page,
@@ -82,8 +115,8 @@ const BoardMembersPage: React.FC = () => {
 
       const response = await boardMemberService.getBoardMembers(params);
       setBoardMembers(response.items);
-      setTotalItems(response.total);
-      setTotalPages(response.pages);
+      setMembersTotalItems(response.total);
+      setMembersTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch board members:', error);
       toast({
@@ -92,31 +125,97 @@ const BoardMembersPage: React.FC = () => {
         variant: 'destructive'
       });
     } finally {
-      setLoading(false);
+      setMembersLoading(false);
     }
   }, [filters.page, filters.size, filters.search]);
 
-  // Effect to fetch board members when filters change
+  // Effect to fetch data when filters change
   useEffect(() => {
     if (hasAccess) {
+      fetchBoardGroups();
       fetchBoardMembers();
     }
-  }, [fetchBoardMembers, hasAccess]);
+  }, [fetchBoardGroups, fetchBoardMembers, hasAccess]);
 
-  // Pagination handled by totalPages state
+  // ===== BOARD GROUP HANDLERS =====
 
-  const handleView = (boardMember: BoardMember) => {
+  const handleGroupView = (boardGroup: BoardGroup) => {
+    setViewingBoardGroup(boardGroup);
+    setIsGroupViewDialogOpen(true);
+  };
+
+  const handleGroupEdit = (boardGroup: BoardGroup) => {
+    setEditingBoardGroup(boardGroup);
+    setIsGroupDialogOpen(true);
+  };
+
+  const handleGroupDelete = (boardGroup: BoardGroup) => {
+    setBoardGroupToDelete(boardGroup);
+  };
+
+  const handleGroupCreate = () => {
+    setEditingBoardGroup(null);
+    setIsGroupDialogOpen(true);
+  };
+
+  const handleGroupSave = async (data: any) => {
+    try {
+      if (editingBoardGroup) {
+        await boardMemberService.updateBoardGroup(editingBoardGroup.id, data);
+      } else {
+        await boardMemberService.createBoardGroup(data);
+      }
+      setIsGroupDialogOpen(false);
+      setEditingBoardGroup(null);
+      fetchBoardGroups();
+    } catch (error: any) {
+      console.error('Failed to save board group:', error);
+      const errorMessage = error?.message || 'Gagal menyimpan grup. Silakan coba lagi.';
+      throw new Error(errorMessage);
+    }
+  };
+
+  const confirmDeleteBoardGroup = async () => {
+    if (boardGroupToDelete) {
+      try {
+        await boardMemberService.deleteBoardGroup(boardGroupToDelete.id);
+        setBoardGroupToDelete(null);
+        fetchBoardGroups();
+        toast({
+          title: 'Grup berhasil dihapus',
+          description: `Grup ${boardGroupToDelete.title} telah dihapus dari sistem.`,
+        });
+      } catch (error: any) {
+        console.error('Failed to delete board group:', error);
+        const errorMessage = error?.message || 'Gagal menghapus grup. Silakan coba lagi.';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive'
+        });
+      }
+    }
+  };
+
+  // ===== BOARD MEMBER HANDLERS =====
+
+  const handleMemberView = (boardMember: BoardMember) => {
     setViewingBoardMember(boardMember);
-    setIsViewDialogOpen(true);
+    setIsMemberViewDialogOpen(true);
   };
 
-  const handleEdit = (boardMember: BoardMember) => {
+  const handleMemberEdit = (boardMember: BoardMember) => {
     setEditingBoardMember(boardMember);
-    setIsDialogOpen(true);
+    setIsMemberDialogOpen(true);
   };
 
-  const handleDelete = (boardMember: BoardMember) => {
+  const handleMemberDelete = (boardMember: BoardMember) => {
     setBoardMemberToDelete(boardMember);
+  };
+
+  const handleMemberCreate = () => {
+    setEditingBoardMember(null);
+    setIsMemberDialogOpen(true);
   };
 
   const confirmDeleteBoardMember = async () => {
@@ -124,7 +223,7 @@ const BoardMembersPage: React.FC = () => {
       try {
         await boardMemberService.deleteBoardMember(boardMemberToDelete.id);
         setBoardMemberToDelete(null);
-        fetchBoardMembers(); // Refresh the list
+        fetchBoardMembers();
         toast({
           title: 'Anggota Dewan berhasil dihapus',
           description: `Anggota Dewan ${boardMemberToDelete.name} telah dihapus dari sistem.`,
@@ -141,29 +240,22 @@ const BoardMembersPage: React.FC = () => {
     }
   };
 
-  const handleCreate = () => {
-    setEditingBoardMember(null);
-    setIsDialogOpen(true);
-  };
-
-  const handleSave = async (data: any, image?: File) => {
+  const handleMemberSave = async (data: any, image?: File) => {
     try {
       if (editingBoardMember) {
-        // Update existing board member
         await boardMemberService.updateBoardMember(editingBoardMember.id, data, image);
       } else {
-        // Create new board member - image is required
         if (!image) {
-          throw new Error('Gambar wajib diupload untuk pengurus baru');
+          throw new Error('Gambar wajib diupload untuk anggota baru');
         }
         await boardMemberService.createBoardMember(data, image);
       }
-      setIsDialogOpen(false);
+      setIsMemberDialogOpen(false);
       setEditingBoardMember(null);
-      fetchBoardMembers(); // Refresh the list
+      fetchBoardMembers();
     } catch (error: any) {
       console.error('Failed to save board member:', error);
-      const errorMessage = error?.message || 'Gagal menyimpan pengurus. Silakan coba lagi.';
+      const errorMessage = error?.message || 'Gagal menyimpan anggota. Silakan coba lagi.';
       throw new Error(errorMessage);
     }
   };
@@ -184,11 +276,21 @@ const BoardMembersPage: React.FC = () => {
     updateURL({ page });
   };
 
-  // Generate composite title
-  const getCompositeTitle = () => {
-    let title = "Daftar Anggota Dewan";
+  // Generate composite titles
+  const getGroupsCompositeTitle = () => {
+    let title = "Daftar Grup Dewan";
     const activeFilters: string[] = [];
     
+    if (activeFilters.length > 0) {
+      title += " - " + activeFilters.join(" - ");
+    }
+    
+    return title;
+  };
+
+  const getMembersCompositeTitle = () => {
+    let title = "Daftar Anggota Dewan";
+    const activeFilters: string[] = [];
     
     if (activeFilters.length > 0) {
       title += " - " + activeFilters.join(" - ");
@@ -214,39 +316,80 @@ const BoardMembersPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Manajemen Anggota Dewan"
-        description="Kelola anggota dewan dan atur urutan tampilan"
+        title="Manajemen Dewan"
+        description="Kelola grup dan anggota dewan serta atur urutan tampilan"
         actions={
-          <Button onClick={handleCreate}>
-            <Plus className="w-4 h-4 mr-2" />
-            Tambah Anggota Dewan
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleGroupCreate}>
+              <Plus className="w-4 h-4 mr-2" />
+              Tambah Grup
+            </Button>
+            <Button onClick={handleMemberCreate}>
+              <Plus className="w-4 h-4 mr-2" />
+              Tambah Anggota
+            </Button>
+          </div>
         }
       />
 
-
+      {/* Board Groups Section */}
       <Card>
         <CardContent>
           <div className="space-y-4">
             <ListHeaderComposite
-              title={getCompositeTitle()}
+              title={getGroupsCompositeTitle()}
+              subtitle="Kelola grup dewan dan atur urutan tampilan"
+            />
+
+
+            {/* Desktop Groups Table */}
+            <div className="hidden lg:block">
+              <BoardGroupTable
+                boardGroups={boardGroups}
+                loading={groupsLoading}
+                onView={handleGroupView}
+                onEdit={handleGroupEdit}
+                onDelete={handleGroupDelete}
+              />
+            </div>
+
+            {/* Mobile Groups Cards */}
+            <div className="lg:hidden">
+              <BoardGroupCards
+                boardGroups={boardGroups}
+                loading={groupsLoading}
+                onView={handleGroupView}
+                onEdit={handleGroupEdit}
+                onDelete={handleGroupDelete}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Board Members Section */}
+      <Card>
+        <CardContent>
+          <div className="space-y-4">
+            <ListHeaderComposite
+              title={getMembersCompositeTitle()}
               subtitle="Kelola anggota dewan dan atur urutan tampilan"
             />
 
             <SearchContainer
               searchQuery={filters.search}
               onSearchChange={handleSearchChange}
-              placeholder="Cari anggota dewan berdasarkan nama atau posisi..."
+              placeholder="Cari anggota berdasarkan nama..."
             />
 
             {/* Desktop Table */}
             <div className="hidden lg:block">
               <BoardMemberTable
                 boardMembers={boardMembers}
-                loading={loading}
-                onView={handleView}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
+                loading={membersLoading}
+                onView={handleMemberView}
+                onEdit={handleMemberEdit}
+                onDelete={handleMemberDelete}
               />
             </div>
 
@@ -254,20 +397,20 @@ const BoardMembersPage: React.FC = () => {
             <div className="lg:hidden">
               <BoardMemberCards
                 boardMembers={boardMembers}
-                loading={loading}
-                onView={handleView}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
+                loading={membersLoading}
+                onView={handleMemberView}
+                onEdit={handleMemberEdit}
+                onDelete={handleMemberDelete}
               />
             </div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
+            {membersTotalPages > 1 && (
               <Pagination
                 currentPage={filters.page}
-                totalPages={totalPages}
+                totalPages={membersTotalPages}
                 itemsPerPage={filters.size}
-                totalItems={totalItems}
+                totalItems={membersTotalItems}
                 onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
               />
@@ -276,84 +419,72 @@ const BoardMembersPage: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Board Group Dialog */}
+      <BoardGroupDialog
+        open={isGroupDialogOpen}
+        onOpenChange={setIsGroupDialogOpen}
+        editingBoardGroup={editingBoardGroup}
+        onSave={handleGroupSave}
+        mode={editingBoardGroup ? 'edit' : 'create'}
+      />
+
+      {/* Board Group View Dialog */}
+      <BoardGroupDialog
+        open={isGroupViewDialogOpen}
+        onOpenChange={setIsGroupViewDialogOpen}
+        editingBoardGroup={viewingBoardGroup}
+        onSave={() => {}}
+        mode="view"
+      />
+
       {/* Board Member Dialog */}
       <BoardMemberDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        open={isMemberDialogOpen}
+        onOpenChange={setIsMemberDialogOpen}
         editingBoardMember={editingBoardMember}
-        onSave={handleSave}
+        onSave={handleMemberSave}
+        mode={editingBoardMember ? 'edit' : 'create'}
+        boardGroups={boardGroups}
       />
 
       {/* Board Member View Dialog */}
-      {viewingBoardMember && (
-        <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Detail Anggota Dewan</DialogTitle>
-            </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label>Nama</Label>
-                <div className="p-2 bg-muted rounded text-sm">
-                  {viewingBoardMember.name}
-                </div>
-              </div>
-              <div>
-                <Label>Posisi</Label>
-                <div className="p-2 bg-muted rounded text-sm">
-                  {viewingBoardMember.position}
-                </div>
-              </div>
-              <div>
-                <Label>Urutan Tampilan</Label>
-                <div className="p-2 bg-muted rounded text-sm">
-                  {viewingBoardMember.display_order}
-                </div>
-              </div>
-              {viewingBoardMember.img_url && (
-                <div className="md:col-span-2">
-                  <Label>Foto</Label>
-                  <div className="p-2 bg-muted rounded text-sm">
-                    <img 
-                      src={getBoardImageUrl(viewingBoardMember.img_url)} 
-                      alt={viewingBoardMember.name}
-                      className="w-32 h-32 object-cover rounded"
-                    />
-                  </div>
-                </div>
-              )}
-              {viewingBoardMember.description && (
-                <div className="md:col-span-2">
-                  <Label>Deskripsi</Label>
-                  <div className="p-2 bg-muted rounded text-sm">
-                    {viewingBoardMember.description}
-                  </div>
-                </div>
-              )}
-              <div>
-                <Label>Dibuat</Label>
-                <div className="p-2 bg-muted rounded text-sm">
-                  {new Date(viewingBoardMember.created_at).toLocaleDateString('id-ID')}
-                </div>
-              </div>
-              {viewingBoardMember.updated_at && (
-                <div>
-                  <Label>Terakhir Diperbarui</Label>
-                  <div className="p-2 bg-muted rounded text-sm">
-                    {new Date(viewingBoardMember.updated_at).toLocaleDateString('id-ID')}
-                  </div>
-                </div>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      <BoardMemberDialog
+        open={isMemberViewDialogOpen}
+        onOpenChange={setIsMemberViewDialogOpen}
+        editingBoardMember={viewingBoardMember}
+        onSave={() => {}}
+        mode="view"
+        boardGroups={boardGroups}
+      />
 
-      {/* Delete Confirmation Dialog */}
+      {/* Group Delete Confirmation Dialog */}
+      <AlertDialog open={!!boardGroupToDelete} onOpenChange={() => setBoardGroupToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Konfirmasi Hapus Grup</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tindakan ini tidak dapat dibatalkan. Grup{' '}
+              <span className="font-semibold">{boardGroupToDelete?.title}</span> akan dihapus
+              secara permanen dari sistem.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteBoardGroup}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Hapus Grup
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Member Delete Confirmation Dialog */}
       <AlertDialog open={!!boardMemberToDelete} onOpenChange={() => setBoardMemberToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
+            <AlertDialogTitle>Konfirmasi Hapus Anggota</AlertDialogTitle>
             <AlertDialogDescription>
               Tindakan ini tidak dapat dibatalkan. Anggota Dewan{' '}
               <span className="font-semibold">{boardMemberToDelete?.name}</span> akan dihapus
@@ -366,7 +497,7 @@ const BoardMembersPage: React.FC = () => {
               onClick={confirmDeleteBoardMember}
               className="bg-red-600 hover:bg-red-700"
             >
-              Hapus Anggota Dewan
+              Hapus Anggota
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

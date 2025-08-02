@@ -1,13 +1,16 @@
 // apps/vite-react-app/src/services/board-members/service.ts
 import { BaseService } from "../base";
 import {
+  BoardGroupCreate,
+  BoardGroupUpdate,
+  BoardGroupResponse,
+  BoardGroupListResponse,
+  BoardGroupFilterParams,
   BoardMemberCreate,
   BoardMemberUpdate,
   BoardMemberResponse,
   BoardMemberListResponse,
-  BoardMemberSummary,
   BoardMemberFilterParams,
-  BoardMemberStatistics,
   MessageResponse,
 } from "./types";
 
@@ -15,6 +18,50 @@ class BoardMemberService extends BaseService {
   constructor() {
     super("/board-members");
   }
+
+  // ===== BOARD GROUP METHODS =====
+
+  // List board groups with filtering  
+  async getBoardGroups(
+    params?: BoardGroupFilterParams
+  ): Promise<BoardGroupListResponse> {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    
+    const endpoint = queryParams.toString() ? `/groups?${queryParams.toString()}` : "/groups";
+    return this.get(endpoint);
+  }
+
+  // Create new board group (admin only)
+  async createBoardGroup(data: BoardGroupCreate): Promise<BoardGroupResponse> {
+    return this.post("/groups", data);
+  }
+
+  // Get board group by ID
+  async getBoardGroupById(boardGroupId: number): Promise<BoardGroupResponse> {
+    return this.get(`/groups/${boardGroupId}`);
+  }
+
+  // Update board group (admin only)
+  async updateBoardGroup(
+    boardGroupId: number,
+    data: BoardGroupUpdate
+  ): Promise<BoardGroupResponse> {
+    return this.put(`/groups/${boardGroupId}`, data);
+  }
+
+  // Delete board group (admin only)
+  async deleteBoardGroup(boardGroupId: number): Promise<MessageResponse> {
+    return this.delete(`/groups/${boardGroupId}`);
+  }
+
+  // ===== BOARD MEMBER METHODS =====
 
   // List board members with filtering
   async getBoardMembers(
@@ -29,59 +76,7 @@ class BoardMemberService extends BaseService {
       });
     }
     
-    const endpoint = queryParams.toString() ? `/?${queryParams.toString()}` : "/";
-    return this.get(endpoint);
-  }
-
-  // Get all board members
-  async getAllBoardMembers(limit?: number): Promise<BoardMemberResponse[]> {
-    const queryParams = new URLSearchParams();
-    if (limit) {
-      queryParams.append("limit", limit.toString());
-    }
-    
-    const endpoint = queryParams.toString() ? `/all?${queryParams.toString()}` : "/all";
-    return this.get(endpoint);
-  }
-
-  // Get board members by position
-  async getBoardMembersByPosition(position: string): Promise<BoardMemberResponse[]> {
-    return this.get(`/position/${encodeURIComponent(position)}`);
-  }
-
-  // Search board members
-  async searchBoardMembers(
-    query: string, 
-    limit?: number
-  ): Promise<BoardMemberResponse[]> {
-    const queryParams = new URLSearchParams();
-    queryParams.append("q", query);
-    if (limit) {
-      queryParams.append("limit", limit.toString());
-    }
-    
-    return this.get(`/search?${queryParams.toString()}`);
-  }
-
-  // Get board member statistics (admin only)
-  async getBoardMemberStatistics(): Promise<BoardMemberStatistics> {
-    return this.get("/statistics");
-  }
-
-  // Get board member summaries
-  async getBoardMemberSummaries(
-    params?: BoardMemberFilterParams
-  ): Promise<BoardMemberSummary[]> {
-    const queryParams = new URLSearchParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          queryParams.append(key, value.toString());
-        }
-      });
-    }
-    
-    const endpoint = queryParams.toString() ? `/summaries?${queryParams.toString()}` : "/summaries";
+    const endpoint = queryParams.toString() ? `/members?${queryParams.toString()}` : "/members";
     return this.get(endpoint);
   }
 
@@ -94,7 +89,7 @@ class BoardMemberService extends BaseService {
     formData.append('data', JSON.stringify(data));
     formData.append('image', image);
     
-    return this.post("/", formData, {
+    return this.post("/members", formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -105,7 +100,7 @@ class BoardMemberService extends BaseService {
   async getBoardMemberById(
     boardMemberId: number
   ): Promise<BoardMemberResponse> {
-    return this.get(`/${boardMemberId}`);
+    return this.get(`/members/${boardMemberId}`);
   }
 
   // Update board member with optional image upload (admin only)
@@ -120,7 +115,7 @@ class BoardMemberService extends BaseService {
       formData.append('image', image);
     }
     
-    return this.put(`/${boardMemberId}`, formData, {
+    return this.put(`/members/${boardMemberId}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -131,15 +126,7 @@ class BoardMemberService extends BaseService {
   async deleteBoardMember(
     boardMemberId: number
   ): Promise<MessageResponse> {
-    return this.delete(`/${boardMemberId}`);
-  }
-
-  // Update display order (admin only) - Updated endpoint path
-  async updateDisplayOrder(
-    boardMemberId: number,
-    newOrder: number
-  ): Promise<BoardMemberResponse> {
-    return this.patch(`/${boardMemberId}/order`, { new_order: newOrder });
+    return this.delete(`/members/${boardMemberId}`);
   }
 
 }

@@ -73,7 +73,7 @@ export const BoardMemberTable: React.FC<BoardMemberTableProps> = ({
                   {boardMember.position}
                 </TableCell>
                 <TableCell>
-                  {boardMember.display_order}
+                  {boardMember.member_order}
                 </TableCell>
                 <TableCell>
                   {format(new Date(boardMember.created_at), 'dd MMM yyyy', { locale: id })}
