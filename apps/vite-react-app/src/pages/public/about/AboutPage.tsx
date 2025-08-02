@@ -3,8 +3,7 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@workspace/ui/components/carousel";
-import { Users, Target, Eye, Heart } from 'lucide-react';
-import { AboutSection } from '@/components/Home/AboutSection';
+import { Users, Target, Eye, MapPin, Calendar } from 'lucide-react';
 import { PartnerCard, ProgramCard } from '@/components/About';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { boardMemberService } from '@/services/board-members';
@@ -323,7 +322,78 @@ const AboutPage = () => {
       </section>
 
       {/* Section 1: About Section */}
-      <AboutSection />
+      <section className="py-16">
+        <div className="max-w-screen-xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <Badge variant="outline" className="mb-4 border-primary text-primary">
+                Sejarah Kami
+              </Badge>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
+                Yayasan Baitul Muslim Lampung Timur
+              </h2>
+              <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                Yayasan Baitul Muslim Lampung Timur adalah lembaga pendidikan dan dakwah Islam yang telah berdiri sejak 15 Juli 1993.
+                Kami menyelenggarakan pendidikan Islam terpadu berkualitas dari tingkat TKIT hingga Pondok Pesantren Tahfidz Qur'an.
+              </p>
+              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                Berlokasi di Way Jepara, Lampung Timur, kami berkomitmen memberikan pendidikan yang menggabungkan ilmu agama dan umum
+                dengan pendekatan yang holistik dan modern.
+              </p>
+
+              {/* Highlights */}
+              <div className="grid gap-4">
+                {[
+                  {
+                    icon: Calendar,
+                    title: "Berdiri Sejak 1993",
+                    description: "Lebih dari 30 tahun pengalaman dalam pendidikan Islam"
+                  },
+                  {
+                    icon: MapPin,
+                    title: "Lokasi Strategis",
+                    description: "Jl. Ir. H. Djuanda No. 19, Way Jepara, Lampung Timur"
+                  },
+                  {
+                    icon: Users,
+                    title: "Pendidikan Holistik",
+                    description: "Menggabungkan ilmu agama dan umum dengan pendekatan modern"
+                  }
+                ].map((item, index) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <div key={index} className="flex items-start gap-3">
+                      <div className="bg-primary/10 p-2 rounded-lg">
+                        <IconComponent className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground">{item.title}</h4>
+                        <p className="text-muted-foreground text-sm">{item.description}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="relative">
+                <img
+                  src="https://picsum.photos/600/400"
+                  alt="Yayasan Baitul Muslim"
+                  className="rounded-lg shadow-lg w-full"
+                />
+                <Card className="absolute -bottom-6 -right-6 shadow-lg border-0 bg-primary text-primary-foreground">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-2xl font-bold">30+</div>
+                    <div className="text-sm opacity-90">Tahun Melayani</div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Section 2: Leadership Section */}
       <section className="py-16 bg-muted/20">
@@ -450,53 +520,6 @@ const AboutPage = () => {
             </Card>
           </div>
 
-          {/* Values */}
-          <div className="mt-12">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-foreground mb-4">Nilai-Nilai Kami</h3>
-              <p className="text-muted-foreground">
-                Prinsip-prinsip yang menjadi landasan dalam setiap aktivitas yayasan
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-4 gap-6">
-              {[
-                {
-                  icon: Heart,
-                  title: 'Ikhlas',
-                  description: 'Bekerja dengan ketulusan hati untuk mencapai ridha Allah SWT'
-                },
-                {
-                  icon: Users,
-                  title: 'Amanah',
-                  description: 'Menjalankan tugas dengan penuh tanggung jawab dan kepercayaan'
-                },
-                {
-                  icon: Target,
-                  title: 'Istiqomah',
-                  description: 'Konsisten dalam menjalankan komitmen dan nilai-nilai Islam'
-                },
-                {
-                  icon: Eye,
-                  title: 'Excellence',
-                  description: 'Selalu berusaha memberikan yang terbaik dalam setiap layanan'
-                }
-              ].map((value, index) => {
-                const IconComponent = value.icon;
-                return (
-                  <Card key={index} className="text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <CardContent className="p-6">
-                      <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <IconComponent className="w-8 h-8 text-primary" />
-                      </div>
-                      <h4 className="font-bold text-foreground mb-2">{value.title}</h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{value.description}</p>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
         </div>
       </section>
 

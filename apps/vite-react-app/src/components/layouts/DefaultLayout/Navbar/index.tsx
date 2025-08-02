@@ -1,9 +1,8 @@
-import { Button } from "@workspace/ui/components/button";
 import { NavMenu } from "./NavbarMenu";
 import { NavigationSheet } from "./NavigationSheet";
 import { ScrollToTopLink } from "@/components/common/ScrollToTopLink";
 import logo from '@/assets/logo.png';
-import { Link } from "react-router-dom";
+
 
 const Navbar = () => {
   return (
@@ -17,13 +16,6 @@ const Navbar = () => {
         <NavMenu className="hidden md:block" />
 
         <div className="flex items-center gap-3">
-          <Link to='/login'>
-            <Button
-              className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
-              Masuk
-            </Button>
-          </Link>
-
           {/* Mobile Menu */}
           <div className="md:hidden">
             <NavigationSheet />

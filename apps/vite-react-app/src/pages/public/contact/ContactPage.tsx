@@ -131,7 +131,7 @@ const ContactPage = () => {
 
       {/* Contact Section */}
       <section className="py-16">
-        <div className="px-4 lg:px-8 mx-auto px-4">
+        <div className="px-4 max-w-screen-xl lg:px-8 mx-auto px-4">
           <div className="flex flex-col gap-12">
             {/* Contact Form */}
             <div>

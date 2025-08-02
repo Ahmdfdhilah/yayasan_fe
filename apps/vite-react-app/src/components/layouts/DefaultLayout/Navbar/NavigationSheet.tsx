@@ -5,7 +5,6 @@ import { Menu } from "lucide-react";
 import logo from '@/assets/logo.png';
 import { Button } from "@workspace/ui/components/button";
 import { MobileNavLink } from "@/components/common/MobileNavLink";
-import { Link } from "react-router-dom";
 
 export const NavigationSheet = () => {
   const [open, setOpen] = useState(false);
@@ -24,7 +23,7 @@ export const NavigationSheet = () => {
           <SheetTitle>Navigation Menu</SheetTitle>
           <SheetDescription>Main navigation menu for the application</SheetDescription>
         </SheetHeader>
-        
+
         <div className="flex h-full flex-col">
           {/* Header */}
           <div className="flex items-center gap-3 p-4 border-b border-border">
@@ -43,6 +42,13 @@ export const NavigationSheet = () => {
                     onNavigate={handleClose}
                   >
                     Beranda
+                  </MobileNavLink>
+                  <MobileNavLink
+                    to="/about"
+                    className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                    onNavigate={handleClose}
+                  >
+                    Tentang
                   </MobileNavLink>
                   <MobileNavLink
                     to="/articles"
@@ -66,13 +72,6 @@ export const NavigationSheet = () => {
                     Sekolah
                   </MobileNavLink>
                   <MobileNavLink
-                    to="/about"
-                    className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-                    onNavigate={handleClose}
-                  >
-                    Tentang
-                  </MobileNavLink>
-                  <MobileNavLink
                     to="/contact"
                     className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
                     onNavigate={handleClose}
@@ -83,15 +82,6 @@ export const NavigationSheet = () => {
               </div>
               <ScrollBar orientation="vertical" />
             </ScrollArea>
-          </div>
-
-          {/* Footer */}
-          <div className="p-4 border-t border-border">
-            <Link to='/login' className="w-full">
-              <Button className="w-full rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                Masuk
-              </Button>
-            </Link>
           </div>
         </div>
       </SheetContent>

@@ -8,7 +8,6 @@ import { ArrowLeft, Users, Calendar } from 'lucide-react';
 import { getOrganizationImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { AutoScrollCarousel } from '@/components/common/AutoScrollCarousel';
-import { DetailPageHeader } from '@/components/common/DetailPageHeader';
 import { DetailPageFooter } from '@/components/common/DetailPageFooter';
 import { useShareHandler } from '@/hooks/useShareHandler';
 import type { Organization } from '@/services/organizations/types';
@@ -104,13 +103,6 @@ const OrganizationDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-background pt-24">
-      {/* Back Navigation */}
-      <DetailPageHeader 
-        backLabel="Kembali ke Lembaga"
-        backPath="/schools"
-        onShare={onShare}
-      />
-
       {/* Organization Content */}
       <div className="mx-auto px-4 lg:px-12 py-8">
         {/* Header */}

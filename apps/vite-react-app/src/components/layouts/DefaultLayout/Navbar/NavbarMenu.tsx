@@ -19,6 +19,13 @@ export const NavMenu = (props: ComponentProps<typeof NavigationMenu>) => (
             </NavigationMenuItem>
             <NavigationMenuItem>
                 <NavigationMenuLink asChild>
+                    <ScrollToTopLink to="/about" className="text-foreground hover:text-primary transition-colors">
+                        Tentang
+                    </ScrollToTopLink>
+                </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+                <NavigationMenuLink asChild>
                     <ScrollToTopLink to="/articles" className="text-foreground hover:text-primary transition-colors">
                         Artikel
                     </ScrollToTopLink>
@@ -38,13 +45,7 @@ export const NavMenu = (props: ComponentProps<typeof NavigationMenu>) => (
                     </ScrollToTopLink>
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                    <ScrollToTopLink to="/about" className="text-foreground hover:text-primary transition-colors">
-                        Tentang
-                    </ScrollToTopLink>
-                </NavigationMenuLink>
-            </NavigationMenuItem>
+           
             <NavigationMenuItem>
                 <NavigationMenuLink asChild>
                     <ScrollToTopLink to="/contact" className="text-foreground hover:text-primary transition-colors">

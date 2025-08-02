@@ -2,14 +2,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import { ArrowRight, MapPin, Calendar, Users } from 'lucide-react';
-
-const educationLevels = [
-  "TKIT (Taman Kanak-Kanak Islam Terpadu)",
-  "SDIT (Sekolah Dasar Islam Terpadu)", 
-  "SMPIT (SMP Islam Terpadu)",
-  "SMAIT (SMA Islam Terpadu)",
-  "Pondok Pesantren Tahfidz Qur'an"
-];
+import { ScrollToTopLink } from "../common/ScrollToTopLink";
 
 const highlights = [
   {
@@ -42,11 +35,11 @@ export const AboutSection = () => {
               Yayasan Baitul Muslim Lampung Timur
             </h2>
             <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-              Yayasan Baitul Muslim Lampung Timur adalah lembaga pendidikan dan dakwah Islam yang telah berdiri sejak 15 Juli 1993. 
+              Yayasan Baitul Muslim Lampung Timur adalah lembaga pendidikan dan dakwah Islam yang telah berdiri sejak 15 Juli 1993.
               Kami menyelenggarakan pendidikan Islam terpadu berkualitas dari tingkat TKIT hingga Pondok Pesantren Tahfidz Qur'an.
             </p>
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              Berlokasi di Way Jepara, Lampung Timur, kami berkomitmen memberikan pendidikan yang menggabungkan ilmu agama dan umum 
+              Berlokasi di Way Jepara, Lampung Timur, kami berkomitmen memberikan pendidikan yang menggabungkan ilmu agama dan umum
               dengan pendekatan yang holistik dan modern.
             </p>
 
@@ -68,17 +61,19 @@ export const AboutSection = () => {
               })}
             </div>
 
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-              Pelajari Lebih Lanjut
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+            <ScrollToTopLink to='/about'>
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                Pelajari Lebih Lanjut
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </ScrollToTopLink>
           </div>
 
           <div className="space-y-6">
             <div className="relative">
-              <img 
-                src="https://picsum.photos/600/400" 
-                alt="Yayasan Baitul Muslim" 
+              <img
+                src="https://picsum.photos/600/400"
+                alt="Yayasan Baitul Muslim"
                 className="rounded-lg shadow-lg w-full"
               />
               <Card className="absolute -bottom-6 -right-6 shadow-lg border-0 bg-primary text-primary-foreground">
@@ -88,21 +83,6 @@ export const AboutSection = () => {
                 </CardContent>
               </Card>
             </div>
-
-            {/* Education Levels */}
-            <Card className="bg-muted/50 border-muted">
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-foreground mb-4">Jenjang Pendidikan</h3>
-                <div className="space-y-3">
-                  {educationLevels.map((level, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
-                      <span className="text-sm text-muted-foreground">{level}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
