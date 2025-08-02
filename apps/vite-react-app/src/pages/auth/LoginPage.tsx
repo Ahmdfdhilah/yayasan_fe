@@ -74,8 +74,8 @@ export function LoginPage() {
     }
   });
 
-  // Clear errors and success message when form values change
-  useEffect(() => {
+  // Clear errors when user starts typing
+  const handleFieldChange = () => {
     if (loginError) {
       setLoginError('');
       clearAuthError();
@@ -83,7 +83,7 @@ export function LoginPage() {
     if (successMessage) {
       setSuccessMessage('');
     }
-  }, [form.watch(), clearAuthError, loginError, successMessage]);
+  };
 
   const onSubmit = async (data: LoginFormData) => {
     setLoginError('');
@@ -172,24 +172,6 @@ export function LoginPage() {
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                   <CardContent className="space-y-4">
-                    {/* Error Alert */}
-                    {loginError && (
-                      <Alert variant="destructive">
-                        <AlertDescription>
-                          {loginError}
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
-                    {/* Success Alert */}
-                    {successMessage && (
-                      <Alert>
-                        <AlertDescription>
-                          {successMessage}
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
                     {/* Email Field */}
                     <FormField
                       control={form.control}
@@ -203,6 +185,10 @@ export function LoginPage() {
                               placeholder="Masukkan email"
                               disabled={authLoading}
                               {...field}
+                              onChange={(e) => {
+                                field.onChange(e);
+                                handleFieldChange();
+                              }}
                             />
                           </FormControl>
                           <FormMessage />
@@ -224,6 +210,10 @@ export function LoginPage() {
                                 placeholder="Masukkan password"
                                 disabled={authLoading}
                                 {...field}
+                                onChange={(e) => {
+                                  field.onChange(e);
+                                  handleFieldChange();
+                                }}
                               />
                               <Button
                                 type="button"
@@ -363,6 +353,10 @@ export function LoginPage() {
                             placeholder="Masukkan email"
                             disabled={authLoading}
                             {...field}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              handleFieldChange();
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -384,6 +378,10 @@ export function LoginPage() {
                               placeholder="Masukkan password"
                               disabled={authLoading}
                               {...field}
+                              onChange={(e) => {
+                                field.onChange(e);
+                                handleFieldChange();
+                              }}
                             />
                             <Button
                               type="button"
