@@ -1,5 +1,5 @@
 import React from 'react';
-import { BoardMember } from '@/services/board-members/types';
+import { BoardMember, BoardGroup } from '@/services/board-members/types';
 import {
   Table,
   TableBody,
@@ -19,6 +19,7 @@ interface BoardMemberTableProps {
   onEdit: (boardMember: BoardMember) => void;
   onDelete: (boardMember: BoardMember) => void;
   onView: (boardMember: BoardMember) => void;
+  boardGroups: BoardGroup[];
 }
 
 export const BoardMemberTable: React.FC<BoardMemberTableProps> = ({
@@ -26,8 +27,14 @@ export const BoardMemberTable: React.FC<BoardMemberTableProps> = ({
   loading = false,
   onEdit,
   onDelete,
-  onView
+  onView,
+  boardGroups
 }) => {
+  const getGroupName = (groupId?: number) => {
+    if (!groupId) return '-';
+    const group = boardGroups.find(g => g.id === groupId);
+    return group?.title || '-';
+  };
 
   return (
     <div className="rounded-md border">
@@ -36,6 +43,7 @@ export const BoardMemberTable: React.FC<BoardMemberTableProps> = ({
           <TableRow>
             <TableHead>Nama</TableHead>
             <TableHead>Posisi</TableHead>
+            <TableHead>Grup</TableHead>
             <TableHead>Urutan</TableHead>
             <TableHead>Dibuat</TableHead>
             <TableHead className="text-right">Aksi</TableHead>
@@ -44,13 +52,13 @@ export const BoardMemberTable: React.FC<BoardMemberTableProps> = ({
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                 Memuat Anggota Dewan...
               </TableCell>
             </TableRow>
           ) : boardMembers.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                 Tidak ada Anggota Dewan ditemukan
               </TableCell>
             </TableRow>
@@ -71,6 +79,9 @@ export const BoardMemberTable: React.FC<BoardMemberTableProps> = ({
                 </TableCell>
                 <TableCell>
                   {boardMember.position}
+                </TableCell>
+                <TableCell>
+                  {getGroupName(boardMember.group_id)}
                 </TableCell>
                 <TableCell>
                   {boardMember.member_order}

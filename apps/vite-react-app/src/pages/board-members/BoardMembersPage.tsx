@@ -390,6 +390,7 @@ const BoardMembersPage: React.FC = () => {
                 onView={handleMemberView}
                 onEdit={handleMemberEdit}
                 onDelete={handleMemberDelete}
+                boardGroups={boardGroups}
               />
             </div>
 
@@ -401,6 +402,7 @@ const BoardMembersPage: React.FC = () => {
                 onView={handleMemberView}
                 onEdit={handleMemberEdit}
                 onDelete={handleMemberDelete}
+                boardGroups={boardGroups}
               />
             </div>
 

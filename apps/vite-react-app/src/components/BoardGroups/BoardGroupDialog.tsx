@@ -115,54 +115,52 @@ export const BoardGroupDialog: React.FC<BoardGroupDialogProps> = ({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nama Grup</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Masukkan nama grup"
-                        {...field}
-                        disabled={loading || isView}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nama Grup</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Masukkan nama grup"
+                      {...field}
+                      disabled={loading || isView}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="display_order"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Urutan Tampil</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.select();
-                          }
-                        }}
-                        disabled={loading || isView}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Urutan tampil di website (0 = paling atas)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="display_order"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Urutan Tampil</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      {...field}
+                      onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      onFocus={(e) => {
+                        if (e.target.value === '0') {
+                          e.target.select();
+                        }
+                      }}
+                      disabled={loading || isView}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Urutan tampil di website (0 = paling atas)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Description */}
             <FormField

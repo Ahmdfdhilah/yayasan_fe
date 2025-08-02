@@ -159,43 +159,41 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nama Lengkap</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Masukkan nama lengkap"
-                        {...field}
-                        disabled={loading || isView}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nama Lengkap</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Masukkan nama lengkap"
+                      {...field}
+                      disabled={loading || isView}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="position"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Posisi/Jabatan</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Masukkan posisi/jabatan"
-                        {...field}
-                        disabled={loading || isView}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="position"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Posisi/Jabatan</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Masukkan posisi/jabatan"
+                      {...field}
+                      disabled={loading || isView}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Group Selection */}
             <FormField

@@ -20,8 +20,14 @@ export const BoardMemberCards: React.FC<BoardMemberCardsProps> = ({
   loading = false,
   onEdit,
   onDelete,
-  onView
+  onView,
+  boardGroups
 }) => {
+  const getGroupName = (groupId?: number) => {
+    if (!groupId) return '-';
+    const group = boardGroups.find(g => g.id === groupId);
+    return group?.title || '-';
+  };
   if (loading) {
     return (
       <div className="grid gap-4">
@@ -72,6 +78,11 @@ export const BoardMemberCards: React.FC<BoardMemberCardsProps> = ({
                 </div>
                 
                 <div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">Grup:</span>
+                    <span>{getGroupName(boardMember.group_id)}</span>
+                  </div>
+                  
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Urutan:</span>
                     <span>{boardMember.member_order}</span>
