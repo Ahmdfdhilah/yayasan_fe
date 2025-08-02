@@ -700,22 +700,39 @@ const TeacherEvaluationDetailPage: React.FC = () => {
             {/* Save Button */}
             {mode === 'edit' && (
               <div className="flex justify-end">
-                <Button 
-                  type="submit" 
-                  disabled={saving}
-                >
-                  {saving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Menyimpan...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Simpan Nilai Evaluasi
-                    </>
-                  )}
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button type="button" disabled={saving}>
+                      {saving ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Menyimpan...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Simpan Nilai Evaluasi
+                        </>
+                      )}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Konfirmasi Simpan Evaluasi</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Apakah Anda yakin ingin menyimpan evaluasi untuk <strong>{teacherInfo.teacher?.display_name || 'N/A'}</strong> periode {currentPeriod?.academic_year} - {currentPeriod?.semester}?
+                        <br /><br />
+                        Data evaluasi yang telah disimpan dapat diubah kembali selama periode masih aktif.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Batal</AlertDialogCancel>
+                      <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>
+                        Ya, Simpan Evaluasi
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             )}
           </form>
