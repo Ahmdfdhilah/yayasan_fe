@@ -40,7 +40,7 @@ import { teacherEvaluationService, evaluationAspectService, periodService } from
 import { generateEvaluationPDF, EvaluationReportData } from '@/utils/pdfReportUtils';
 
 const evaluationFormSchema = z.object({
-  aspects: z.record(z.string(), z.string().min(1, 'Rating harus dipilih')),
+  aspects: z.record(z.string(), z.string().optional()),
   notes: z.string().optional(),
 });
 
@@ -114,7 +114,6 @@ const TeacherEvaluationDetailPage: React.FC = () => {
         selectedPeriodId = periods[0].id.toString();
       }
       
-      console.log('Auto-selecting period (no URL param):', selectedPeriodId);
       updateURL({ period_id: selectedPeriodId });
     }
   }, [activePeriod, periods, filters.period_id, updateURL]);
@@ -210,7 +209,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       // Set form values from evaluation items
       const evaluationData: Record<string, string> = {};
       evaluationResponse?.items?.forEach(item => {
-        evaluationData[item.aspect_id.toString()] = item.grade;
+        evaluationData[item.aspect_id.toString()] = item.grade || '';
       });
 
       form.reset({
@@ -294,7 +293,9 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   };
 
   const onSubmit = async (data: EvaluationFormData) => {
-    if (!teacherId || !currentPeriod) return;
+    if (!teacherId || !currentPeriod) {
+      return;
+    }
 
     try {
       setSaving(true);
@@ -459,10 +460,11 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     canEditEvaluation(evaluation, currentPeriod, activePeriod) && isActivePeriod : 
     false;
 
+
   // Create evaluation data mapping for display
   const evaluationData: Record<string, string> = {};
   evaluation?.items?.forEach(item => {
-    evaluationData[item.aspect_id.toString()] = item.grade;
+    evaluationData[item.aspect_id.toString()] = item.grade || '';
   });
 
   // Get teacher info from evaluation or use teacherId
@@ -698,7 +700,10 @@ const TeacherEvaluationDetailPage: React.FC = () => {
             {/* Save Button */}
             {mode === 'edit' && (
               <div className="flex justify-end">
-                <Button type="submit" disabled={saving}>
+                <Button 
+                  type="submit" 
+                  disabled={saving}
+                >
                   {saving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
