@@ -1,7 +1,4 @@
 // apps/vite-react-app/src/services/program/types.ts
-
-import { PaginatedResponse } from "../base/types";
-
 // Program Types
 export interface Program {
   id: number;
@@ -30,13 +27,20 @@ export interface ProgramUpdate {
 
 // Response Types
 export interface ProgramResponse extends Program {}
-export interface ProgramListResponse extends PaginatedResponse<Program> {}
-
 // Filter Types
 export interface ProgramFilterParams {
   skip?: number;
   limit?: number;
   search?: string;
+}
+
+// List Response with proper pagination structure
+export interface ProgramListResponse {
+  items: Program[];
+  total: number;
+  page: number;
+  size: number;
+  pages: number;
 }
 
 // Response wrapper for single operations

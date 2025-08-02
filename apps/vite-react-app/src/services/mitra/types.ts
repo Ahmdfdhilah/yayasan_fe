@@ -1,7 +1,4 @@
 // apps/vite-react-app/src/services/mitra/types.ts
-
-import { PaginatedResponse } from "../base/types";
-
 // Mitra Types
 export interface Mitra {
   id: number;
@@ -27,13 +24,21 @@ export interface MitraUpdate {
 
 // Response Types
 export interface MitraResponse extends Mitra {}
-export interface MitraListResponse extends PaginatedResponse<Mitra> {}
 
 // Filter Types
 export interface MitraFilterParams {
   skip?: number;
   limit?: number;
   search?: string;
+}
+
+// List Response with proper pagination structure
+export interface MitraListResponse {
+  items: Mitra[];
+  total: number;
+  page: number;
+  size: number;
+  pages: number;
 }
 
 // Response wrapper for single operations
