@@ -3,13 +3,17 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@workspace/ui/components/carousel";
-import { Users, Target, Eye, MapPin, Calendar, Fullscreen } from 'lucide-react';
-import { PartnerCard, ProgramCard } from '@/components/About';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@workspace/ui/components/collapsible";
+import { Users, Target, Eye, MapPin, Calendar, Fullscreen, ChevronDown, BookOpen } from 'lucide-react';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import ImageViewDialog from '@/components/common/ImageViewDialog';
 import { boardMemberService } from '@/services/board-members';
-import { getBoardImageUrl } from '@/utils/imageUtils';
+import { mitraService } from '@/services/mitra';
+import { programService } from '@/services/program';
+import { getBoardImageUrl, getNewsImageUrl } from '@/utils/imageUtils';
 import type { BoardMember, BoardGroup } from '@/services/board-members/types';
+import type { Mitra } from '@/services/mitra/types';
+import type { Program } from '@/services/program/types';
 
 const LeadershipSkeleton = () => (
   <div className="max-w-4xl mx-auto">
@@ -47,180 +51,15 @@ const LeadershipSkeleton = () => (
   </div>
 );
 
-// Mock data types
-interface Partner {
-  id: number;
-  name: string;
-  description: string;
-  logo: string;
-  website?: string;
-}
-
-interface Program {
-  id: number;
-  title: string;
-  description: string;
-  htmlContent: string;
-  image: string;
-  category: string;
-}
-
-// Mock data
-const mockPartners: Partner[] = [
-  {
-    id: 1,
-    name: "Kementerian Agama RI",
-    description: "Kemitraan dalam pengembangan pendidikan Islam yang berkualitas",
-    logo: "https://picsum.photos/200/200?random=kemenag",
-    website: "https://kemenag.go.id"
-  },
-  {
-    id: 2,
-    name: "Yayasan Darussalam",
-    description: "Kolaborasi dalam program pendidikan dan dakwah",
-    logo: "https://picsum.photos/200/200?random=darussalam"
-  },
-  {
-    id: 3,
-    name: "Bank Syariah Indonesia",
-    description: "Dukungan pembiayaan untuk pengembangan fasilitas pendidikan",
-    logo: "https://picsum.photos/200/200?random=bsi",
-    website: "https://bankbsi.co.id"
-  },
-  {
-    id: 4,
-    name: "Universitas Islam Negeri",
-    description: "Kerjasama dalam peningkatan kualitas tenaga pendidik",
-    logo: "https://picsum.photos/200/200?random=uin"
-  },
-  {
-    id: 5,
-    name: "Rumah Zakat",
-    description: "Program bantuan sosial dan pendidikan untuk masyarakat",
-    logo: "https://picsum.photos/200/200?random=rumahzakat"
-  }
-];
-
-const mockPrograms: Program[] = [
-  {
-    id: 1,
-    title: "Program Beasiswa Yatim Piatu",
-    description: "Program bantuan pendidikan untuk anak yatim piatu dan dhuafa",
-    htmlContent: `
-      <div class="space-y-4">
-        <p>Program Beasiswa Yatim Piatu adalah salah satu program unggulan Yayasan Baitul Muslim yang bertujuan memberikan akses pendidikan berkualitas bagi anak-anak yatim piatu dan keluarga kurang mampu.</p>
-        
-        <h4 class="font-semibold text-lg">Kriteria Penerima:</h4>
-        <ul class="list-disc pl-6 space-y-2">
-          <li>Anak yatim, piatu, atau yatim piatu</li>
-          <li>Berasal dari keluarga kurang mampu</li>
-          <li>Memiliki prestasi akademik yang baik</li>
-          <li>Berkomitmen melanjutkan pendidikan</li>
-        </ul>
-        
-        <h4 class="font-semibold text-lg">Fasilitas yang Diberikan:</h4>
-        <ul class="list-disc pl-6 space-y-2">
-          <li>Biaya sekolah/kuliah penuh</li>
-          <li>Uang saku bulanan</li>
-          <li>Seragam dan perlengkapan sekolah</li>
-          <li>Bimbingan belajar tambahan</li>
-          <li>Pembinaan karakter dan spiritual</li>
-        </ul>
-      </div>
-    `,
-    image: "https://picsum.photos/400/250?random=program1",
-    category: "Pendidikan"
-  },
-  {
-    id: 2,
-    title: "Program Tahfidz Al-Quran",
-    description: "Program menghafal Al-Quran dengan metode modern dan bimbingan ahli",
-    htmlContent: `
-      <div class="space-y-4">
-        <p>Program Tahfidz Al-Quran dirancang untuk membentuk generasi Qur'ani yang mampu menghafal, memahami, dan mengamalkan ajaran Al-Quran dalam kehidupan sehari-hari.</p>
-        
-        <h4 class="font-semibold text-lg">Metode Pembelajaran:</h4>
-        <ul class="list-disc pl-6 space-y-2">
-          <li>Metode Tilawati untuk tahsin bacaan</li>
-          <li>Sistem talaqqi langsung dengan ustadz</li>
-          <li>Muraja'ah rutin dan terjadwal</li>
-          <li>Evaluasi berkala dengan tes bacaan</li>
-        </ul>
-        
-        <h4 class="font-semibold text-lg">Target Program:</h4>
-        <ul class="list-disc pl-6 space-y-2">
-          <li>Hafalan minimal 5 juz untuk tingkat dasar</li>
-          <li>Hafalan 15 juz untuk tingkat menengah</li>
-          <li>Hafalan 30 juz untuk tingkat lanjut</li>
-          <li>Kemampuan membaca dengan tartil</li>
-        </ul>
-      </div>
-    `,
-    image: "https://picsum.photos/400/250?random=program2",
-    category: "Spiritual"
-  },
-  {
-    id: 3,
-    title: "Program Pemberdayaan Ekonomi Umat",
-    description: "Program pengembangan usaha mikro dan keterampilan untuk masyarakat",
-    htmlContent: `
-      <div class="space-y-4">
-        <p>Program Pemberdayaan Ekonomi Umat bertujuan meningkatkan kesejahteraan masyarakat melalui pengembangan usaha mikro, pelatihan keterampilan, dan pendampingan bisnis.</p>
-        
-        <h4 class="font-semibold text-lg">Jenis Kegiatan:</h4>
-        <ul class="list-disc pl-6 space-y-2">
-          <li>Pelatihan keterampilan tenjahit dan kerajinan</li>
-          <li>Workshop manajemen usaha mikro</li>
-          <li>Bantuan modal usaha tanpa bunga</li>
-          <li>Pemasaran produk melalui platform digital</li>
-        </ul>
-        
-        <h4 class="font-semibold text-lg">Sasaran Program:</h4>
-        <ul class="list-disc pl-6 space-y-2">
-          <li>Ibu-ibu rumah tangga</li>
-          <li>Pemuda putus sekolah</li>
-          <li>Keluarga prasejahtera</li>
-          <li>Kelompok usaha mikro</li>
-        </ul>
-      </div>
-    `,
-    image: "https://picsum.photos/400/250?random=program3",
-    category: "Ekonomi"
-  },
-  {
-    id: 4,
-    title: "Program Dakwah dan Kajian Islam",
-    description: "Program penyebaran ajaran Islam melalui kajian dan ceramah rutin",
-    htmlContent: `
-      <div class="space-y-4">
-        <p>Program Dakwah dan Kajian Islam bertujuan menyebarkan ajaran Islam yang rahmatan lil alamin melalui berbagai kegiatan dakwah dan pembelajaran agama.</p>
-        
-        <h4 class="font-semibold text-lg">Kegiatan Rutin:</h4>
-        <ul class="list-disc pl-6 space-y-2">
-          <li>Kajian mingguan setiap hari Jumat</li>
-          <li>Ceramah bulanan dengan ustadz tamu</li>
-          <li>Halaqah Al-Quran untuk ibu-ibu</li>
-          <li>Program muallaf dan pembinaan</li>
-        </ul>
-        
-        <h4 class="font-semibold text-lg">Materi Kajian:</h4>
-        <ul class="list-disc pl-6 space-y-2">
-          <li>Tafsir Al-Quran dan Hadits</li>
-          <li>Fiqh sehari-hari</li>
-          <li>Akhlak dan tasawuf</li>
-          <li>Sejarah Islam dan sirah nabawiyah</li>
-        </ul>
-      </div>
-    `,
-    image: "https://picsum.photos/400/250?random=program4",
-    category: "Dakwah"
-  }
-];
 
 const AboutPage = () => {
   const [boardMembers, setBoardMembers] = useState<BoardMember[]>([]);
   const [boardGroups, setBoardGroups] = useState<BoardGroup[]>([]);
+  const [mitras, setMitras] = useState<Mitra[]>([]);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mitraLoading, setMitraLoading] = useState(true);
+  const [programLoading, setProgramLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<{
     src: string;
     alt: string;
@@ -254,7 +93,35 @@ const AboutPage = () => {
       }
     };
 
+    const loadMitras = async () => {
+      try {
+        const response = await mitraService.getMitras({
+          limit: 50
+        });
+        setMitras(response.items);
+      } catch (error) {
+        console.error('Error loading mitra data:', error);
+      } finally {
+        setMitraLoading(false);
+      }
+    };
+
+    const loadPrograms = async () => {
+      try {
+        const response = await programService.getPrograms({
+          limit: 50
+        });
+        setPrograms(response.items);
+      } catch (error) {
+        console.error('Error loading program data:', error);
+      } finally {
+        setProgramLoading(false);
+      }
+    };
+
     loadData();
+    loadMitras();
+    loadPrograms();
   }, []);
 
   // Handle image click to open dialog
@@ -284,6 +151,97 @@ const AboutPage = () => {
       setSelectedDescription('');
     }
   };
+
+
+  // Render mitra card for carousel
+  const renderMitraCard = (mitra: Mitra) => (
+    <Card key={mitra.id} className="h-full">
+      <CardContent className="p-6 text-center h-full flex flex-col">
+        <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden bg-muted">
+          {mitra.img_url ? (
+            <img
+              src={getNewsImageUrl(mitra.img_url)}
+              alt={mitra.title}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = `https://picsum.photos/200/200?random=${mitra.id}`;
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Users className="w-8 h-8 text-muted-foreground" />
+            </div>
+          )}
+        </div>
+        <h3 className="font-semibold text-foreground mb-2">{mitra.title}</h3>
+        {mitra.description && (
+          <div className="text-sm text-muted-foreground leading-relaxed flex-1">
+            <RichTextDisplay content={mitra.description} />
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  // Render program card for carousel
+  const renderProgramCard = (program: Program) => (
+    <Card key={program.id} className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+      {/* Image Section */}
+      <div className="relative overflow-hidden rounded-t-lg bg-muted h-48">
+        {program.img_url ? (
+          <img
+            src={getNewsImageUrl(program.img_url)}
+            alt={program.title}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = `https://picsum.photos/400/300?random=${program.id}`;
+            }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Target className="w-12 h-12 text-muted-foreground" />
+          </div>
+        )}
+      </div>
+      
+      <CardContent className="p-6">
+        <div className="flex items-start gap-3 mb-4">
+          <div className="bg-primary/10 p-2 rounded-lg flex-shrink-0">
+            <BookOpen className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="font-bold text-lg text-foreground mb-2">
+              {program.title}
+            </h3>
+            {program.excerpt && (
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {program.excerpt}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Collapsible Details */}
+        {program.description && (
+          <Collapsible>
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+              <span className="text-sm font-medium text-foreground">
+                Lihat Detail Program
+              </span>
+              <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform [&[data-state=open]]:rotate-180" />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-3">
+              <div className="prose prose-sm max-w-none text-muted-foreground">
+                <RichTextDisplay content={program.description} />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+      </CardContent>
+    </Card>
+  );
 
   const renderLeadershipCard = (member: BoardMember, isCenter: boolean = false) => (
     <Card key={member.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group w-full">
@@ -583,23 +541,43 @@ const AboutPage = () => {
           </div>
 
           <div className="relative max-w-5xl mx-auto">
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              className="w-full"
-            >
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {mockPartners.map((partner) => (
-                  <CarouselItem key={partner.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                    <PartnerCard partner={partner} />
-                  </CarouselItem>
+            {mitraLoading ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <Card key={index}>
+                    <CardContent className="p-6 text-center">
+                      <Skeleton className="w-24 h-24 rounded-full mx-auto mb-4" />
+                      <Skeleton className="h-6 w-32 mx-auto mb-2" />
+                      <Skeleton className="h-4 w-full mb-2" />
+                      <Skeleton className="h-4 w-3/4 mx-auto" />
+                    </CardContent>
+                  </Card>
                 ))}
-              </CarouselContent>
-              <CarouselPrevious className="hidden md:flex" />
-              <CarouselNext className="hidden md:flex" />
-            </Carousel>
+              </div>
+            ) : mitras.length > 0 ? (
+              <Carousel
+                opts={{
+                  align: "start",
+                  loop: true,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-2 md:-ml-4">
+                  {mitras.map((mitra) => (
+                    <CarouselItem key={mitra.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                      {renderMitraCard(mitra)}
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="hidden md:flex" />
+                <CarouselNext className="hidden md:flex" />
+              </Carousel>
+            ) : (
+              <div className="text-center py-12">
+                <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Belum ada data mitra yang tersedia.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -620,23 +598,45 @@ const AboutPage = () => {
           </div>
 
           <div className="relative max-w-6xl mx-auto">
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              className="w-full"
-            >
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {mockPrograms.map((program) => (
-                  <CarouselItem key={program.id} className="pl-2 md:pl-4">
-                    <ProgramCard program={program} />
-                  </CarouselItem>
+            {programLoading ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <Card key={index}>
+                    <div className="relative overflow-hidden rounded-t-lg bg-muted h-48">
+                      <Skeleton className="w-full h-full" />
+                    </div>
+                    <CardContent className="p-6">
+                      <Skeleton className="h-6 w-32 mb-2" />
+                      <Skeleton className="h-4 w-full mb-2" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </CardContent>
+                  </Card>
                 ))}
-              </CarouselContent>
-              <CarouselPrevious className="hidden md:flex" />
-              <CarouselNext className="hidden md:flex" />
-            </Carousel>
+              </div>
+            ) : programs.length > 0 ? (
+              <Carousel
+                opts={{
+                  align: "start",
+                  loop: true,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-2 md:-ml-4">
+                  {programs.map((program) => (
+                    <CarouselItem key={program.id} className="pl-2 md:pl-4">
+                      {renderProgramCard(program)}
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="hidden md:flex" />
+                <CarouselNext className="hidden md:flex" />
+              </Carousel>
+            ) : (
+              <div className="text-center py-12">
+                <Target className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Belum ada data program yang tersedia.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
