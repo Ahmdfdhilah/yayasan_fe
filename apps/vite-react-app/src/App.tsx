@@ -32,6 +32,8 @@ import BoardMembersPage from './pages/board-members/BoardMembersPage';
 import ArticlesPage from './pages/articles/ArticlesPage';
 import GalleriesPage from './pages/galleries/GalleriesPage';
 import MessagesPage from './pages/messages/MessagesPage';
+import MitraPage from './pages/mitra/MitraPage';
+import ProgramPage from './pages/program/ProgramPage';
 import HomePage from './pages/public/home/HomePage';
 import ArticlesListPage from './pages/public/articles/ArticlesListPage';
 import ArticleDetailPage from './pages/public/articles/ArticleDetailPage';
@@ -231,6 +233,18 @@ function App() {
                       <Route path="messages" element={
                         <RoleProtectedRoute allowedRoles={['admin']}>
                           <MessagesPage />
+                        </RoleProtectedRoute>
+                      } />
+
+                      <Route path="mitra" element={
+                        <RoleProtectedRoute allowedRoles={['admin']}>
+                          <MitraPage />
+                        </RoleProtectedRoute>
+                      } />
+
+                      <Route path="program" element={
+                        <RoleProtectedRoute allowedRoles={['admin']}>
+                          <ProgramPage />
                         </RoleProtectedRoute>
                       } />
                     </Route>

@@ -14,6 +14,8 @@ import {
   Image,
   MessageSquare,
   Settings,
+  Building2,
+  Target,
 } from "lucide-react";
 
 // PKG System Role definitions
@@ -151,6 +153,18 @@ export const appMenuItems: SidebarItem[] = [
         title: 'Pesan',
         href: '/cms/messages',
         icon: MessageSquare,
+        allowedRoles: ['admin'],
+      },
+      {
+        title: 'Mitra',
+        href: '/cms/mitra',
+        icon: Building2,
+        allowedRoles: ['admin'],
+      },
+      {
+        title: 'Program',
+        href: '/cms/program',
+        icon: Target,
         allowedRoles: ['admin'],
       },
     ],
