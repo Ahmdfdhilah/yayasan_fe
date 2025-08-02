@@ -149,24 +149,31 @@ const ArticleDetailPage = () => {
           )}
         </header>
 
-        {/* Featured Image */}
-        {article.img_url && (
-          <div className="aspect-video relative overflow-hidden rounded-lg mb-8 bg-muted">
-            <img 
-              src={getNewsImageUrl(article.img_url)}
-              alt={article.title}
-              className="w-full h-full object-cover"
+        {/* Main Content Grid */}
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          {/* Featured Image */}
+          {article.img_url ? (
+            <div className="aspect-[4/3] relative overflow-hidden rounded-lg bg-muted">
+              <img 
+                src={getNewsImageUrl(article.img_url)}
+                alt={article.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="aspect-[4/3] bg-muted rounded-lg flex items-center justify-center">
+              <p className="text-muted-foreground">Tidak ada gambar</p>
+            </div>
+          )}
+
+          {/* Article Body */}
+          <div className="prose prose-lg max-w-none">
+            <RichTextDisplay 
+              content={article.description}
+              isDetailView={true}
+              fallback="Konten artikel tidak tersedia."
             />
           </div>
-        )}
-
-        {/* Article Body */}
-        <div className="prose prose-lg max-w-none mb-12">
-          <RichTextDisplay 
-            content={article.description}
-            isDetailView={true}
-            fallback="Konten artikel tidak tersedia."
-          />
         </div>
 
         {/* Article Footer */}

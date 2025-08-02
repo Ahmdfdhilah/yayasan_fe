@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
+import { Card, CardContent } from "@workspace/ui/components/card";
 import { ArrowLeft, Users, Calendar } from 'lucide-react';
 import { getOrganizationImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
@@ -27,20 +27,20 @@ const OrganizationDetailPage = () => {
     const loadOrganization = async () => {
       setLoading(true);
       setError(null);
-      
+
       try {
         const org = await organizationService.getOrganizationById(parseInt(id));
         setOrganization(org);
-        
+
         // Load related organizations (exclude current one)
         const orgResponse = await organizationService.getOrganizations({
           size: 12
         });
-        
+
         const related = orgResponse.items
           .filter(o => o.id !== org.id)
           .slice(0, 9);
-        
+
         setRelatedOrganizations(related);
       } catch (err) {
         console.error('Error loading organization:', err);
@@ -145,72 +145,36 @@ const OrganizationDetailPage = () => {
           )}
         </header>
 
-        {/* Featured Image */}
-        {organization.img_url && (
-          <div className="aspect-video relative overflow-hidden rounded-lg mb-8 bg-muted">
-            <img 
-              src={getOrganizationImageUrl(organization.img_url)}
-              alt={organization.name}
-              className="w-full h-full object-cover"
+        {/* Main Content Grid */}
+        <div className="grid md:grid-cols-2 gap-8 mb-8">
+          {/* Featured Image */}
+          {organization.img_url ? (
+            <div className="aspect-[4/3] relative overflow-hidden rounded-lg bg-muted">
+              <img
+                src={getOrganizationImageUrl(organization.img_url)}
+                alt={organization.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="aspect-[4/3] bg-muted rounded-lg flex items-center justify-center">
+              <p className="text-muted-foreground">Tidak ada gambar</p>
+            </div>
+          )}
+
+          {/* Description */}
+          <div className="prose prose-sm max-w-none">
+            <RichTextDisplay
+              content={organization.description || organization.excerpt}
+              isDetailView={true}
+              fallback={`Informasi tentang ${organization.name} belum tersedia.`}
             />
           </div>
-        )}
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-3">
-            {/* Description */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Tentang {organization.display_name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="prose prose-sm max-w-none">
-                  <RichTextDisplay 
-                    content={organization.description || organization.excerpt}
-                    isDetailView={true}
-                    fallback={`Informasi tentang ${organization.name} belum tersedia.`}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-          </div>
-
-          {/* Sidebar */}
-          {/* <div className="lg:col-span-1"> */}
-
-            {/* Statistics */}
-            {/* <Card>
-              <CardHeader>
-                <CardTitle>Statistik</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {organization.user_count > 0 && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Total Anggota</span>
-                    <span className="font-semibold text-foreground">{organization.user_count}</span>
-                  </div>
-                )} */}
-                
-                {/* {organization.created_at && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Tahun Berdiri</span>
-                    <span className="font-semibold text-foreground">
-                      {new Date(organization.created_at).getFullYear()}
-                    </span>
-                  </div>
-                )}
-                 */}
-                 {/* TODO */}
-              {/* </CardContent>
-            </Card> */}
-          {/* </div> */}
         </div>
 
         {/* Footer */}
         <div className="mt-12">
-          <DetailPageFooter 
+          <DetailPageFooter
             onShare={onShare}
             shareLabel="Bagikan Lembaga"
             backPath="/schools"
@@ -242,7 +206,7 @@ const OrganizationDetailPage = () => {
               renderItem={(relatedOrg, index) => (
                 <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group h-full">
                   <div className="aspect-video relative overflow-hidden rounded-t-lg bg-muted">
-                    <img 
+                    <img
                       src={getOrganizationImageUrl(relatedOrg.img_url) || `https://picsum.photos/320/180?random=${index + 200}`}
                       alt={relatedOrg.name}
                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
