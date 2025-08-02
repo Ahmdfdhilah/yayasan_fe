@@ -5,7 +5,6 @@ import { Card, CardContent } from '@workspace/ui/components/card';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { 
   User, 
-  Calendar,
   GraduationCap,
   Star,
   BarChart3,

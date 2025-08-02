@@ -29,7 +29,7 @@ import { Switch } from '@workspace/ui/components/switch';
 const galleryFormSchema = z.object({
   title: z.string().min(1, 'Judul wajib diisi').max(255, 'Judul maksimal 255 karakter'),
   excerpt: z.string().optional().or(z.literal('')),
-  is_highlight: z.boolean().default(false),
+  is_highlight: z.boolean(),
 });
 
 type GalleryFormData = z.infer<typeof galleryFormSchema>;
@@ -67,7 +67,7 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
         form.reset({
           title: editingGallery.title,
           excerpt: editingGallery.excerpt || '',
-          is_highlight: editingGallery.is_highlight,
+          is_highlight: editingGallery.is_highlight || false,
         });
       } else {
         form.reset({

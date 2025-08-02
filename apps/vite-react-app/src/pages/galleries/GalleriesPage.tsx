@@ -25,7 +25,7 @@ interface GalleryPageFilters {
   page: number;
   size: number;
   is_highlighted?: string;
-  [key: string]: string | number;
+  [key: string]: string | number | undefined;
 }
 
 const GalleriesPage: React.FC = () => {

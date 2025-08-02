@@ -34,7 +34,12 @@ export const useTheme = () => {
     };
   }, [dispatch]);
 
+  const toggleTheme = () => {
+    dispatch(setTheme(!isDarkMode));
+  };
+
   return {
-    isDarkMode
+    isDarkMode,
+    toggleTheme
   };
 };

@@ -45,7 +45,7 @@ interface MessageDialogProps {
 const statusOptions: { value: MessageStatus; label: string; color: string }[] = [
   { value: MessageStatus.UNREAD, label: 'Belum Dibaca', color: 'bg-red-100 text-red-800' },
   { value: MessageStatus.READ, label: 'Sudah Dibaca', color: 'bg-green-100 text-green-800' },
-  { value: MessageStatus.ARCHIVED, label: 'Diarsipkan', color: 'bg-gray-100 text-gray-800' },
+  { value: MessageStatus.ARCHIEVED, label: 'Diarsipkan', color: 'bg-gray-100 text-gray-800' },
 ];
 
 export function MessageDialog({
