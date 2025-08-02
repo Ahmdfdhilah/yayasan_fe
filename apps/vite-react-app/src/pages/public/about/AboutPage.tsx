@@ -3,9 +3,10 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@workspace/ui/components/carousel";
-import { Users, Target, Eye, MapPin, Calendar } from 'lucide-react';
+import { Users, Target, Eye, MapPin, Calendar, Fullscreen } from 'lucide-react';
 import { PartnerCard, ProgramCard } from '@/components/About';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
+import ImageViewDialog from '@/components/common/ImageViewDialog';
 import { boardMemberService } from '@/services/board-members';
 import { getBoardImageUrl } from '@/utils/imageUtils';
 import type { BoardMember, BoardGroup } from '@/services/board-members/types';
@@ -220,6 +221,13 @@ const AboutPage = () => {
   const [boardMembers, setBoardMembers] = useState<BoardMember[]>([]);
   const [boardGroups, setBoardGroups] = useState<BoardGroup[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<{
+    src: string;
+    alt: string;
+    title?: string;
+  } | null>(null);
+  const [selectedDescription, setSelectedDescription] = useState<string>('');
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -249,15 +257,52 @@ const AboutPage = () => {
     loadData();
   }, []);
 
+  // Handle image click to open dialog
+  const handleImageClick = (member: BoardMember) => {
+    const imageUrl = getBoardImageUrl(member.img_url) || `https://picsum.photos/400/500?random=${member.id}`;
+    
+    setSelectedImage({
+      src: imageUrl,
+      alt: member.name,
+      title: `${member.name} - ${member.position}`
+    });
+    
+    setSelectedDescription(
+      member.description || 
+      member.short_description || 
+      'Pengurus Yayasan Baitul Muslim Lampung Timur'
+    );
+    
+    setIsImageDialogOpen(true);
+  };
+
+  // Handle dialog close
+  const handleDialogClose = (open: boolean) => {
+    setIsImageDialogOpen(open);
+    if (!open) {
+      setSelectedImage(null);
+      setSelectedDescription('');
+    }
+  };
+
   const renderLeadershipCard = (member: BoardMember, isCenter: boolean = false) => (
     <Card key={member.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group w-full">
-      {/* Image Section - Flexible aspect ratio */}
-      <div className="relative overflow-hidden rounded-t-lg bg-muted h-80">
+      {/* Image Section - Clickable for dialog */}
+      <div 
+        className="relative overflow-hidden rounded-t-lg bg-muted h-80 cursor-pointer"
+        onClick={() => handleImageClick(member)}
+      >
         <img
           src={getBoardImageUrl(member.img_url) || `https://picsum.photos/400/500?random=${member.id}`}
           alt={member.name}
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
         />
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <Fullscreen className="w-8 h-8 text-white" />
+          </div>
+        </div>
         {/* Rank indicator */}
         <div className="absolute top-3 right-3 bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm shadow-lg">
           {member.member_order}
@@ -425,7 +470,7 @@ const AboutPage = () => {
                 return (
                   <div key={group.id} className="space-y-6">
                     {/* Group Title */}
-                    <div className="text-center">
+                    <div className="text-left">
                       <h3 className="text-2xl font-bold text-foreground mb-2">{group.title}</h3>
                       {group.description && (
                         <div className="text-muted-foreground">
@@ -519,7 +564,6 @@ const AboutPage = () => {
               </CardContent>
             </Card>
           </div>
-
         </div>
       </section>
 
@@ -596,6 +640,16 @@ const AboutPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Image View Dialog */}
+      {selectedImage && (
+        <ImageViewDialog
+          open={isImageDialogOpen}
+          onOpenChange={handleDialogClose}
+          image={selectedImage}
+          description={selectedDescription}
+        />
+      )}
     </div>
   );
 };
