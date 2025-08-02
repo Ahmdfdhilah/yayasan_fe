@@ -6,9 +6,10 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 import { Users, Target, Eye, Heart } from 'lucide-react';
 import { AboutSection } from '@/components/Home/AboutSection';
 import { PartnerCard, ProgramCard } from '@/components/About';
+import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import { boardMemberService } from '@/services/board-members';
 import { getBoardImageUrl } from '@/utils/imageUtils';
-import type { BoardMember } from '@/services/board-members/types';
+import type { BoardMember, BoardGroup } from '@/services/board-members/types';
 
 const LeadershipSkeleton = () => (
   <div className="max-w-4xl mx-auto">
@@ -27,7 +28,7 @@ const LeadershipSkeleton = () => (
         </Card>
       </div>
     </div>
-    
+
     {/* Second row - Two side positions */}
     <div className="grid md:grid-cols-2 gap-8">
       {Array.from({ length: 2 }).map((_, index) => (
@@ -218,26 +219,35 @@ const mockPrograms: Program[] = [
 
 const AboutPage = () => {
   const [boardMembers, setBoardMembers] = useState<BoardMember[]>([]);
+  const [boardGroups, setBoardGroups] = useState<BoardGroup[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadBoardMembers = async () => {
+    const loadData = async () => {
       try {
-        // Get top 3 board members by display_order
-        const response = await boardMemberService.getBoardMembers({
-          size: 3,
+        // Load board groups first
+        const groupsResponse = await boardMemberService.getBoardGroups({
+          size: 50,
           sort_by: 'display_order',
           sort_order: 'asc'
         });
-        setBoardMembers(response.items);
+        setBoardGroups(groupsResponse.items);
+
+        // Load all board members
+        const membersResponse = await boardMemberService.getBoardMembers({
+          size: 50,
+          sort_by: 'member_order',
+          sort_order: 'asc'
+        });
+        setBoardMembers(membersResponse.items);
       } catch (error) {
-        console.error('Error loading board members:', error);
+        console.error('Error loading board data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadBoardMembers();
+    loadData();
   }, []);
 
   const renderLeadershipCard = (member: BoardMember, isCenter: boolean = false) => (
@@ -251,23 +261,29 @@ const AboutPage = () => {
         />
         {/* Rank indicator */}
         <div className="absolute top-3 right-3 bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm shadow-lg">
-          {member.display_order}
+          {member.member_order}
         </div>
       </div>
-      
+
       {/* Content Section */}
       <CardContent className="p-6 text-center">
         <h3 className={`font-bold text-foreground mb-2 group-hover:text-primary transition-colors ${isCenter ? 'text-xl' : 'text-lg'}`}>
           {member.name}
         </h3>
-        
+
         <Badge variant="secondary" className="mb-4">
           {member.position}
         </Badge>
-        
-        <p className="text-muted-foreground leading-relaxed text-sm">
-          {member.short_description || member.description || `Pengurus Yayasan Baitul Muslim Lampung Timur`}
-        </p>
+
+        <div className="text-muted-foreground leading-relaxed text-sm">
+          {member.description ? (
+            <RichTextDisplay content={member.description} />
+          ) : member.short_description ? (
+            <p>{member.short_description}</p>
+          ) : (
+            <p>Pengurus Yayasan Baitul Muslim Lampung Timur</p>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
@@ -293,11 +309,11 @@ const AboutPage = () => {
               <Badge variant="secondary" className="mb-6 bg-white/10 text-white border-white/20 hover:bg-white/20">
                 Yayasan Baitul Muslim Lampung Timur
               </Badge>
-              
+
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
                 Tentang Yayasan
               </h1>
-              
+
               <p className="text-lg md:text-xl mb-8 text-white/90 leading-relaxed max-w-2xl">
                 Mengenal lebih dekat Yayasan Baitul Muslim Lampung Timur, visi misi, dan pengurus yayasan
               </p>
@@ -326,25 +342,39 @@ const AboutPage = () => {
 
           {loading ? (
             <LeadershipSkeleton />
-          ) : boardMembers.length > 0 ? (
-            <div className="max-w-4xl mx-auto">
-              {/* First row - Center position (order 1) */}
-              <div className="grid gap-8 mb-8">
-                {boardMembers.filter(member => member.display_order === 1).map(member => (
-                  <div key={member.id} className="max-w-sm mx-auto w-full">
-                    {renderLeadershipCard(member, true)}
+          ) : boardGroups.length > 0 ? (
+            <div className="max-w-6xl mx-auto space-y-12">
+              {/* Render each group */}
+              {boardGroups.map((group) => {
+                const groupMembers = boardMembers
+                  .filter(member => member.group_id === group.id)
+                  .sort((a, b) => a.member_order - b.member_order);
+
+                if (groupMembers.length === 0) return null;
+
+                return (
+                  <div key={group.id} className="space-y-6">
+                    {/* Group Title */}
+                    <div className="text-center">
+                      <h3 className="text-2xl font-bold text-foreground mb-2">{group.title}</h3>
+                      {group.description && (
+                        <div className="text-muted-foreground">
+                          <RichTextDisplay content={group.description} />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Group Members */}
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {groupMembers.map(member => (
+                        <div key={member.id} className="w-full">
+                          {renderLeadershipCard(member, false)}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
-              
-              {/* Second row - Side positions (order 2 and 3) */}
-              <div className="grid md:grid-cols-2 gap-8">
-                {boardMembers.filter(member => member.display_order === 2 || member.display_order === 3).map(member => (
-                  <div key={member.id} className="w-full">
-                    {renderLeadershipCard(member, false)}
-                  </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-12">
@@ -384,7 +414,7 @@ const AboutPage = () => {
                   <h3 className="text-2xl font-bold text-foreground">Visi</h3>
                 </div>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  Menjadi lembaga pendidikan Islam terpadu yang unggul, berkarakter, dan berwawasan global, 
+                  Menjadi lembaga pendidikan Islam terpadu yang unggul, berkarakter, dan berwawasan global,
                   yang mampu mencetak generasi Qur'ani yang beriman, bertakwa, berilmu, dan berakhlak mulia.
                 </p>
               </CardContent>
@@ -428,7 +458,7 @@ const AboutPage = () => {
                 Prinsip-prinsip yang menjadi landasan dalam setiap aktivitas yayasan
               </p>
             </div>
-            
+
             <div className="grid md:grid-cols-4 gap-6">
               {[
                 {

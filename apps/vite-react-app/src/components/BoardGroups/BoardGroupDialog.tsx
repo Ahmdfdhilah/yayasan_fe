@@ -12,7 +12,7 @@ import {
 } from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
-import { Textarea } from '@workspace/ui/components/textarea';
+import { RichTextEditor } from '@/components/common/RichTextEditor';
 import {
   Form,
   FormControl,
@@ -170,11 +170,11 @@ export const BoardGroupDialog: React.FC<BoardGroupDialogProps> = ({
                 <FormItem>
                   <FormLabel>Deskripsi</FormLabel>
                   <FormControl>
-                    <Textarea
+                    <RichTextEditor
+                      value={field.value || ''}
+                      onChange={field.onChange}
                       placeholder="Masukkan deskripsi grup (opsional)"
-                      rows={4}
-                      {...field}
-                      disabled={loading}
+                      disabled={loading || isView}
                     />
                   </FormControl>
                   <FormDescription>
