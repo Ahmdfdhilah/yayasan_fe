@@ -15,10 +15,10 @@ export interface TeacherEvaluation {
   period_id: number;
   period?: Period;
   
-  // Auto-calculated aggregate fields
-  total_score: number;
-  average_score: number;
-  final_grade: number; // Calculated as total_score * 1.25
+  // Auto-calculated aggregate fields - nullable until evaluated
+  total_score: number | null;
+  average_score: number | null;
+  final_grade: number | null; // Calculated as total_score * 1.25
   
   // Summary fields
   final_notes?: string;
@@ -40,8 +40,8 @@ export interface TeacherEvaluationItem {
   teacher_evaluation_id: number;
   aspect_id: number;
   aspect?: EvaluationAspect;
-  grade: EvaluationGrade;
-  score: number; // Auto-calculated from grade
+  grade: EvaluationGrade | null; // Nullable until evaluated
+  score: number | null; // Auto-calculated from grade, nullable until evaluated
   notes?: string;
   evaluated_at: string;
   created_at?: string;
@@ -77,7 +77,7 @@ export interface TeacherEvaluationWithItemsCreate {
 
 export interface TeacherEvaluationItemCreate {
   aspect_id: number;
-  grade: EvaluationGrade;
+  grade: EvaluationGrade | null;
   notes?: string;
 }
 
@@ -86,12 +86,12 @@ export interface TeacherEvaluationUpdate {
 }
 
 export interface TeacherEvaluationItemUpdate {
-  grade?: EvaluationGrade;
+  grade?: EvaluationGrade | null;
   notes?: string;
 }
 
 export interface UpdateEvaluationItemGrade {
-  grade: EvaluationGrade;
+  grade: EvaluationGrade | null;
   notes?: string;
 }
 
@@ -102,7 +102,7 @@ export interface UpdateEvaluationFinalNotes {
 export interface TeacherEvaluationBulkItemUpdate {
   item_updates: Array<{
     aspect_id: number;
-    grade: EvaluationGrade;
+    grade: EvaluationGrade | null;
     notes?: string;
   }>;
 }
@@ -129,9 +129,9 @@ export interface TeacherEvaluationSummary {
   period_id: number;
   total_aspects: number;
   completed_aspects: number;
-  total_score: number;
-  average_score: number;
-  final_grade: number;
+  total_score: number | null;
+  average_score: number | null;
+  final_grade: number | null;
   completion_percentage: number;
   last_updated?: string;
 }

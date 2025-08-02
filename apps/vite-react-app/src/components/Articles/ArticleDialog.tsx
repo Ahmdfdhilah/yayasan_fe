@@ -33,6 +33,7 @@ import {
 import FileUpload from '@/components/common/FileUpload';
 import { RichTextEditor } from '@/components/common/RichTextEditor';
 import { Article, ArticleCreate, ArticleUpdate } from '@/services/articles/types';
+import { articleService } from '@/services/articles';
 
 const articleFormSchema = z.object({
   title: z.string().min(1, 'Judul wajib diisi').max(255, 'Judul maksimal 255 karakter'),
@@ -53,8 +54,8 @@ interface ArticleDialogProps {
   onSave: (data: ArticleCreate | ArticleUpdate, image?: File) => void;
 }
 
-// Common article categories
-const ARTICLE_CATEGORIES = [
+// Default article categories (fallback if API fails)
+const DEFAULT_CATEGORIES = [
   'Berita',
   'Pengumuman',
   'Kegiatan',
@@ -73,6 +74,10 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [customCategory, setCustomCategory] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
   const isEdit = !!editingArticle;
 
   const form = useForm<ArticleFormData>({
@@ -87,6 +92,28 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
     },
   });
 
+  // Fetch categories from API
+  useEffect(() => {
+    if (open) {
+      fetchCategories();
+    }
+  }, [open]);
+
+  const fetchCategories = async () => {
+    setLoadingCategories(true);
+    try {
+      const response = await articleService.getCategories();
+      if (response.categories && response.categories.length > 0) {
+        setCategories(response.categories);
+      }
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+      // Keep default categories on error
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
   useEffect(() => {
     if (open) {
       if (editingArticle) {
@@ -98,6 +125,9 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
           category: editingArticle.category,
           is_published: editingArticle.is_published,
         });
+        // Check if current category is in the list, if not, show custom input
+        setCustomCategory('');
+        setShowCustomInput(!categories.includes(editingArticle.category));
       } else {
         form.reset({
           title: '',
@@ -107,10 +137,12 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
           category: '',
           is_published: false,
         });
+        setCustomCategory('');
+        setShowCustomInput(false);
       }
       setSelectedFiles([]);
     }
-  }, [open, editingArticle, form]);
+  }, [open, editingArticle, form, categories]);
 
   // Auto-generate slug from title
   const generateSlug = (title: string) => {
@@ -122,14 +154,14 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
       .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
   };
 
-  // Watch title changes to auto-generate slug
+  // Watch title changes to auto-generate slug (always generate, even in edit mode)
   const watchTitle = form.watch('title');
   useEffect(() => {
-    if (watchTitle && !isEdit) {
+    if (watchTitle) {
       const newSlug = generateSlug(watchTitle);
       form.setValue('slug', newSlug);
     }
-  }, [watchTitle, isEdit, form]);
+  }, [watchTitle, form]);
 
   const onSubmit = async (data: ArticleFormData) => {
     // Validasi file upload untuk create
@@ -227,23 +259,15 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
                 )}
               />
 
+              {/* Slug is auto-generated from title, no need to show input */}
               <FormField
                 control={form.control}
                 name="slug"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Slug URL</FormLabel>
+                  <FormItem className="hidden">
                     <FormControl>
-                      <Input
-                        placeholder="url-artikel"
-                        {...field}
-                        disabled={loading}
-                      />
+                      <Input {...field} />
                     </FormControl>
-                    <FormDescription>
-                      URL artikel (otomatis dibuat dari judul)
-                    </FormDescription>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -256,20 +280,72 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Kategori</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value} disabled={loading}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih kategori artikel" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {ARTICLE_CATEGORIES.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {showCustomInput ? (
+                      <div className="space-y-2">
+                        <FormControl>
+                          <Input
+                            placeholder="Masukkan kategori baru"
+                            value={customCategory}
+                            onChange={(e) => {
+                              setCustomCategory(e.target.value);
+                              field.onChange(e.target.value);
+                            }}
+                            disabled={loading}
+                          />
+                        </FormControl>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setShowCustomInput(false);
+                            setCustomCategory('');
+                            field.onChange('');
+                          }}
+                          disabled={loading}
+                        >
+                          Pilih dari daftar
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <Select 
+                          onValueChange={(value) => {
+                            if (value === '__custom__') {
+                              setShowCustomInput(true);
+                              setCustomCategory('');
+                              field.onChange('');
+                            } else {
+                              field.onChange(value);
+                            }
+                          }} 
+                          value={field.value}
+                          disabled={loading || loadingCategories}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder={loadingCategories ? "Memuat kategori..." : "Pilih kategori artikel"} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {categories.map((category) => (
+                              <SelectItem key={category} value={category}>
+                                {category}
+                              </SelectItem>
+                            ))}
+                            <SelectItem value="__custom__">
+                              <span className="text-primary font-medium">+ Tambah kategori baru</span>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                    <FormDescription>
+                      {showCustomInput 
+                        ? "Masukkan nama kategori baru" 
+                        : "Pilih kategori yang sudah ada atau tambah kategori baru"
+                      }
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

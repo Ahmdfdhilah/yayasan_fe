@@ -1,10 +1,11 @@
 import React from 'react';
 import { TeacherEvaluationResponse } from '@/services/teacher-evaluations/types';
+import { formatAverageScore, formatFinalGrade } from '@/services/teacher-evaluations/utils';
 import { UserRole } from '@/lib/constants';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { 
-  User, 
+import {
+  User,
   GraduationCap,
   Star,
   BarChart3,
@@ -113,13 +114,13 @@ export const TeacherEvaluationCards: React.FC<TeacherEvaluationCardsProps> = ({
                   <div className="flex items-center gap-2">
                     <BarChart3 className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm">
-                      Rata-rata: <span className="font-medium">{evaluation.average_score.toFixed(2)}</span>
+                      Rata-rata: <span className="font-medium">{formatAverageScore(evaluation.average_score)}</span>
                     </span>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <Star className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">Nilai: {evaluation.final_grade.toFixed(1)}</span>
+                    Nilai: {formatFinalGrade(evaluation.final_grade)}
                   </div>
                 </div>
               </div>

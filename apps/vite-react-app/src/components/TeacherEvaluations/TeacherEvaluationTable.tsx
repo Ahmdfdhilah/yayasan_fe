@@ -1,5 +1,6 @@
 import React from 'react';
 import { TeacherEvaluationResponse } from '@/services/teacher-evaluations/types';
+import { formatAverageScore, formatFinalGrade } from '@/services/teacher-evaluations/utils';
 import { UserRole } from '@/lib/constants';
 import {
   Table,
@@ -117,10 +118,10 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
                   {evaluation.evaluator?.full_name || 'N/A'}
                 </TableCell>
                 <TableCell className="text-center">
-                  {evaluation.average_score.toFixed(2)}
+                  {formatAverageScore(evaluation.average_score)}
                 </TableCell>
                 <TableCell className="text-center">
-                  {evaluation.final_grade.toFixed(1)}
+                  {formatFinalGrade(evaluation.final_grade)}
                 </TableCell>
                 <TableCell className="text-center">
                   <ActionDropdown {...getActionProps(evaluation)} />
@@ -130,6 +131,6 @@ export const TeacherEvaluationTable: React.FC<TeacherEvaluationTableProps> = ({
           )}
         </TableBody>
       </Table>
-    </div>
+    </div >
   );
 };
