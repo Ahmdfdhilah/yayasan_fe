@@ -27,7 +27,6 @@ import TeacherEvaluationsPage from './pages/teacher-evaluations/TeacherEvaluatio
 import TeacherEvaluationDetailPage from './pages/teacher-evaluations/TeacherEvaluationDetailPage';
 import EvaluationReportsPage from './pages/evaluation-reports/EvaluationReportsPage';
 import { MyRPPSubmissionsPage, RPPSubmissionsPage, RPPSubmissionDetailPage } from './pages/rpp-submissions';
-import { MediaFilesPage } from './pages/media-files';
 import BoardMembersPage from './pages/board-members/BoardMembersPage';
 import ArticlesPage from './pages/articles/ArticlesPage';
 import GalleriesPage from './pages/galleries/GalleriesPage';
@@ -59,197 +58,182 @@ function App() {
               <BrowserRouter>
                 <AuthProvider>
                   <Toaster />
-                <Routes>
-                  {/* Public routes */}
-                  <Route path="/" element={<DefaultLayout />}>
-                    <Route index element={<HomePage />} />
-                    <Route path='home' element={<HomePage />} />
+                  <Routes>
+                    {/* Public routes */}
+                    <Route path="/" element={<DefaultLayout />}>
+                      <Route index element={<HomePage />} />
+                      <Route path='home' element={<HomePage />} />
 
-                    {/* Public Articles Routes */}
-                    <Route path='articles' element={<ArticlesListPage />} />
-                    <Route path='articles/:id' element={<ArticleDetailPage />} />
+                      {/* Public Articles Routes */}
+                      <Route path='articles' element={<ArticlesListPage />} />
+                      <Route path='articles/:id' element={<ArticleDetailPage />} />
 
-                    {/* Public Organizations Routes - using /schools to avoid conflict with CMS */}
-                    <Route path='schools' element={<OrganizationsListPage />} />
-                    <Route path='schools/:id' element={<OrganizationDetailPage />} />
+                      {/* Public Organizations Routes - using /schools to avoid conflict with CMS */}
+                      <Route path='schools' element={<OrganizationsListPage />} />
+                      <Route path='schools/:id' element={<OrganizationDetailPage />} />
 
-                    {/* Public Galleries Routes */}
-                    <Route path='galleries' element={<GalleriesListPage />} />
-          
-                    {/* About Page */}
-                    <Route path='about' element={<AboutPage />} />
+                      {/* Public Galleries Routes */}
+                      <Route path='galleries' element={<GalleriesListPage />} />
 
-                    {/* Contact Page */}
-                    <Route path='contact' element={<ContactPage />} />
-                  </Route>
+                      {/* About Page */}
+                      <Route path='about' element={<AboutPage />} />
 
-                  <Route path='/'>
-                    <Route path='login' element={
-                      <PublicRoute>
-                        <LoginPage />
-                      </PublicRoute>
-                    } />
-                    <Route path='forgot-password' element={
-                      <PublicRoute>
-                        <ForgotPasswordPage />
-                      </PublicRoute>
-                    } />
-                    <Route path='callback' element={
-                      <PublicRoute>
-                        <EmailSentSuccessPage />
-                      </PublicRoute>
-                    } />
-                    <Route path='reset-password' element={
-                      <PublicRoute>
-                        <ResetPasswordPage />
-                      </PublicRoute>
-                    } />
-                  </Route>
+                      {/* Contact Page */}
+                      <Route path='contact' element={<ContactPage />} />
+                    </Route>
 
-
-                  {/* Protected routes */}
-                  <Route path="/" element={
-                    <AuthGuard>
-                      <DashboardLayout />
-                    </AuthGuard>
-                  }>
-                    {/* Dashboard - All authenticated users */}
-                    <Route index element={<DashboardPage />} />
-
-                    <Route path="dashboard" element={<DashboardPage />} />
-
-                    {/* Profile - All authenticated users */}
-                    <Route path="profile" element={<ProfilePage />} />
-
-                    {/* Admin only routes */}
-                    <Route path="users" element={
-                      <RoleProtectedRoute allowedRoles={['admin']}>
-                        <UsersPage />
-                      </RoleProtectedRoute>
-                    } />
-
-                    <Route path="cms/organizations" element={
-                      <RoleProtectedRoute allowedRoles={['admin']}>
-                        <OrganizationsPage />
-                      </RoleProtectedRoute>
-                    } />
-                    <Route path="periods" element={
-                      <RoleProtectedRoute allowedRoles={['admin']}>
-                        <PeriodsPage />
-                      </RoleProtectedRoute>
-                    } />
-
-                    <Route path="evaluation-aspects" element={
-                      <RoleProtectedRoute allowedRoles={['admin']}>
-                        <EvaluationAspectsPage />
-                      </RoleProtectedRoute>
-                    } />
-
-                    {/* Evaluation Reports - Admin only */}
-                    <Route path="evaluations/reports" element={
-                      <RoleProtectedRoute allowedRoles={['admin']}>
-                        <EvaluationReportsPage />
-                      </RoleProtectedRoute>
-                    } />
-
-                    {/* Teacher Evaluations - Admin and Kepala Sekolah */}
-                    <Route path="teacher-evaluations" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah']}>
-                        <TeacherEvaluationsPage />
-                      </RoleProtectedRoute>
-                    } />
-
-                    {/* Teacher Evaluation Detail - Admin, Kepala Sekolah, and Guru */}
-                    <Route path="teacher-evaluations/:teacherId" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
-                        <TeacherEvaluationDetailPage />
-                      </RoleProtectedRoute>
-                    } />
-
-                    {/* My Evaluations - Guru only - Redirect to detail page */}
-                    <Route path="my-evaluations" element={
-                      <RoleProtectedRoute allowedRoles={['guru', 'kepala_sekolah']}>
-                        <MyEvaluationsRedirect />
-                      </RoleProtectedRoute>
-                    } />
-
-                    {/* RPP Submissions Routes */}
-                    {/* My RPP Submissions - Guru only */}
-                    <Route path="my-rpp-submissions" element={
-                      <RoleProtectedRoute allowedRoles={['guru', 'kepala_sekolah']}>
-                        <MyRPPSubmissionsPage />
-                      </RoleProtectedRoute>
-                    } />
-
-                    {/* RPP Submissions List - Admin and Kepala Sekolah */}
-                    <Route path="rpp-submissions" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah']}>
-                        <RPPSubmissionsPage />
-                      </RoleProtectedRoute>
-                    } />
-
-                    {/* RPP Submission Detail - Admin/Kepala Sekolah viewing teacher's submission */}
-                    <Route path="rpp-submissions/teacher/:teacherId" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
-                        <RPPSubmissionDetailPage />
-                      </RoleProtectedRoute>
-                    } />
-
-                    {/* Media Files Routes */}
-                    {/* My Media Files - All authenticated users can view their own files */}
-                    <Route path="media-files" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
-                        <MediaFilesPage />
-                      </RoleProtectedRoute>
-                    } />
-
-                    {/* Specific User Media Files - Admin and Kepala Sekolah can view others' files */}
-                    <Route path="media-files/:uploaderId" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
-                        <MediaFilesPage />
-                      </RoleProtectedRoute>
-                    } />
-
-                    <Route path='/cms'>
-                      {/* Content Management Routes - Admin only */}
-                      <Route path="board-members" element={
-                        <RoleProtectedRoute allowedRoles={['admin']}>
-                          <BoardMembersPage />
-                        </RoleProtectedRoute>
+                    <Route path='/'>
+                      <Route path='login' element={
+                        <PublicRoute>
+                          <LoginPage />
+                        </PublicRoute>
                       } />
-
-                      <Route path="articles" element={
-                        <RoleProtectedRoute allowedRoles={['admin']}>
-                          <ArticlesPage />
-                        </RoleProtectedRoute>
+                      <Route path='forgot-password' element={
+                        <PublicRoute>
+                          <ForgotPasswordPage />
+                        </PublicRoute>
                       } />
-
-                      <Route path="galleries" element={
-                        <RoleProtectedRoute allowedRoles={['admin']}>
-                          <GalleriesPage />
-                        </RoleProtectedRoute>
+                      <Route path='callback' element={
+                        <PublicRoute>
+                          <EmailSentSuccessPage />
+                        </PublicRoute>
                       } />
-
-                      <Route path="messages" element={
-                        <RoleProtectedRoute allowedRoles={['admin']}>
-                          <MessagesPage />
-                        </RoleProtectedRoute>
-                      } />
-
-                      <Route path="mitra" element={
-                        <RoleProtectedRoute allowedRoles={['admin']}>
-                          <MitraPage />
-                        </RoleProtectedRoute>
-                      } />
-
-                      <Route path="program" element={
-                        <RoleProtectedRoute allowedRoles={['admin']}>
-                          <ProgramPage />
-                        </RoleProtectedRoute>
+                      <Route path='reset-password' element={
+                        <PublicRoute>
+                          <ResetPasswordPage />
+                        </PublicRoute>
                       } />
                     </Route>
-                  </Route>
-                </Routes>
+
+
+                    {/* Protected routes */}
+                    <Route path="/" element={
+                      <AuthGuard>
+                        <DashboardLayout />
+                      </AuthGuard>
+                    }>
+                      {/* Dashboard - All authenticated users */}
+                      <Route index element={<DashboardPage />} />
+
+                      <Route path="dashboard" element={<DashboardPage />} />
+
+                      {/* Profile - All authenticated users */}
+                      <Route path="profile" element={<ProfilePage />} />
+
+                      {/* Admin only routes */}
+                      <Route path="users" element={
+                        <RoleProtectedRoute allowedRoles={['admin']}>
+                          <UsersPage />
+                        </RoleProtectedRoute>
+                      } />
+
+                      <Route path="cms/organizations" element={
+                        <RoleProtectedRoute allowedRoles={['admin']}>
+                          <OrganizationsPage />
+                        </RoleProtectedRoute>
+                      } />
+                      <Route path="periods" element={
+                        <RoleProtectedRoute allowedRoles={['admin']}>
+                          <PeriodsPage />
+                        </RoleProtectedRoute>
+                      } />
+
+                      <Route path="evaluation-aspects" element={
+                        <RoleProtectedRoute allowedRoles={['admin']}>
+                          <EvaluationAspectsPage />
+                        </RoleProtectedRoute>
+                      } />
+
+                      {/* Evaluation Reports - Admin only */}
+                      <Route path="evaluations/reports" element={
+                        <RoleProtectedRoute allowedRoles={['admin']}>
+                          <EvaluationReportsPage />
+                        </RoleProtectedRoute>
+                      } />
+
+                      {/* Teacher Evaluations - Admin and Kepala Sekolah */}
+                      <Route path="teacher-evaluations" element={
+                        <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah']}>
+                          <TeacherEvaluationsPage />
+                        </RoleProtectedRoute>
+                      } />
+
+                      {/* Teacher Evaluation Detail - Admin, Kepala Sekolah, and Guru */}
+                      <Route path="teacher-evaluations/:teacherId" element={
+                        <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
+                          <TeacherEvaluationDetailPage />
+                        </RoleProtectedRoute>
+                      } />
+
+                      {/* My Evaluations - Guru only - Redirect to detail page */}
+                      <Route path="my-evaluations" element={
+                        <RoleProtectedRoute allowedRoles={['guru', 'kepala_sekolah']}>
+                          <MyEvaluationsRedirect />
+                        </RoleProtectedRoute>
+                      } />
+
+                      {/* RPP Submissions Routes */}
+                      {/* My RPP Submissions - Guru only */}
+                      <Route path="my-rpp-submissions" element={
+                        <RoleProtectedRoute allowedRoles={['guru', 'kepala_sekolah']}>
+                          <MyRPPSubmissionsPage />
+                        </RoleProtectedRoute>
+                      } />
+
+                      {/* RPP Submissions List - Admin and Kepala Sekolah */}
+                      <Route path="rpp-submissions" element={
+                        <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah']}>
+                          <RPPSubmissionsPage />
+                        </RoleProtectedRoute>
+                      } />
+
+                      {/* RPP Submission Detail - Admin/Kepala Sekolah viewing teacher's submission */}
+                      <Route path="rpp-submissions/teacher/:teacherId" element={
+                        <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
+                          <RPPSubmissionDetailPage />
+                        </RoleProtectedRoute>
+                      } />
+
+                      <Route path='/cms'>
+                        {/* Content Management Routes - Admin only */}
+                        <Route path="board-members" element={
+                          <RoleProtectedRoute allowedRoles={['admin']}>
+                            <BoardMembersPage />
+                          </RoleProtectedRoute>
+                        } />
+
+                        <Route path="articles" element={
+                          <RoleProtectedRoute allowedRoles={['admin']}>
+                            <ArticlesPage />
+                          </RoleProtectedRoute>
+                        } />
+
+                        <Route path="galleries" element={
+                          <RoleProtectedRoute allowedRoles={['admin']}>
+                            <GalleriesPage />
+                          </RoleProtectedRoute>
+                        } />
+
+                        <Route path="messages" element={
+                          <RoleProtectedRoute allowedRoles={['admin']}>
+                            <MessagesPage />
+                          </RoleProtectedRoute>
+                        } />
+
+                        <Route path="mitra" element={
+                          <RoleProtectedRoute allowedRoles={['admin']}>
+                            <MitraPage />
+                          </RoleProtectedRoute>
+                        } />
+
+                        <Route path="program" element={
+                          <RoleProtectedRoute allowedRoles={['admin']}>
+                            <ProgramPage />
+                          </RoleProtectedRoute>
+                        } />
+                      </Route>
+                    </Route>
+                  </Routes>
                 </AuthProvider>
               </BrowserRouter>
             </ThemeProvider>

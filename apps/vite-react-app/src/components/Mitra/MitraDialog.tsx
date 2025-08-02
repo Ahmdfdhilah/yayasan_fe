@@ -164,7 +164,7 @@ export const MitraDialog: React.FC<MitraDialogProps> = ({
                   required={false}
                   disabled={loading || isView}
                   showPreview={true}
-                  allowRemove={true}
+                  allowRemove={false}
                 />
               </div>
 

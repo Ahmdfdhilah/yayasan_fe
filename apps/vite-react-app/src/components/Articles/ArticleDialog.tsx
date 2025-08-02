@@ -291,7 +291,7 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
                 required={!isEdit}
                 disabled={loading}
                 showPreview={true}
-                allowRemove={true}
+                allowRemove={false}
               />
             </div>
 

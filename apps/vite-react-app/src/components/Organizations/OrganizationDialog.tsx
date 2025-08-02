@@ -272,7 +272,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
                     required={false}
                     disabled={loading}
                     showPreview={true}
-                    allowRemove={true}
+                    allowRemove={false}
                   />
                 </div>
 

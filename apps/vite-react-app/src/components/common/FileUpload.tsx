@@ -51,7 +51,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   required = false,
   dragAndDrop = true,
   showPreview = true,
-  allowRemove = true,
+  allowRemove = false,
   className,
   onFilesChange,
   onFileRemove,

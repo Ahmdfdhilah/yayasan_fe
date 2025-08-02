@@ -8,7 +8,6 @@ import {
   Building,
   ClipboardCheck,
   Upload,
-  FolderOpen,
   UserCheck,
   Newspaper,
   Image,
@@ -168,16 +167,7 @@ export const appMenuItems: SidebarItem[] = [
         allowedRoles: ['admin'],
       },
     ],
-  },
-
-  // Media Files Management - All users can view their own files
-  {
-    title: 'File Saya',
-    href: '/media-files',
-    icon: FolderOpen,
-    allowedRoles: ['admin', 'guru', 'kepala_sekolah'],
-  },
-
+  }
 ];
 
 // Helper function to get appropriate menu items based on user roles

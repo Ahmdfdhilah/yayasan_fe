@@ -61,7 +61,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
   // URL Filters configuration for period selection (when teacherId is provided)
   const { updateURL, getCurrentFilters } = useURLFilters<DetailPageFilters>({
     defaults: {
-      period_id: periodId || 'latest',
+      period_id: periodId || '',
     },
     cleanDefaults: true,
   });
@@ -105,6 +105,23 @@ const RPPSubmissionDetailPage: React.FC = () => {
       loadSubmissionDetail();
     }
   }, [periods, teacherId, periodId]);
+
+  // Auto-select period only if no period_id in URL (for teacherId route)
+  useEffect(() => {
+    if (teacherId && !periodId && periods.length > 0 && !filters.period_id) {
+      let selectedPeriodId: string;
+      
+      if (activePeriod) {
+        // Use active period if exists
+        selectedPeriodId = activePeriod.id.toString();
+      } else {
+        // Use first period as fallback
+        selectedPeriodId = periods[0].id.toString();
+      }
+      
+      updateURL({ period_id: selectedPeriodId });
+    }
+  }, [teacherId, periodId, activePeriod, periods, filters.period_id, updateURL]);
 
   const loadInitialData = async () => {
     try {
@@ -172,22 +189,12 @@ const RPPSubmissionDetailPage: React.FC = () => {
         targetPeriodId = Number(periodId);
       } else if (teacherId) {
         // Teacher selection route - determine period from filters
-        if (periods.length === 0) {
+        if (periods.length === 0 || !filters.period_id) {
           setIsLoadingSubmission(false);
           return;
         }
 
-        if (filters.period_id === 'latest') {
-          const sortedPeriods = [...periods].sort((a, b) => {
-            if (a.academic_year !== b.academic_year) {
-              return b.academic_year.localeCompare(a.academic_year);
-            }
-            return a.semester === 'Ganjil' ? 1 : -1;
-          });
-          targetPeriodId = sortedPeriods[0].id;
-        } else {
-          targetPeriodId = Number(filters.period_id);
-        }
+        targetPeriodId = Number(filters.period_id);
       } else {
         throw new Error('No teacher or period specified');
       }
@@ -394,10 +401,10 @@ const RPPSubmissionDetailPage: React.FC = () => {
                 <SelectValue placeholder="Pilih periode" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="latest">Periode Terbaru</SelectItem>
                 {periods.map((period) => (
                   <SelectItem key={period.id} value={period.id.toString()}>
                     {period.academic_year} - {period.semester}
+                    {period.is_active ? ' (Aktif)' : ''}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -524,10 +531,10 @@ const RPPSubmissionDetailPage: React.FC = () => {
                 <SelectValue placeholder="Pilih periode" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="latest">Periode Terbaru</SelectItem>
                 {periods.map((period) => (
                   <SelectItem key={period.id} value={period.id.toString()}>
                     {period.academic_year} - {period.semester}
+                    {period.is_active ? ' (Aktif)' : ''}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -243,7 +243,7 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
                 required={!isEdit}
                 disabled={loading}
                 showPreview={true}
-                allowRemove={true}
+                allowRemove={false}
               />
             </div>
 

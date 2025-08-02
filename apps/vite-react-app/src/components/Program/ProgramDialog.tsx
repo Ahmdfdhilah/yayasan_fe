@@ -170,7 +170,7 @@ export const ProgramDialog: React.FC<ProgramDialogProps> = ({
                   required={false}
                   disabled={loading || isView}
                   showPreview={true}
-                  allowRemove={true}
+                  allowRemove={false}
                 />
               </div>
 
