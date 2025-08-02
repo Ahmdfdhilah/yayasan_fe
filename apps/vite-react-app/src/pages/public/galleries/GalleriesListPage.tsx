@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@workspace/ui/components/card";
+import { useSearchParams } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Input } from "@workspace/ui/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
-import { ArrowRight, Search, Image } from 'lucide-react';
+import { Search, Image } from 'lucide-react';
 import { getGalleryImageUrl } from '@/utils/imageUtils';
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import Pagination from '@/components/common/Pagination';
@@ -24,8 +24,8 @@ const GalleriesListPage = () => {
   // Get params from URL
   const currentPage = parseInt(searchParams.get('page') || '1');
   const searchQuery = searchParams.get('search') || '';
-  const sortBy = searchParams.get('sort_by') || 'display_order';
-  const sortOrder = searchParams.get('sort_order') || 'asc';
+  const sortBy = searchParams.get('sort_by') || 'created_at';
+  const sortOrder = searchParams.get('sort_order') || 'desc';
 
   const [localSearch, setLocalSearch] = useState(searchQuery);
 
@@ -41,9 +41,6 @@ const GalleriesListPage = () => {
         <Skeleton className="h-4 w-full mb-2" />
         <Skeleton className="h-4 w-2/3" />
       </CardContent>
-      <CardFooter>
-        <Skeleton className="h-9 w-24" />
-      </CardFooter>
     </Card>
   );
 
@@ -191,11 +188,10 @@ const GalleriesListPage = () => {
                   <SelectValue placeholder="Urutkan" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="display_order-asc">Urutan Tampil</SelectItem>
-                  <SelectItem value="title-asc">Judul A-Z</SelectItem>
-                  <SelectItem value="title-desc">Judul Z-A</SelectItem>
                   <SelectItem value="created_at-desc">Terbaru</SelectItem>
                   <SelectItem value="created_at-asc">Terlama</SelectItem>
+                  <SelectItem value="title-asc">Judul A-Z</SelectItem>
+                  <SelectItem value="title-desc">Judul Z-A</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -255,14 +251,6 @@ const GalleriesListPage = () => {
                       />
                     </div>
                   </CardContent>
-                  <CardFooter>
-                    <Link to={`/galleries/${gallery.id}`} className="w-full">
-                      <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary text-xs">
-                        Lihat Detail
-                        <ArrowRight className="w-3 h-3 ml-1" />
-                      </Button>
-                    </Link>
-                  </CardFooter>
                 </Card>
               ))
             ) : (

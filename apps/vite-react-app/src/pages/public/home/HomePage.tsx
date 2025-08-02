@@ -27,9 +27,8 @@ const HomePage = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load galleries for hero section (limit to 10, ordered by display_order)
-        const galleriesResponse = await galleryService.getAllGalleries(10);
-        const sortedGalleries = galleriesResponse.sort((a, b) => a.display_order - b.display_order);
+        // Load highlighted galleries for hero section (limit to 10)
+        const galleriesResponse = await galleryService.getHighlightedGalleries();
 
         // Load articles (limit to 5, published only)
         const articlesResponse = await articleService.getArticles({
@@ -45,7 +44,7 @@ const HomePage = () => {
           sort_by: 'name',
           sort_order: 'asc'
         });
-        setGalleries(sortedGalleries);
+        setGalleries(galleriesResponse);
         setArticles(articlesResponse.items);
         setOrganizations(organizationsResponse.items);
       } catch (error) {

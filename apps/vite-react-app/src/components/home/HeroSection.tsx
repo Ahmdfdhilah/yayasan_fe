@@ -5,7 +5,7 @@ import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import type { Gallery } from '@/services/galleries/types';
 
 interface HeroSectionProps {
-  galleries: Gallery[];
+  galleries: Gallery[]; // Highlighted galleries only
   loading?: boolean;
 }
 
@@ -15,12 +15,13 @@ export const HeroSection = ({ galleries, loading }: HeroSectionProps) => {
       <section className="relative h-screen flex items-center justify-center bg-muted/20">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Memuat galeri...</p>
+          <p className="text-muted-foreground">Memuat galeri unggulan...</p>
         </div>
       </section>
     );
   }
 
+  // Render each highlighted gallery as a hero slide
   const renderHeroItem = (gallery: Gallery, index: number) => (
     <div className="relative h-screen overflow-hidden">
       {/* Background Image with Overlay */}
