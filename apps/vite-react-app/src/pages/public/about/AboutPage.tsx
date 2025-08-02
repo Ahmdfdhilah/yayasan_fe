@@ -127,19 +127,19 @@ const AboutPage = () => {
   // Handle image click to open dialog
   const handleImageClick = (member: BoardMember) => {
     const imageUrl = getBoardImageUrl(member.img_url) || `https://picsum.photos/400/500?random=${member.id}`;
-    
+
     setSelectedImage({
       src: imageUrl,
       alt: member.name,
       title: `${member.name} - ${member.position}`
     });
-    
+
     setSelectedDescription(
-      member.description || 
-      member.short_description || 
+      member.description ||
+      member.short_description ||
       'Pengurus Yayasan Baitul Muslim Lampung Timur'
     );
-    
+
     setIsImageDialogOpen(true);
   };
 
@@ -188,7 +188,7 @@ const AboutPage = () => {
   const renderProgramCard = (program: Program) => (
     <Card key={program.id} className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
       {/* Image Section */}
-      <div className="relative overflow-hidden rounded-t-lg bg-muted h-48">
+      <div className="relative overflow-hidden rounded-t-lg bg-muted">
         {program.img_url ? (
           <img
             src={getNewsImageUrl(program.img_url)}
@@ -205,7 +205,7 @@ const AboutPage = () => {
           </div>
         )}
       </div>
-      
+
       <CardContent className="p-6">
         <div className="flex items-start gap-3 mb-4">
           <div className="bg-primary/10 p-2 rounded-lg flex-shrink-0">
@@ -246,7 +246,7 @@ const AboutPage = () => {
   const renderLeadershipCard = (member: BoardMember, isCenter: boolean = false) => (
     <Card key={member.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group w-full">
       {/* Image Section - Clickable for dialog */}
-      <div 
+      <div
         className="relative overflow-hidden rounded-t-lg bg-muted h-80 cursor-pointer"
         onClick={() => handleImageClick(member)}
       >
@@ -386,12 +386,6 @@ const AboutPage = () => {
                   alt="Yayasan Baitul Muslim"
                   className="rounded-lg shadow-lg w-full"
                 />
-                <Card className="absolute -bottom-6 -right-6 shadow-lg border-0 bg-primary text-primary-foreground">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-2xl font-bold">30+</div>
-                    <div className="text-sm opacity-90">Tahun Melayani</div>
-                  </CardContent>
-                </Card>
               </div>
             </div>
           </div>

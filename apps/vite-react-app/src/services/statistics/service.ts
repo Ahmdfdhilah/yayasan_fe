@@ -33,7 +33,7 @@ class StatisticService extends BaseService {
 
   // Get all statistics ordered by display_order (using main endpoint with no pagination)
   async getAllStatistics(): Promise<StatisticResponse[]> {
-    const result = await this.getStatistics({ size: 1000 });
+    const result = await this.getStatistics({ size: 100 });
     return result.items;
   }
 

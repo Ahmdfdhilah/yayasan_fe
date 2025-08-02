@@ -1,5 +1,4 @@
 import { Button } from "@workspace/ui/components/button";
-import { Card, CardContent } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import { ArrowRight, MapPin, Calendar, Users } from 'lucide-react';
 import { ScrollToTopLink } from "../common/ScrollToTopLink";
@@ -76,12 +75,6 @@ export const AboutSection = () => {
                 alt="Yayasan Baitul Muslim"
                 className="rounded-lg shadow-lg w-full"
               />
-              <Card className="absolute -bottom-6 -right-6 shadow-lg border-0 bg-primary text-primary-foreground">
-                <CardContent className="p-6 text-center">
-                  <div className="text-2xl font-bold">30+</div>
-                  <div className="text-sm opacity-90">Tahun Melayani</div>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </div>
