@@ -17,7 +17,7 @@ const SearchContainer: React.FC<SearchContainerProps> = ({
   onSearchChange,
   placeholder = "Cari...",
   className,
-  debounceDelay = 300
+  debounceDelay = 500
 }) => {
   const [inputValue, setInputValue] = useState(searchQuery);
   const debouncedSearchQuery = useDebounce(inputValue, debounceDelay);

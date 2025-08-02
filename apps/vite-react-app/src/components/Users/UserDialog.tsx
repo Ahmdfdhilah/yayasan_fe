@@ -172,7 +172,7 @@ export const UserDialog: React.FC<UserDialogProps> = ({
         <div className="flex-1 overflow-y-auto py-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex  flex-col gap-6">
                 <FormField
                   control={form.control}
                   name="email"
@@ -209,32 +209,34 @@ export const UserDialog: React.FC<UserDialogProps> = ({
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="role"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Role</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        disabled={loading}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih role" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value={UserRole.ADMIN}>Admin</SelectItem>
-                          <SelectItem value={UserRole.GURU}>Guru</SelectItem>
-                          <SelectItem value={UserRole.KEPALA_SEKOLAH}>Kepala Sekolah</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+{!isEdit && (
+                  <FormField
+                    control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Role</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={loading}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih role" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value={UserRole.ADMIN}>Admin</SelectItem>
+                            <SelectItem value={UserRole.GURU}>Guru</SelectItem>
+                            <SelectItem value={UserRole.KEPALA_SEKOLAH}>Kepala Sekolah</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 {isEdit && (
                   <FormField
