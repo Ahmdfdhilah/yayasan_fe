@@ -152,7 +152,7 @@ export const ProgramTable: React.FC<ProgramTableProps> = ({
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-medium text-foreground truncate">
+                    <h3 className="truncate">
                       {program.title}
                     </h3>
                   </div>
@@ -160,30 +160,26 @@ export const ProgramTable: React.FC<ProgramTableProps> = ({
               </TableCell>
               <TableCell className="max-w-md">
                 {program.excerpt ? (
-                  <div className="text-sm text-muted-foreground line-clamp-2">
+                  <div className="line-clamp-2">
                     {program.excerpt}
                   </div>
                 ) : (
-                  <span className="text-sm text-muted-foreground italic">
+                  <span className="italic">
                     Tidak ada ringkasan
                   </span>
                 )}
               </TableCell>
               <TableCell className="max-w-md">
                 {program.description ? (
-                  <div className="text-sm text-muted-foreground line-clamp-2">
-                    <RichTextDisplay content={program.description} />
-                  </div>
+                  <RichTextDisplay content={program.description} />
                 ) : (
-                  <span className="text-sm text-muted-foreground italic">
+                  <span className="italic">
                     Tidak ada deskripsi
                   </span>
                 )}
               </TableCell>
               <TableCell>
-                <div className="text-sm text-foreground">
-                  {format(new Date(program.created_at), 'dd MMM yyyy', { locale: id })}
-                </div>
+                {format(new Date(program.created_at), 'dd MMM yyyy', { locale: id })}
               </TableCell>
               <TableCell>
                 <ActionDropdown

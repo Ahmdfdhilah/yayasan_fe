@@ -143,7 +143,7 @@ export const MitraTable: React.FC<MitraTableProps> = ({
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-medium text-foreground truncate">
+                    <h3 className="truncate">
                       {mitra.title}
                     </h3>
                   </div>
@@ -151,19 +151,15 @@ export const MitraTable: React.FC<MitraTableProps> = ({
               </TableCell>
               <TableCell className="max-w-md">
                 {mitra.description ? (
-                  <div className="text-sm text-muted-foreground line-clamp-2">
-                    <RichTextDisplay content={mitra.description} />
-                  </div>
+                  <RichTextDisplay content={mitra.description} />
                 ) : (
-                  <span className="text-sm text-muted-foreground italic">
+                  <span className="italic">
                     Tidak ada deskripsi
                   </span>
                 )}
               </TableCell>
               <TableCell>
-                <div className="text-sm text-foreground">
-                  {format(new Date(mitra.created_at), 'dd MMM yyyy', { locale: id })}
-                </div>
+                {format(new Date(mitra.created_at), 'dd MMM yyyy', { locale: id })}
               </TableCell>
               <TableCell>
                 <ActionDropdown
