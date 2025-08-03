@@ -29,8 +29,9 @@ class AuthService extends BaseService {
     }
   }
 
-  async refreshToken(refreshToken: string): Promise<TokenResponse> {
-    return this.post("/refresh", { refresh_token: refreshToken });
+  async refreshToken(): Promise<TokenResponse> {
+    // Use cookie-based refresh only - no refresh token in request body
+    return this.post("/refresh", {});
   }
 
   async getCurrentUser(): Promise<UserResponse> {

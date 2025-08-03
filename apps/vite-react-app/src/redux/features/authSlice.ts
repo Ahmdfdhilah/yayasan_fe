@@ -14,10 +14,8 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   user: UserResponse | null;
-  accessToken: string | null;
-  refreshToken: string | null;
   error: string | null;
-  tokenExpiry: number | null;
+  // Note: tokens are stored in HttpOnly cookies, not in Redux state
 }
 
 export const updateProfileAsync = createAsyncThunk(
@@ -38,10 +36,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
   user: null,
-  accessToken: null,
-  refreshToken: null,
   error: null,
-  tokenExpiry: null,
 };
 
 export const loginAsync = createAsyncThunk(
@@ -50,13 +45,8 @@ export const loginAsync = createAsyncThunk(
     try {
       const response = await authService.login(loginData);
       
-      const tokenExpiry = Date.now() + (response.expires_in * 1000);
-      
+      // Only return user data - tokens are stored in HttpOnly cookies
       return {
-        access_token: response.access_token,
-        refresh_token: response.refresh_token,
-        expires_in: response.expires_in,
-        tokenExpiry,
         user: response.user
       };
     } catch (error: any) {
@@ -83,15 +73,13 @@ export const logoutAsync = createAsyncThunk(
 
 export const refreshTokenAsync = createAsyncThunk(
   'auth/refreshToken',
-  async (refreshToken: string, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await authService.refreshToken(refreshToken);
-      const tokenExpiry = Date.now() + (response.expires_in * 1000);
+      const response = await authService.refreshToken();
       
+      // Only return user data - tokens are handled by cookies
       return {
-        access_token: response.access_token,
-        expires_in: response.expires_in,
-        tokenExpiry
+        user: response.user
       };
     } catch (error: any) {
       // BaseService already handles error.response?.data?.detail extraction
@@ -165,29 +153,15 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    setTokens: (state, action: PayloadAction<{ accessToken: string; refreshToken?: string; expires_in: number }>) => {
-      state.accessToken = action.payload.accessToken;
-      if (action.payload.refreshToken) {
-        state.refreshToken = action.payload.refreshToken;
-      }
-      state.tokenExpiry = Date.now() + (action.payload.expires_in * 1000);
-      state.isAuthenticated = true;
-    },
     clearAuth: (state) => {
       state.isAuthenticated = false;
       state.user = null;
-      state.accessToken = null;
-      state.refreshToken = null;
-      state.tokenExpiry = null;
       state.error = null;
     },
     clearPersistAndAuth: (state) => {
       // This action will be handled by the AuthProvider to purge persist storage
       state.isAuthenticated = false;
       state.user = null;
-      state.accessToken = null;
-      state.refreshToken = null;
-      state.tokenExpiry = null;
       state.error = null;
     },
     setUser: (state, action: PayloadAction<UserResponse>) => {
@@ -208,13 +182,7 @@ const authSlice = createSlice({
       .addCase(loginAsync.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = true;
-        state.accessToken = action.payload.access_token;
-        state.refreshToken = action.payload.refresh_token;
-        state.tokenExpiry = action.payload.tokenExpiry;
-        
-        if (action.payload.user) {
-          state.user = action.payload.user;
-        }
+        state.user = action.payload.user;
         state.error = null;
       })
       .addCase(loginAsync.rejected, (state, action) => {
@@ -229,9 +197,6 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isAuthenticated = false;
         state.user = null;
-        state.accessToken = null;
-        state.refreshToken = null;
-        state.tokenExpiry = null;
         state.error = null;
       })
       .addCase(logoutAsync.rejected, (state, action) => {
@@ -244,9 +209,9 @@ const authSlice = createSlice({
       })
       .addCase(refreshTokenAsync.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.accessToken = action.payload.access_token;
-        state.tokenExpiry = action.payload.tokenExpiry;
-        // Keep user authenticated and preserve user data
+        if (action.payload.user) {
+          state.user = action.payload.user;
+        }
         state.isAuthenticated = true;
         state.error = null;
       })
@@ -256,9 +221,6 @@ const authSlice = createSlice({
         // Clear all auth data when refresh fails
         state.isAuthenticated = false;
         state.user = null;
-        state.accessToken = null;
-        state.refreshToken = null;
-        state.tokenExpiry = null;
       })
       .addCase(requestPasswordResetAsync.pending, (state) => {
         state.isLoading = true;
@@ -314,9 +276,6 @@ const authSlice = createSlice({
         if (errorMsg.includes('401') || errorMsg.includes('403') || errorMsg.includes('Unauthorized') || errorMsg.includes('Forbidden')) {
           state.isAuthenticated = false;
           state.user = null;
-          state.accessToken = null;
-          state.refreshToken = null;
-          state.tokenExpiry = null;
         }
       })
       .addCase(updateProfileAsync.pending, (state) => {
@@ -338,15 +297,12 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, setTokens, clearAuth, clearPersistAndAuth, setUser, updateUser } = authSlice.actions;
+export const { clearError, clearAuth, clearPersistAndAuth, setUser, updateUser } = authSlice.actions;
 
 export const selectAuth = (state: { auth: AuthState }) => state.auth;
 export const selectIsAuthenticated = (state: { auth: AuthState }) => state.auth.isAuthenticated;
 export const selectUser = (state: { auth: AuthState }) => state.auth.user;
 export const selectAuthLoading = (state: { auth: AuthState }) => state.auth.isLoading;
 export const selectAuthError = (state: { auth: AuthState }) => state.auth.error;
-export const selectAccessToken = (state: { auth: AuthState }) => state.auth.accessToken;
-export const selectRefreshToken = (state: { auth: AuthState }) => state.auth.refreshToken;
-export const selectTokenExpiry = (state: { auth: AuthState }) => state.auth.tokenExpiry;
 
 export default authSlice.reducer;

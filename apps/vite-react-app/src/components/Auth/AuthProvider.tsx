@@ -5,7 +5,6 @@ import { persistor } from '@/redux/store';
 import {
   loginAsync,
   logoutAsync,
-  refreshTokenAsync,
   changePasswordAsync,
   getCurrentUserAsync,
   clearAuth,
@@ -56,9 +55,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const user = useAppSelector((state) => state.auth?.user ?? null);
   const loading = useAppSelector((state) => state.auth?.isLoading ?? false);
   const error = useAppSelector((state) => state.auth?.error ?? null);
-  const accessToken = useAppSelector((state) => state.auth?.accessToken ?? null);
-  const refreshToken = useAppSelector((state) => state.auth?.refreshToken ?? null);
-  const tokenExpiry = useAppSelector((state) => state.auth?.tokenExpiry ?? null);
 
   const login = async (loginData: LoginData): Promise<void> => {
     try {
@@ -80,50 +76,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const checkAuth = async (): Promise<void> => {
-    if (!accessToken) {
-      return;
-    }
-
     try {
-      // Check if token is expired
-      if (tokenExpiry && tokenExpiry < Date.now()) {
-        // Token is expired, try to refresh
-        if (refreshToken) {
-          try {
-            await dispatch(refreshTokenAsync(refreshToken)).unwrap();
-            // After successful refresh, try to get current user
-            if (!user) {
-              await dispatch(getCurrentUserAsync()).unwrap();
-            }
-          } catch (refreshError) {
-            console.error('Token refresh failed:', refreshError);
-            // Both tokens are invalid, clear persistent storage
-            await clearPersistentAuth();
-          }
-        } else {
-          // No refresh token, clear persistent storage
-          await clearPersistentAuth();
-        }
-        return;
-      }
-
-      // Fetch user data if not available
+      // Try to get current user using cookies
+      // This will succeed if valid authentication cookies exist
       if (!user) {
-        try {
-          await dispatch(getCurrentUserAsync()).unwrap();
-        } catch (getCurrentUserError: any) {
-          console.error('Get current user failed:', getCurrentUserError);
-          // If getting user fails with token-related error, clear persistent storage
-          const errorMsg = getCurrentUserError?.message || '';
-          if (errorMsg.includes('401') || errorMsg.includes('403') ||
-            errorMsg.includes('Unauthorized') || errorMsg.includes('Forbidden') ||
-            errorMsg.includes('Invalid token') || errorMsg.includes('Token expired')) {
-            await clearPersistentAuth();
-          }
-        }
+        await dispatch(getCurrentUserAsync()).unwrap();
       }
-    } catch (error) {
-      console.error('Auth check failed:', error);
+    } catch (error: any) {
+      // Clear any stale Redux state
       await clearPersistentAuth();
     }
   };
@@ -156,57 +116,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const isTokenValid = (): boolean => {
-    if (!accessToken || !tokenExpiry) {
-      return false;
-    }
-
-    // Check if token expires in the next 5 minutes
-    const fiveMinutesFromNow = Date.now() + (5 * 60 * 1000);
-    return tokenExpiry > fiveMinutesFromNow;
+    // With cookie-based auth, we check if user exists
+    // Actual token validation happens server-side
+    return isAuthenticated && !!user;
   };
 
   const getAccessToken = (): string | null => {
-    return accessToken;
+    // Tokens are stored in HttpOnly cookies, not accessible to JavaScript
+    // Return null to indicate tokens are handled by cookies
+    return null;
   };
 
-  // Check auth on mount and when authentication state changes
+  // Check auth on mount - this will work with both cookies and stored tokens
   useEffect(() => {
-    if (isAuthenticated && accessToken) {
-      checkAuth();
-    }
+    checkAuth();
   }, []); // Only run on mount
 
-  // Auto-refresh token before expiration
+  // Auto-refresh token before expiration (handled by server-side cookie expiry)
+  // No need for client-side token refresh timing with HttpOnly cookies
+
+  // Periodic authentication check (every 10 minutes)
   useEffect(() => {
-    if (accessToken && tokenExpiry) {
-      const timeUntilExpiry = tokenExpiry - Date.now();
-      // Refresh 5 minutes before expiry, but not if less than 1 minute remaining
-      const refreshTime = Math.max(timeUntilExpiry - 5 * 60 * 1000, 0);
-
-      if (refreshTime > 60 * 1000) { // Only set timer if more than 1 minute
-        const timer = setTimeout(() => {
-          if (isAuthenticated) {
-            checkAuth();
-          }
-        }, refreshTime);
-
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [accessToken, refreshToken, tokenExpiry, isAuthenticated, dispatch]);
-
-  // Periodic token validation (every 10 minutes)
-  useEffect(() => {
-    if (isAuthenticated && accessToken) {
+    if (isAuthenticated) {
       const interval = setInterval(() => {
-        if (!isTokenValid()) {
-          checkAuth();
-        }
+        checkAuth();
       }, 10 * 60 * 1000); // Check every 10 minutes
 
       return () => clearInterval(interval);
     }
-  }, [isAuthenticated, accessToken]);
+  }, [isAuthenticated]);
 
   const value: AuthContextType = {
     // State

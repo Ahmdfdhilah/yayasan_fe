@@ -1,5 +1,5 @@
 // src/App.jsx
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { TooltipProvider } from '@workspace/ui/components/tooltip';
 // Import your layouts/components
@@ -7,7 +7,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './redux/store';
 import { Toaster } from "@workspace/ui/components/sonner";
-import { AuthProvider, useAuth } from './components/Auth/AuthProvider';
+import { AuthProvider } from './components/Auth/AuthProvider';
 import { ThemeProvider } from './components/ThemeProvider';
 import { DashboardLayout } from './components/layouts/DashboardLayout';
 import { LoginPage } from './pages/auth/LoginPage';
@@ -42,12 +42,7 @@ import GalleriesListPage from './pages/public/galleries/GalleriesListPage';
 import AboutPage from './pages/public/about/AboutPage';
 import ContactPage from './pages/public/contact/ContactPage';
 import { StatisticsPage } from './pages/statistics';
-
-// Simple redirect component for My Evaluations
-const MyEvaluationsRedirect = () => {
-  const { user } = useAuth();
-  return user?.id ? <Navigate to={`/teacher-evaluations/${user.id}`} replace /> : null;
-};
+import MyEvaluationsPage from './pages/teacher-evaluations/MyEvaluationsPage';
 
 function App() {
   return (
@@ -169,7 +164,7 @@ function App() {
                       {/* My Evaluations - Guru only - Redirect to detail page */}
                       <Route path="my-evaluations" element={
                         <RoleProtectedRoute allowedRoles={['guru', 'kepala_sekolah']}>
-                          <MyEvaluationsRedirect />
+                          <MyEvaluationsPage />
                         </RoleProtectedRoute>
                       } />
 
