@@ -6,6 +6,7 @@ import { useToast } from '@workspace/ui/components/sonner';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
 import { changePasswordAsync } from '@/redux/features/authSlice';
+import { useAuth } from '@/components/Auth/AuthProvider';
 import {
   Dialog,
   DialogContent,
@@ -54,6 +55,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+  const { logout } = useAuth();
   const isLoading = loading || externalLoading;
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -93,12 +95,21 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
       onSave();
       toast({
         title: 'Password berhasil diubah',
-        description: 'Password Anda telah berhasil diperbarui.',
+        description: 'Anda akan logout otomatis dalam 3 detik untuk keamanan.',
         variant: 'default'
       });
       
       form.reset();
       onOpenChange(false);
+      
+      // Auto logout after 3 seconds
+      setTimeout(async () => {
+        try {
+          await logout();
+        } catch (error) {
+          console.error('Auto logout error:', error);
+        }
+      }, 3000);
       
     } catch (error: any) {
       console.error('Error changing password:', error);

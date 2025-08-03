@@ -95,11 +95,7 @@ const ProfilePage: React.FC = () => {
   };
 
   const handlePasswordChangeSuccess = () => {
-    toast({
-      title: 'Password berhasil diubah',
-      description: 'Password Anda telah berhasil diubah.',
-      variant: 'default'
-    });
+    // Dialog will handle success message and auto-logout
     setIsPasswordDialogOpen(false);
   };
 
