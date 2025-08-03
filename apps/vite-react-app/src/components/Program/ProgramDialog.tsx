@@ -50,7 +50,7 @@ export const ProgramDialog: React.FC<ProgramDialogProps> = ({
   onSave,
   mode = 'create'
 }) => {
-  const { error: toastError, success: toastSuccess } = useToast();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const isEdit = mode === 'edit';
@@ -100,11 +100,14 @@ export const ProgramDialog: React.FC<ProgramDialogProps> = ({
       onOpenChange(false);
       form.reset();
       setSelectedFiles([]);
-
-      toastSuccess(isEdit ? 'Program berhasil diperbarui' : 'Program berhasil ditambahkan');
+      // Success message handled by parent page
     } catch (error: any) {
       console.error('Error saving program:', error);
-      toastError(error.message || 'Gagal menyimpan program');
+      toast({
+        title: 'Terjadi kesalahan',
+        description: error.message || 'Gagal menyimpan program',
+        variant: 'destructive'
+      });
     } finally {
       setLoading(false);
     }
@@ -115,7 +118,11 @@ export const ProgramDialog: React.FC<ProgramDialogProps> = ({
   };
 
   const handleFileError = (error: string) => {
-    toastError(error);
+    toast({
+      title: 'Error file',
+      description: error,
+      variant: 'destructive'
+    });
   };
 
   const existingFiles = editingProgram?.img_url ? [{

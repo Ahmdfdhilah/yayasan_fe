@@ -48,7 +48,7 @@ export const MitraDialog: React.FC<MitraDialogProps> = ({
   onSave,
   mode = 'create'
 }) => {
-  const { error: toastError, success: toastSuccess } = useToast();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const isEdit = mode === 'edit';
@@ -94,11 +94,14 @@ export const MitraDialog: React.FC<MitraDialogProps> = ({
       onOpenChange(false);
       form.reset();
       setSelectedFiles([]);
-
-      toastSuccess(isEdit ? 'Mitra berhasil diperbarui' : 'Mitra berhasil ditambahkan');
+      // Success message handled by parent page
     } catch (error: any) {
       console.error('Error saving mitra:', error);
-      toastError(error.message || 'Gagal menyimpan mitra');
+      toast({
+        title: 'Terjadi kesalahan',
+        description: error.message || 'Gagal menyimpan mitra',
+        variant: 'destructive'
+      });
     } finally {
       setLoading(false);
     }
@@ -109,7 +112,11 @@ export const MitraDialog: React.FC<MitraDialogProps> = ({
   };
 
   const handleFileError = (error: string) => {
-    toastError(error);
+    toast({
+      title: 'Error file',
+      description: error,
+      variant: 'destructive'
+    });
   };
 
   const existingFiles = editingMitra?.img_url ? [{

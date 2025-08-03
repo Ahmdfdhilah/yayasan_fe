@@ -59,7 +59,7 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
   mode = 'create',
   boardGroups
 }) => {
-  const { error: toastError, success: toastSuccess } = useToast();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const isEdit = mode === 'edit';
@@ -102,7 +102,11 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
   const onSubmit = async (data: BoardMemberFormData) => {
     // Validasi file upload untuk create
     if (!isEdit && selectedFiles.length === 0) {
-      toastError('Gambar wajib diupload untuk pengurus baru');
+      toast({
+        title: 'Validasi gagal',
+        description: 'Gambar wajib diupload untuk pengurus baru',
+        variant: 'destructive'
+      });
       return;
     }
 
@@ -123,11 +127,14 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
       onOpenChange(false);
       form.reset();
       setSelectedFiles([]);
-
-      toastSuccess(isEdit ? 'Pengurus berhasil diperbarui' : 'Pengurus berhasil ditambahkan');
+      // Success message handled by parent page
     } catch (error: any) {
       console.error('Error saving board member:', error);
-      toastError(error.message || 'Gagal menyimpan pengurus');
+      toast({
+        title: 'Terjadi kesalahan',
+        description: error.message || 'Gagal menyimpan pengurus',
+        variant: 'destructive'
+      });
     } finally {
       setLoading(false);
     }
@@ -138,7 +145,11 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
   };
 
   const handleFileError = (error: string) => {
-    toastError(error);
+    toast({
+      title: 'Error file',
+      description: error,
+      variant: 'destructive'
+    });
   };
 
   const existingFiles = editingBoardMember?.img_url ? [{

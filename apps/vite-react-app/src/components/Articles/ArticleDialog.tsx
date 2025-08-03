@@ -193,11 +193,7 @@ export const ArticleDialog: React.FC<ArticleDialogProps> = ({
       onOpenChange(false);
       form.reset();
       setSelectedFiles([]);
-
-      toast({
-        title: 'Berhasil',
-        description: isEdit ? 'Artikel berhasil diperbarui' : 'Artikel berhasil ditambahkan'
-      });
+      // Success message handled by parent page
     } catch (error: any) {
       console.error('Error saving article:', error);
       toast({

@@ -47,7 +47,7 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
   editingGallery,
   onSave
 }) => {
-  const { error: toastError, success: toastSuccess } = useToast();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const isEdit = !!editingGallery;
@@ -83,7 +83,11 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
   const onSubmit = async (data: GalleryFormData) => {
     // Validasi file upload untuk create
     if (!isEdit && selectedFiles.length === 0) {
-      toastError('Gambar wajib diupload untuk galeri baru');
+      toast({
+        title: 'Validasi gagal',
+        description: 'Gambar wajib diupload untuk galeri baru',
+        variant: 'destructive'
+      });
       return;
     }
 
@@ -102,11 +106,14 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
       onOpenChange(false);
       form.reset();
       setSelectedFiles([]);
-      
-      toastSuccess(isEdit ? 'Galeri berhasil diperbarui' : 'Galeri berhasil ditambahkan');
+      // Success message handled by parent page
     } catch (error: any) {
       console.error('Error saving gallery:', error);
-      toastError(error.message || 'Gagal menyimpan galeri');
+      toast({
+        title: 'Terjadi kesalahan',
+        description: error.message || 'Gagal menyimpan galeri',
+        variant: 'destructive'
+      });
     } finally {
       setLoading(false);
     }
@@ -117,7 +124,11 @@ export const GalleryDialog: React.FC<GalleryDialogProps> = ({
   };
 
   const handleFileError = (error: string) => {
-    toastError(error);
+    toast({
+      title: 'Error file',
+      description: error,
+      variant: 'destructive'
+    });
   };
 
   const existingFiles = editingGallery?.img_url ? [{

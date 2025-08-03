@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useToast } from '@workspace/ui/components/sonner';
 import {
   Dialog,
   DialogContent,
@@ -57,7 +56,6 @@ export const UserDialog: React.FC<UserDialogProps> = ({
   editingUser,
   onSave
 }) => {
-  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const isEdit = !!editingUser;
 
@@ -143,11 +141,7 @@ export const UserDialog: React.FC<UserDialogProps> = ({
       onOpenChange(false);
     } catch (error) {
       console.error('Error saving user:', error);
-      toast({
-        title: 'Terjadi kesalahan',
-        description: 'Gagal menyimpan data user. Silakan coba lagi.',
-        variant: 'destructive'
-      });
+      // Error handling delegated to parent component (UsersPage)
     } finally {
       setLoading(false);
     }

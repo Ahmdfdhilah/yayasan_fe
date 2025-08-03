@@ -47,7 +47,7 @@ export const BoardGroupDialog: React.FC<BoardGroupDialogProps> = ({
   onSave,
   mode = 'create'
 }) => {
-  const { error: toastError, success: toastSuccess } = useToast();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const isEdit = mode === 'edit';
   const isView = mode === 'view';
@@ -93,11 +93,14 @@ export const BoardGroupDialog: React.FC<BoardGroupDialogProps> = ({
 
       onOpenChange(false);
       form.reset();
-
-      toastSuccess(isEdit ? 'Grup berhasil diperbarui' : 'Grup berhasil ditambahkan');
+      // Success message handled by parent page
     } catch (error: any) {
       console.error('Error saving board group:', error);
-      toastError(error.message || 'Gagal menyimpan grup');
+      toast({
+        title: 'Terjadi kesalahan',
+        description: error.message || 'Gagal menyimpan grup',
+        variant: 'destructive'
+      });
     } finally {
       setLoading(false);
     }
