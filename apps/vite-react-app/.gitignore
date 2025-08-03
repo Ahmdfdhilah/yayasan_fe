@@ -24,7 +24,7 @@ node_modules
 *.sw?
 
 .vercel
-dist
+# dist
 ./claude
 claude
 *claude

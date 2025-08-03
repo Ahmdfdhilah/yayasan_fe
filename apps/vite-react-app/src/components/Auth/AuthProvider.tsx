@@ -115,9 +115,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           console.error('Get current user failed:', getCurrentUserError);
           // If getting user fails with token-related error, clear persistent storage
           const errorMsg = getCurrentUserError?.message || '';
-          if (errorMsg.includes('401') || errorMsg.includes('403') || 
-              errorMsg.includes('Unauthorized') || errorMsg.includes('Forbidden') ||
-              errorMsg.includes('Invalid token') || errorMsg.includes('Token expired')) {
+          if (errorMsg.includes('401') || errorMsg.includes('403') ||
+            errorMsg.includes('Unauthorized') || errorMsg.includes('Forbidden') ||
+            errorMsg.includes('Invalid token') || errorMsg.includes('Token expired')) {
             await clearPersistentAuth();
           }
         }
@@ -148,7 +148,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await persistor.purge();
       // Clear localStorage items that might contain auth data
       localStorage.removeItem('rememberMe');
-      console.log('Persistent auth data cleared due to invalid tokens');
     } catch (error) {
       console.error('Error clearing persistent auth:', error);
       // Fallback to just clearing Redux state

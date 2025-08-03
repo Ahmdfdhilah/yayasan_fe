@@ -14,6 +14,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
         navigateFallback: 'index.html',
         navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
         runtimeCaching: [
@@ -101,5 +102,23 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['@workspace/ui', '@workspace/tailwind'] 
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          redux: ['@reduxjs/toolkit', 'react-redux', 'redux-persist'],
+          excel: ['exceljs', 'xlsx'],
+          pdf: ['jspdf', 'jspdf-autotable'],
+          forms: ['react-hook-form', '@hookform/resolvers', 'zod'],
+          editor: ['@tiptap/react', '@tiptap/starter-kit'],
+          charts: ['recharts'],
+          utils: ['lodash', 'date-fns', 'axios']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
   }
 })

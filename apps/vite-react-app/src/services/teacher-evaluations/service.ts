@@ -213,9 +213,11 @@ class TeacherEvaluationService extends BaseService {
       }
       
       acc[aspectId].items.push(item);
-      acc[aspectId].grade_distribution[item.grade]++;
+      if (item.grade) {
+        acc[aspectId].grade_distribution[item.grade]++;
+      }
       
-      const totalScore = acc[aspectId].items.reduce((sum: number, evalItem: TeacherEvaluationItem) => sum + evalItem.score, 0);
+      const totalScore = acc[aspectId].items.reduce((sum: number, evalItem: TeacherEvaluationItem) => sum + (evalItem?.score || 0), 0);
       acc[aspectId].average_score = totalScore / acc[aspectId].items.length;
       
       return acc;

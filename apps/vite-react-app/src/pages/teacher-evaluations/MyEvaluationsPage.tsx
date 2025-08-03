@@ -36,9 +36,7 @@ const MyEvaluationsPage: React.FC = () => {
       try {
         // Get active period
         const activePeriod = await periodService.getActivePeriod();
-        console.log(activePeriod);
-        
-        
+
         if (activePeriod?.id) {
           // Redirect to teacher evaluation page with current user and active period
           navigate(`/teacher-evaluations/${user.id}?period_id=${activePeriod.id}`);
