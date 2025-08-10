@@ -330,7 +330,7 @@ const TeacherEvaluationsPage: React.FC = () => {
               <SelectValue placeholder="Pilih periode" />
             </SelectTrigger>
             <SelectContent>
-              {isAdmin() && periods.map((period) => (
+              {periods.map((period) => (
                 <SelectItem key={period.id} value={period.id.toString()}>
                   {period.academic_year} - {period.semester}
                   {period.is_active ? ' (Aktif)' : ''}
