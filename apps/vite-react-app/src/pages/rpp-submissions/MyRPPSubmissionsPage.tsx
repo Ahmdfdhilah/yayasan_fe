@@ -7,7 +7,7 @@ import { periodService } from '@/services';
 
 const MyRPPSubmissionsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { currentRole, isGuru, isKepalaSekolah } = useRole();
+  const { currentRole } = useRole();
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -16,19 +16,7 @@ const MyRPPSubmissionsPage: React.FC = () => {
     return <Navigate to="/rpp-submissions" replace />;
   }
 
-  // Check access first - allow both teachers and principals
-  if (!isGuru() && !isKepalaSekolah()) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
-          <p className="text-muted-foreground">
-            Halaman ini hanya untuk guru dan kepala sekolah.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Check access first - allow both teachers and principal
 
   // Redirect logic
   useEffect(() => {

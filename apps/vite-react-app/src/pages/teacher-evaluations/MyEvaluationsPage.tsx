@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { useToast } from '@workspace/ui/components/sonner';
@@ -7,22 +7,13 @@ import { periodService } from '@/services';
 
 const MyEvaluationsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { isGuru, isKepalaSekolah } = useRole();
+  const { currentRole  } = useRole();
   const { user } = useAuth();
   const { toast } = useToast();
 
   // Check access first
-  if (!isGuru() && !isKepalaSekolah()) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
-          <p className="text-muted-foreground">
-            Halaman ini hanya untuk guru.
-          </p>
-        </div>
-      </div>
-    );
+  if (currentRole === 'admin') {
+    return <Navigate to="/rpp-submissions" replace />;
   }
 
   // Redirect logic
