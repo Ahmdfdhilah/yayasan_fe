@@ -7,12 +7,12 @@ import { periodService } from '@/services';
 
 const MyEvaluationsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { isGuru } = useRole();
+  const { isGuru, isKepalaSekolah } = useRole();
   const { user } = useAuth();
   const { toast } = useToast();
 
   // Check access first
-  if (!isGuru()) {
+  if (!isGuru() && !isKepalaSekolah()) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
