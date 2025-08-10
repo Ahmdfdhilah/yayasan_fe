@@ -46,7 +46,7 @@ class UserService extends BaseService {
       });
     }
     
-    const endpoint = queryParams.toString() ? `?${queryParams.toString()}` : "/";
+    const endpoint = queryParams.toString() ? `?${queryParams.toString()}` : "";
     return this.get(endpoint);
   }
 
