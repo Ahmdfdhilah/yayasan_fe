@@ -37,7 +37,7 @@ export class EvaluationAspectService extends BaseService {
       });
     }
     
-    const endpoint = queryParams.toString() ? `/?${queryParams.toString()}` : "/";
+    const endpoint = queryParams.toString() ? `?${queryParams.toString()}` : "";
     return this.get(endpoint);
   }
 
@@ -88,7 +88,7 @@ export class EvaluationAspectService extends BaseService {
 
   // Create evaluation aspect (Admin only)
   async createEvaluationAspect(aspectData: EvaluationAspectCreate): Promise<EvaluationAspectResponse> {
-    return this.post('', aspectData);
+    return this.post('/', aspectData);
   }
 
   // Update evaluation aspect (Admin only)
