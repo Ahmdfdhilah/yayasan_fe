@@ -1,6 +1,7 @@
 import React from 'react';
 import { User } from '@/services/users/types';
 import { UserStatus } from '@/services/auth/types';
+import { getRoleDisplayName, getRoleBadgeVariant } from '@/utils/role';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
@@ -127,7 +128,9 @@ export const UserCards: React.FC<UserCardsProps> = ({
             <div className="mb-3">
               <p className="text-xs text-muted-foreground mb-1">Role:</p>
               <div className="flex flex-wrap gap-1">
-                {user.role}
+                <Badge variant={getRoleBadgeVariant(user.role)} className="text-xs">
+                  {getRoleDisplayName(user.role)}
+                </Badge>
               </div>
             </div>
 

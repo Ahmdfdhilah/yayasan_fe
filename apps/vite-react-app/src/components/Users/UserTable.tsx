@@ -1,6 +1,7 @@
 import React from 'react';
 import { User } from '@/services/users/types';
 import { UserStatus } from '@/services/auth/types';
+import { getRoleDisplayName } from '@/utils/role';
 import {
   Table,
   TableBody,
@@ -72,7 +73,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                   {user.email}
                 </TableCell>
                 <TableCell>
-                  {user.role}
+                  {getRoleDisplayName(user.role)}
                 </TableCell>
                 <TableCell>
                   {user.profile?.phone || '-'}

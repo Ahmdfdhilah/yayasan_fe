@@ -28,6 +28,7 @@ import {
 } from '@workspace/ui/components/form';
 import { User, UserCreate, AdminUserUpdate } from '@/services/users/types';
 import { UserRole, UserStatus } from '@/services/auth/types';
+import { getRoleOptions } from '@/utils/role';
 
 const userFormSchema = z.object({
   email: z.string().email('Email tidak valid').min(1, 'Email wajib diisi'),
@@ -221,9 +222,11 @@ export const UserDialog: React.FC<UserDialogProps> = ({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value={UserRole.ADMIN}>Admin</SelectItem>
-                            <SelectItem value={UserRole.GURU}>Guru</SelectItem>
-                            <SelectItem value={UserRole.KEPALA_SEKOLAH}>Kepala Sekolah</SelectItem>
+                            {getRoleOptions().map((role) => (
+                              <SelectItem key={role.value} value={role.value}>
+                                {role.label}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />

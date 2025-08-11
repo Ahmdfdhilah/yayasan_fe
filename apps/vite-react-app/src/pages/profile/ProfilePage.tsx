@@ -182,10 +182,6 @@ const ProfilePage: React.FC = () => {
                   Informasi Personal
                 </h3>
                 <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium">User ID</label>
-                    <p className="text-sm text-muted-foreground">{user.id}</p>
-                  </div>
                   {user.profile?.address && (
                     <div>
                       <label className="text-sm font-medium">Alamat</label>

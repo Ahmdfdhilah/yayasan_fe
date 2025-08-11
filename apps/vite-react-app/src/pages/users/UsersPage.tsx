@@ -4,6 +4,7 @@ import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { User, UserFilterParams } from '@/services/users/types';
 import { UserRole, UserStatus } from '@/services/auth/types';
+import { getRoleOptions, getRoleDisplayName } from '@/utils/role';
 import { userService } from '@/services/users';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent } from '@workspace/ui/components/card';
@@ -226,11 +227,7 @@ const UsersPage: React.FC = () => {
   };
 
   // Role options based on PKG system
-  const roleOptions = [
-    { value: UserRole.ADMIN, label: 'Admin' },
-    { value: UserRole.GURU, label: 'Guru' },
-    { value: UserRole.KEPALA_SEKOLAH, label: 'Kepala Sekolah' },
-  ];
+  const roleOptions = getRoleOptions();
 
   // Generate composite title
   const getCompositeTitle = () => {
@@ -401,7 +398,7 @@ const UsersPage: React.FC = () => {
               <div>
                 <Label>Role</Label>
                 <div className="p-2 bg-muted rounded text-sm">
-                  {viewingUser.role || 'Tidak ada role'}
+                  {getRoleDisplayName(viewingUser.role)}
                 </div>
               </div>
               {viewingUser.profile?.phone && (
