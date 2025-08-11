@@ -15,10 +15,17 @@ export enum RPPSubmissionStatus {
 export interface RPPSubmissionItemBase {
   teacher_id: number;
   period_id: number;
+  name: string;
+  description?: string | null;
   file_id?: number | null;
 }
 
 export interface RPPSubmissionItemCreate extends RPPSubmissionItemBase {}
+
+export interface RPPSubmissionItemCreateRequest {
+  name: string;
+  description?: string | null;
+}
 
 export interface RPPSubmissionItemUpdate {
   file_id: number;

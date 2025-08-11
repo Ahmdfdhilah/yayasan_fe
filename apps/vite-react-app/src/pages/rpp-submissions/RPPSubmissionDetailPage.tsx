@@ -35,7 +35,7 @@ import {
   RPPSubmissionItemResponse,
   RPPSubmissionStatus,
 } from '@/services/rpp-submissions/types';
-import { RPPItemCard, RPPReviewSection, RPPSubmissionOverview } from '@/components/RPPSubmissions';
+import { RPPItemCard, RPPReviewSection, RPPSubmissionOverview, CreateRPPItemDialog } from '@/components/RPPSubmissions';
 import { Period } from '@/services/periods/types';
 import { User } from '@/services/users/types';
 import {
@@ -75,6 +75,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
   const [activePeriod, setActivePeriod] = useState<Period | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
+  const [createItemDialogOpen, setCreateItemDialogOpen] = useState(false);
   const [isLoadingSubmission, setIsLoadingSubmission] = useState(false);
 
   // Determine if this is user's own submission (teacher or principal)
@@ -321,6 +322,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
         canUpload={canUpload ?? false}
         submissionStatus={submission!.status}
         onFileUploaded={handleFileUploaded}
+        onItemDeleted={handleFileUploaded} // Same callback to refresh data
       />
     );
   };
@@ -548,7 +550,26 @@ const RPPSubmissionDetailPage: React.FC = () => {
 
       {/* RPP Items */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">RPP Files</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">RPP Files</h3>
+          {(() => {
+            const isDraftStatus = submission.status === RPPSubmissionStatus.DRAFT;
+            const isRejectedStatus = submission.status === RPPSubmissionStatus.REJECTED;
+            const statusAllowsUpload = isDraftStatus || isRejectedStatus;
+            const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
+            const canCreateItem = isOwnSubmission && statusAllowsUpload && isActivePeriod;
+            
+            return canCreateItem && (
+              <Button
+                onClick={() => setCreateItemDialogOpen(true)}
+                variant="outline"
+                size="sm"
+              >
+                Tambah Item
+              </Button>
+            );
+          })()}
+        </div>
         <div className="grid grid-cols-1  gap-4">
           {submission.items.map(renderRPPItem)}
         </div>
@@ -561,6 +582,14 @@ const RPPSubmissionDetailPage: React.FC = () => {
           onReviewComplete={handleReviewComplete}
         />
       )}
+
+      {/* Create Item Dialog */}
+      <CreateRPPItemDialog
+        open={createItemDialogOpen}
+        onOpenChange={setCreateItemDialogOpen}
+        periodId={currentPeriod?.id || 0}
+        onSuccess={handleFileUploaded} // Same callback to refresh data
+      />
     </div>
   );
 };

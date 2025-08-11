@@ -5,4 +5,5 @@ export { RPPFileUploadDialog } from './RPPFileUploadDialog';
 export { RPPItemCard } from './RPPItemCard';
 export { RPPReviewSection } from './RPPReviewSection';
 export { RPPSubmissionOverview } from './RPPSubmissionOverview';
+export { CreateRPPItemDialog } from './CreateRPPItemDialog';
 export { default as GenerateRPPDialog } from './GenerateRPPDialog';

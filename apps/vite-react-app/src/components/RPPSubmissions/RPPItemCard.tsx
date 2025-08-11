@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
 import {
-  FileText
+  FileText,
 } from 'lucide-react';
 import { useToast } from '@workspace/ui/components/sonner';
 import { RPPSubmissionItemResponse, RPPSubmissionStatus } from '@/services/rpp-submissions/types';
 import { RPPFileUploadDialog } from './RPPFileUploadDialog';
 import { mediaFileService } from '@/services/media-files/service';
+import { rppSubmissionService } from '@/services';
 import { API_BASE_URL } from '@/config/api';
 import ActionDropdown from '@/components/common/ActionDropdown';
 
@@ -16,18 +17,45 @@ interface RPPItemCardProps {
   canUpload: boolean;
   submissionStatus: RPPSubmissionStatus;
   onFileUploaded: () => void;
+  onItemDeleted?: () => void;
 }
 
 export const RPPItemCard: React.FC<RPPItemCardProps> = ({
   item,
   canUpload,
-  onFileUploaded
+  onFileUploaded,
+  onItemDeleted
 }) => {
   const { toast } = useToast();
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
 
   const handleUploadClick = () => {
     setUploadDialogOpen(true);
+  };
+
+  const handleDeleteItem = async () => {
+    if (!confirm('Apakah Anda yakin ingin menghapus item RPP ini?')) {
+      return;
+    }
+
+    try {
+      await rppSubmissionService.deleteRPPSubmissionItem(item.id);
+      
+      toast({
+        title: 'Berhasil',
+        description: 'Item RPP berhasil dihapus.',
+      });
+
+      if (onItemDeleted) {
+        onItemDeleted();
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Gagal menghapus item RPP.',
+        variant: 'destructive'
+      });
+    }
   };
 
   const handleViewFile = async () => {
@@ -106,11 +134,16 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">File RPP #{item.id}</CardTitle>
+            <CardTitle className="text-lg">{item.name}</CardTitle>
             <Badge variant={item.is_uploaded ? "default" : "secondary"}>
               {item.is_uploaded ? "Sudah di Upload" : "Belum Upload"}
             </Badge>
           </div>
+          {item.description && (
+            <p className="text-sm text-muted-foreground mt-1">
+              {item.description}
+            </p>
+          )}
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -139,6 +172,13 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
                         onClick: handleUploadClick,
                         icon: 'Upload'
                       }
+                    ] : []),
+                    ...(canUpload && onItemDeleted ? [
+                      {
+                        label: 'Hapus Item',
+                        onClick: handleDeleteItem,
+                        icon: 'Trash2'
+                      }
                     ] : [])
                   ]}
                   showView={item.is_uploaded}
@@ -162,7 +202,7 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
         onOpenChange={setUploadDialogOpen}
         onSuccess={onFileUploaded}
         periodId={item.period_id}
-        title={`File RPP #${item.id}`}
+        title={item.name}
         currentFileName={item.file_name || undefined}
       />
     </>
