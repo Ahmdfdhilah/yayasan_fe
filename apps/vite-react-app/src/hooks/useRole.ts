@@ -4,37 +4,37 @@ import { USER_ROLES } from '@/lib/constants';
 
 export const useRole = () => {
   const user = useAppSelector((state) => state.auth?.user ?? null);
-  // PKG system uses roles array, get primary role or default to GURU
-  const currentRole = user?.roles?.[0] || USER_ROLES.GURU;
-  const allRoles = user?.roles || [];
+  // PKG system now uses single role field
+  const currentRole = user?.role || USER_ROLES.GURU;
 
   const isRole = useCallback((role: string) => {
-    return allRoles.includes(role);
-  }, [allRoles]);
+    return currentRole === role;
+  }, [currentRole]);
 
   const isAdmin = useCallback(() => {
-    return allRoles.includes(USER_ROLES.ADMIN);
-  }, [allRoles]);
+    return currentRole === USER_ROLES.ADMIN;
+  }, [currentRole]);
 
   const isGuru = useCallback(() => {
-    return allRoles.includes(USER_ROLES.GURU);
-  }, [allRoles]);
+    return currentRole === USER_ROLES.GURU;
+  }, [currentRole]);
 
   const isKepalaSekolah = useCallback(() => {
-    return allRoles.includes(USER_ROLES.KEPALA_SEKOLAH);
-  }, [allRoles]);
+    return currentRole === USER_ROLES.KEPALA_SEKOLAH;
+  }, [currentRole]);
 
   const hasPermission = useCallback((requiredRoles: string[]) => {
-    return requiredRoles.some(role => allRoles.includes(role));
-  }, [allRoles]);
+    return requiredRoles.includes(currentRole);
+  }, [currentRole]);
 
   const hasAnyRole = useCallback((roles: string[]) => {
-    return roles.some(role => allRoles.includes(role));
-  }, [allRoles]);
+    return roles.includes(currentRole);
+  }, [currentRole]);
 
   const hasAllRoles = useCallback((roles: string[]) => {
-    return roles.every(role => allRoles.includes(role));
-  }, [allRoles]);
+    // With single role, user can only have all roles if there's only one role required
+    return roles.length === 1 && roles.includes(currentRole);
+  }, [currentRole]);
 
   // Permission helpers for PKG system
   const canManageUsers = useCallback(() => {
@@ -59,7 +59,6 @@ export const useRole = () => {
 
   return {
     currentRole,
-    allRoles,
     user,
     isRole,
     isAdmin,

@@ -118,52 +118,52 @@ function App() {
 
                       {/* Admin only routes */}
                       <Route path="users" element={
-                        <RoleProtectedRoute allowedRoles={['admin']}>
+                        <RoleProtectedRoute allowedRoles={['ADMIN']}>
                           <UsersPage />
                         </RoleProtectedRoute>
                       } />
 
                       <Route path="cms/organizations" element={
-                        <RoleProtectedRoute allowedRoles={['admin']}>
+                        <RoleProtectedRoute allowedRoles={['ADMIN']}>
                           <OrganizationsPage />
                         </RoleProtectedRoute>
                       } />
                       <Route path="periods" element={
-                        <RoleProtectedRoute allowedRoles={['admin']}>
+                        <RoleProtectedRoute allowedRoles={['ADMIN']}>
                           <PeriodsPage />
                         </RoleProtectedRoute>
                       } />
 
                       <Route path="evaluation-aspects" element={
-                        <RoleProtectedRoute allowedRoles={['admin']}>
+                        <RoleProtectedRoute allowedRoles={['ADMIN']}>
                           <EvaluationAspectsPage />
                         </RoleProtectedRoute>
                       } />
 
                       {/* Evaluation Reports - Admin only */}
                       <Route path="evaluations/reports" element={
-                        <RoleProtectedRoute allowedRoles={['admin']}>
+                        <RoleProtectedRoute allowedRoles={['ADMIN']}>
                           <EvaluationReportsPage />
                         </RoleProtectedRoute>
                       } />
 
                       {/* Teacher Evaluations - Admin and Kepala Sekolah */}
                       <Route path="teacher-evaluations" element={
-                        <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah']}>
+                        <RoleProtectedRoute allowedRoles={['ADMIN', 'KEPALA_SEKOLAH']}>
                           <TeacherEvaluationsPage />
                         </RoleProtectedRoute>
                       } />
 
                       {/* Teacher Evaluation Detail - Admin, Kepala Sekolah, and Guru */}
                       <Route path="teacher-evaluations/:teacherId" element={
-                        <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
+                        <RoleProtectedRoute allowedRoles={['ADMIN', 'KEPALA_SEKOLAH', 'GURU']}>
                           <TeacherEvaluationDetailPage />
                         </RoleProtectedRoute>
                       } />
 
                       {/* My Evaluations - Guru only - Redirect to detail page */}
                       <Route path="my-evaluations" element={
-                        <RoleProtectedRoute allowedRoles={['guru', 'kepala_sekolah']}>
+                        <RoleProtectedRoute allowedRoles={['GURU', 'KEPALA_SEKOLAH']}>
                           <MyEvaluationsPage />
                         </RoleProtectedRoute>
                       } />
@@ -171,21 +171,21 @@ function App() {
                       {/* RPP Submissions Routes */}
                       {/* My RPP Submissions - Guru only */}
                       <Route path="my-rpp-submissions" element={
-                        <RoleProtectedRoute allowedRoles={['guru', 'kepala_sekolah']}>
+                        <RoleProtectedRoute allowedRoles={['GURU', 'KEPALA_SEKOLAH']}>
                           <MyRPPSubmissionsPage />
                         </RoleProtectedRoute>
                       } />
 
                       {/* RPP Submissions List - Admin and Kepala Sekolah */}
                       <Route path="rpp-submissions" element={
-                        <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah']}>
+                        <RoleProtectedRoute allowedRoles={['ADMIN', 'KEPALA_SEKOLAH']}>
                           <RPPSubmissionsPage />
                         </RoleProtectedRoute>
                       } />
 
                       {/* RPP Submission Detail - Admin/Kepala Sekolah viewing teacher's submission */}
                       <Route path="rpp-submissions/teacher/:teacherId" element={
-                        <RoleProtectedRoute allowedRoles={['admin', 'kepala_sekolah', 'guru']}>
+                        <RoleProtectedRoute allowedRoles={['ADMIN', 'KEPALA_SEKOLAH', 'GURU']}>
                           <RPPSubmissionDetailPage />
                         </RoleProtectedRoute>
                       } />
@@ -193,42 +193,42 @@ function App() {
                       <Route path='/cms'>
                         {/* Content Management Routes - Admin only */}
                         <Route path="board-members" element={
-                          <RoleProtectedRoute allowedRoles={['admin']}>
+                          <RoleProtectedRoute allowedRoles={['ADMIN']}>
                             <BoardMembersPage />
                           </RoleProtectedRoute>
                         } />
 
                         <Route path="articles" element={
-                          <RoleProtectedRoute allowedRoles={['admin']}>
+                          <RoleProtectedRoute allowedRoles={['ADMIN']}>
                             <ArticlesPage />
                           </RoleProtectedRoute>
                         } />
 
                         <Route path="galleries" element={
-                          <RoleProtectedRoute allowedRoles={['admin']}>
+                          <RoleProtectedRoute allowedRoles={['ADMIN']}>
                             <GalleriesPage />
                           </RoleProtectedRoute>
                         } />
 
                         <Route path="messages" element={
-                          <RoleProtectedRoute allowedRoles={['admin']}>
+                          <RoleProtectedRoute allowedRoles={['ADMIN']}>
                             <MessagesPage />
                           </RoleProtectedRoute>
                         } />
 
                         <Route path="mitra" element={
-                          <RoleProtectedRoute allowedRoles={['admin']}>
+                          <RoleProtectedRoute allowedRoles={['ADMIN']}>
                             <MitraPage />
                           </RoleProtectedRoute>
                         } />
 
                         <Route path="program" element={
-                          <RoleProtectedRoute allowedRoles={['admin']}>
+                          <RoleProtectedRoute allowedRoles={['ADMIN']}>
                             <ProgramPage />
                           </RoleProtectedRoute>
                         } />
                         <Route path="statistik" element={
-                          <RoleProtectedRoute allowedRoles={['admin']}>
+                          <RoleProtectedRoute allowedRoles={['ADMIN']}>
                             <StatisticsPage />
                           </RoleProtectedRoute>
                         } />

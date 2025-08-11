@@ -19,9 +19,9 @@ import {
 
 // PKG System Role definitions
 export type UserRole =
-  | 'admin'
-  | 'guru'
-  | 'kepala_sekolah';
+  | 'ADMIN'
+  | 'GURU'
+  | 'KEPALA_SEKOLAH';
 
 export interface SidebarItem {
   title: string;
@@ -40,26 +40,26 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Dashboard',
     href: '/dashboard',
     icon: BarChart3,
-    allowedRoles: ['admin', 'guru', 'kepala_sekolah'],
+    allowedRoles: ['ADMIN', 'GURU', 'KEPALA_SEKOLAH'],
   },
 
   // RPP Management - Teachers and Principals
   {
     title: 'RPP Guru',
     icon: FileText,
-    allowedRoles: ['kepala_sekolah', 'admin', 'guru'],
+    allowedRoles: ['KEPALA_SEKOLAH', 'ADMIN', 'GURU'],
     children: [
       {
         title: 'Daftar RPP',
         href: '/rpp-submissions',
         icon: ClipboardCheck,
-        allowedRoles: ['kepala_sekolah', 'admin'],
+        allowedRoles: ['KEPALA_SEKOLAH', 'ADMIN'],
       },
       {
         title: 'RPP Saya',
         href: '/my-rpp-submissions',
         icon: Upload,
-        allowedRoles: ['guru', 'kepala_sekolah'],
+        allowedRoles: ['GURU', 'KEPALA_SEKOLAH'],
       },
     ],
   },
@@ -68,25 +68,25 @@ export const appMenuItems: SidebarItem[] = [
   {
     title: 'Evaluasi Guru',
     icon: GraduationCap,
-    allowedRoles: ['kepala_sekolah', 'admin', 'guru'],
+    allowedRoles: ['KEPALA_SEKOLAH', 'ADMIN', 'GURU'],
     children: [
       {
         title: 'Daftar Evaluasi',
         href: '/teacher-evaluations',
         icon: ClipboardCheck,
-        allowedRoles: ['kepala_sekolah', 'admin'],
+        allowedRoles: ['KEPALA_SEKOLAH', 'ADMIN'],
       },
       {
         title: 'Evaluasi Saya',
         href: '/my-evaluations',
         icon: ClipboardCheck,
-        allowedRoles: ['guru', 'kepala_sekolah'],
+        allowedRoles: ['GURU', 'KEPALA_SEKOLAH'],
       },
       {
         title: 'Laporan Evaluasi',
         href: '/evaluations/reports',
         icon: BarChart3,
-        allowedRoles: ['admin'],
+        allowedRoles: ['ADMIN'],
       },
     ],
   },
@@ -95,25 +95,25 @@ export const appMenuItems: SidebarItem[] = [
   {
     title: 'Manajemen Sistem',
     icon: Settings,
-    allowedRoles: ['admin'],
+    allowedRoles: ['ADMIN'],
     children: [
       {
         title: 'Aspek Evaluasi',
         href: '/evaluation-aspects',
         icon: BookOpen,
-        allowedRoles: ['admin'],
+        allowedRoles: ['ADMIN'],
       },
       {
         title: 'Periode',
         href: '/periods',
         icon: Calendar,
-        allowedRoles: ['admin'],
+        allowedRoles: ['ADMIN'],
       },
       {
         title: 'Pengguna',
         href: '/users',
         icon: Users,
-        allowedRoles: ['admin'],
+        allowedRoles: ['ADMIN'],
       },
     ],
   },
@@ -122,68 +122,103 @@ export const appMenuItems: SidebarItem[] = [
   {
     title: 'Manajemen Konten',
     icon: Building,
-    allowedRoles: ['admin'],
+    allowedRoles: ['ADMIN'],
     children: [
       {
         title: 'Pengurus',
         href: '/cms/board-members',
         icon: UserCheck,
-        allowedRoles: ['admin'],
+        allowedRoles: ['ADMIN'],
       },
       {
         title: 'Sekolah',
         href: '/cms/organizations',
         icon: Building,
-        allowedRoles: ['admin'],
+        allowedRoles: ['ADMIN'],
       },
       {
         title: 'Artikel',
         href: '/cms/articles',
         icon: Newspaper,
-        allowedRoles: ['admin'],
+        allowedRoles: ['ADMIN'],
       },
       {
         title: 'Galeri',
         href: '/cms/galleries',
         icon: Image,
-        allowedRoles: ['admin'],
+        allowedRoles: ['ADMIN'],
       },
       {
         title: 'Pesan',
         href: '/cms/messages',
         icon: MessageSquare,
-        allowedRoles: ['admin'],
+        allowedRoles: ['ADMIN'],
       },
       {
         title: 'Mitra',
         href: '/cms/mitra',
         icon: Building2,
-        allowedRoles: ['admin'],
+        allowedRoles: ['ADMIN'],
       },
       {
         title: 'Program',
         href: '/cms/program',
         icon: Target,
-        allowedRoles: ['admin'],
+        allowedRoles: ['ADMIN'],
       },
       {
         title: 'Statistik',
         href: '/cms/statistik',
         icon: BarChart3,
-        allowedRoles: ['admin'],
+        allowedRoles: ['ADMIN'],
       },
     ],
   }
 ];
 
-// Helper function to get appropriate menu items based on user roles
-export const getMenuItemsForUser = (userRoles: string[]): SidebarItem[] => {
-  // If user has roles, combine basic items with filtered items
-  const items = filterMenuByRoles(appMenuItems, userRoles);
+// Helper function to get appropriate menu items based on user role
+export const getMenuItemsForUser = (userRole: UserRole): SidebarItem[] => {
+  // Filter items based on user's single role
+  const items = filterMenuByRole(appMenuItems, userRole);
   return [...items];
 };
 
-// Helper function to filter menu items based on user roles
+// Helper function to filter menu items based on user role
+export const filterMenuByRole = (
+  menuItems: SidebarItem[],
+  userRole: UserRole
+): SidebarItem[] => {
+  return menuItems
+    .filter(item => {
+      // If allowedRoles is empty, allow access to all authenticated users
+      if (item.allowedRoles.length === 0) {
+        return true;
+      }
+      // Check if user's role is in the allowed roles for this menu item
+      const hasAccess = item.allowedRoles.includes(userRole);
+      return hasAccess;
+    })
+    .map(item => {
+      // If item has children, filter them too
+      if (item.children) {
+        const filteredChildren = filterMenuByRole(item.children, userRole);
+        return {
+          ...item,
+          children: filteredChildren,
+        };
+      }
+      return item;
+    })
+    .filter(item => {
+      // Remove parent items that have no visible children
+      if (item.children) {
+        return item.children.length > 0;
+      }
+      return true;
+    });
+};
+
+// Helper function to filter menu items based on user roles (legacy)
 export const filterMenuByRoles = (
   menuItems: SidebarItem[],
   userRoles: string[]
@@ -221,7 +256,7 @@ export const filterMenuByRoles = (
 // Helper function to check if user has access to specific route
 export const hasRouteAccess = (
   path: string,
-  userRoles: string[],
+  userRole: UserRole,
   menuItems: SidebarItem[] = appMenuItems
 ): boolean => {
   for (const item of menuItems) {
@@ -231,12 +266,12 @@ export const hasRouteAccess = (
       if (item.allowedRoles.length === 0) {
         return true;
       }
-      return item.allowedRoles.some(role => userRoles.includes(role));
+      return item.allowedRoles.includes(userRole);
     }
 
     // Check children
     if (item.children) {
-      const childAccess = hasRouteAccess(path, userRoles, item.children);
+      const childAccess = hasRouteAccess(path, userRole, item.children);
       if (childAccess !== null) return childAccess;
     }
   }

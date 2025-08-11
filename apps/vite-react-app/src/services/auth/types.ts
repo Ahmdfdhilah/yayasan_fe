@@ -2,9 +2,9 @@
 
 // Enums from API
 export enum UserRole {
-  ADMIN = "admin",
-  GURU = "guru",
-  KEPALA_SEKOLAH = "kepala_sekolah"
+  ADMIN = "ADMIN",
+  GURU = "GURU",
+  KEPALA_SEKOLAH = "KEPALA_SEKOLAH"
 }
 
 export enum UserStatus {
@@ -71,6 +71,6 @@ export interface UserResponse {
   updated_at?: string;
   display_name: string;
   full_name: string;
-  roles: string[];
+  role: UserRole;
 }
 

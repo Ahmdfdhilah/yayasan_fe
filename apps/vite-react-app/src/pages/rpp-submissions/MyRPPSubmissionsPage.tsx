@@ -12,7 +12,7 @@ const MyRPPSubmissionsPage: React.FC = () => {
   const { toast } = useToast();
 
   // Redirect admin users to main RPP submissions page
-  if (currentRole === 'admin') {
+  if (currentRole === 'ADMIN') {
     return <Navigate to="/rpp-submissions" replace />;
   }
 

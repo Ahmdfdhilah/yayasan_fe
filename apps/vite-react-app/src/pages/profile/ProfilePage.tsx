@@ -46,8 +46,8 @@ const ProfilePage: React.FC = () => {
   };
 
 
-  const getRoleDisplayNames = () => {
-    return user.roles?.map(role => ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role) || ['N/A'];
+  const getRoleDisplayName = () => {
+    return ROLE_LABELS[user.role as keyof typeof ROLE_LABELS] || user.role || 'N/A';
   };
 
   const getInitials = () => {
@@ -154,7 +154,7 @@ const ProfilePage: React.FC = () => {
 
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">{getRoleDisplayNames().join(', ')}</span>
+                <span className="text-sm">{getRoleDisplayName()}</span>
               </div>
               {user.organization_name && (
                 <div className="flex items-center gap-2">
@@ -215,7 +215,7 @@ const ProfilePage: React.FC = () => {
                 <div className="space-y-3">
                   <div>
                     <label className="text-sm font-medium">Peran</label>
-                    <p className="text-sm text-muted-foreground">{getRoleDisplayNames().join(', ')}</p>
+                    <p className="text-sm text-muted-foreground">{getRoleDisplayName()}</p>
                   </div>
 
                   {user.last_login_at && (

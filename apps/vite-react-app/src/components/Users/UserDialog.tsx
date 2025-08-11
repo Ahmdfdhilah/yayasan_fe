@@ -83,7 +83,7 @@ export const UserDialog: React.FC<UserDialogProps> = ({
           phone: editingUser.profile?.phone || '',
           address: editingUser.profile?.address || '',
           position: editingUser.profile?.position || '',
-          role: (editingUser.roles?.[0] as UserRole) || UserRole.GURU,
+          role: editingUser.role || UserRole.GURU,
           status: editingUser.status,
           organization_id: editingUser.organization_id,
           password: '', // Never pre-fill password

@@ -25,9 +25,9 @@ export function RoleProtectedRoute({
     return <Navigate to="/login" replace />;
   }
 
-  // Get user roles (PKG system uses roles array)
-  const userRoles = user?.roles || [];
-  const hasRole = userRoles.length > 0;
+  // Get user role (PKG system now uses single role field)
+  const userRole = user?.role;
+  const hasRole = !!userRole;
 
   // If route requires roles but user has none, redirect to home
   if (requireRoles && !hasRole) {
@@ -39,8 +39,8 @@ export function RoleProtectedRoute({
     return <>{children}</>;
   }
 
-  // Check if user has any of the required roles
-  const hasAccess = allowedRoles.some(role => userRoles.includes(role));
+  // Check if user has the required role
+  const hasAccess = allowedRoles.includes(userRole as UserRole);
 
   if (!hasAccess) {
     if (fallback) {
@@ -89,7 +89,7 @@ export function NoRolesOnly({
     return <Navigate to="/login" replace />;
   }
 
-  const hasRole = user?.roles && user.roles.length > 0;
+  const hasRole = !!user?.role;
 
   // If user has roles, redirect them away from this route
   if (hasRole) {
@@ -117,33 +117,32 @@ export function HomePageGuard({ children }: { children: ReactNode }) {
 export function useRoleAccess() {
   const { user } = useAuth();
   
-  const userRoles = user?.roles || [];
-  const primaryRole = userRoles[0] || null;
-  const hasRole = userRoles.length > 0;
+  const userRole = user?.role || null;
+  const hasRole = !!userRole;
 
   const checkRole = (role: UserRole | UserRole[]) => {
-    if (userRoles.length === 0) return false;
+    if (!userRole) return false;
     const rolesToCheck = Array.isArray(role) ? role : [role];
-    return rolesToCheck.some(r => userRoles.includes(r));
+    return rolesToCheck.includes(userRole);
   };
 
   const hasAnyRole = (roles: UserRole[]) => {
-    if (userRoles.length === 0) return false;
-    return roles.some(role => userRoles.includes(role));
+    if (!userRole) return false;
+    return roles.includes(userRole);
   };
 
   const hasAllRoles = (roles: UserRole[]) => {
-    if (userRoles.length === 0) return false;
-    return roles.every(role => userRoles.includes(role));
+    if (!userRole) return false;
+    // With single role, user can only have all roles if there's only one role required
+    return roles.length === 1 && roles.includes(userRole);
   };
 
-  const isAdmin = userRoles.includes(USER_ROLES.ADMIN);
-  const isGuru = userRoles.includes(USER_ROLES.GURU);
-  const isKepalaSekolah = userRoles.includes(USER_ROLES.KEPALA_SEKOLAH);
+  const isAdmin = userRole === USER_ROLES.ADMIN;
+  const isGuru = userRole === USER_ROLES.GURU;
+  const isKepalaSekolah = userRole === USER_ROLES.KEPALA_SEKOLAH;
 
   return {
-    userRoles,
-    primaryRole,
+    userRole,
     hasRole,
     checkRole,
     hasAnyRole,

@@ -2,9 +2,9 @@
 
 // PKG System User Role Constants
 export const USER_ROLES = {
-  ADMIN: 'admin',
-  GURU: 'guru',
-  KEPALA_SEKOLAH: 'kepala_sekolah'
+  ADMIN: 'ADMIN',
+  GURU: 'GURU',
+  KEPALA_SEKOLAH: 'KEPALA_SEKOLAH'
 } as const;
 
 export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];

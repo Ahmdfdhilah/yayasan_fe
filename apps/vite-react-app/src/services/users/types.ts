@@ -19,7 +19,7 @@ export interface User {
   updated_at?: string;
   display_name: string;
   full_name: string;
-  roles: string[];
+  role: UserRole;
 }
 
 // Request Types

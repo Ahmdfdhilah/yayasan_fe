@@ -47,7 +47,7 @@ const TeacherEvaluationsPage: React.FC = () => {
   const navigate = useNavigate();
 
   // Redirect guru to my-evaluations
-  if (currentRole === 'guru') {
+  if (currentRole === 'GURU') {
     return <Navigate to="/my-evaluations" replace />;
   }
 

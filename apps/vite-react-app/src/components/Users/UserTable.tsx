@@ -72,7 +72,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                   {user.email}
                 </TableCell>
                 <TableCell>
-                  {user.roles}
+                  {user.role}
                 </TableCell>
                 <TableCell>
                   {user.profile?.phone || '-'}

@@ -84,7 +84,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
   // Admin can review submissions from principals (kepala sekolah)
   const canReview = submission?.status === RPPSubmissionStatus.PENDING && (
     (isKepalaSekolah() && teacher?.profile?.organization_id === currentUser?.profile?.organization_id) ||
-    (isAdmin() && teacher?.roles?.includes('kepala_sekolah'))
+    (isAdmin() && teacher?.role === 'KEPALA_SEKOLAH')
   );
 
   // Admin can view all submissions 

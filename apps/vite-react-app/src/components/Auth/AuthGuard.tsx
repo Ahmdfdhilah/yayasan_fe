@@ -92,8 +92,8 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 
   // Check role requirements
   if (requireRoles.length > 0) {
-    const userRoles = user.roles || [];
-    const hasRequiredRole = requireRoles.some(role => userRoles.includes(role));
+    const userRole = user.role;
+    const hasRequiredRole = requireRoles.includes(userRole);
     
     if (!hasRequiredRole) {
       if (fallback) {

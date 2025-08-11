@@ -45,7 +45,7 @@ const RPPSubmissionsPage: React.FC = () => {
   const navigate = useNavigate();
   
   // Redirect guru to my-rpp-submissions (but not kepala_sekolah)
-  if (currentRole === 'guru') {
+  if (currentRole === 'GURU') {
     return <Navigate to="/my-rpp-submissions" replace />;
   }
 

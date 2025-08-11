@@ -127,7 +127,7 @@ export const UserCards: React.FC<UserCardsProps> = ({
             <div className="mb-3">
               <p className="text-xs text-muted-foreground mb-1">Role:</p>
               <div className="flex flex-wrap gap-1">
-                {user.roles}
+                {user.role}
               </div>
             </div>
 

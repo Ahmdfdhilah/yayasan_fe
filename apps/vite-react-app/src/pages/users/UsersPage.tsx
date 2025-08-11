@@ -399,9 +399,9 @@ const UsersPage: React.FC = () => {
                 </div>
               </div>
               <div>
-                <Label>Roles</Label>
+                <Label>Role</Label>
                 <div className="p-2 bg-muted rounded text-sm">
-                  {viewingUser.roles?.join(', ') || 'Tidak ada role'}
+                  {viewingUser.role || 'Tidak ada role'}
                 </div>
               </div>
               {viewingUser.profile?.phone && (

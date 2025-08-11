@@ -39,7 +39,7 @@ export function SidebarContent({
   
   // Get appropriate menu items based on current role
   const menuItems = useMemo(() => {
-    return getMenuItemsForUser([currentRole]) as SidebarItem[];
+    return getMenuItemsForUser(currentRole) as SidebarItem[];
   }, [currentRole]);
 
   return (

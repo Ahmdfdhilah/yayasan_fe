@@ -12,7 +12,7 @@ const MyEvaluationsPage: React.FC = () => {
   const { toast } = useToast();
 
   // Check access first
-  if (currentRole === 'admin') {
+  if (currentRole === 'ADMIN') {
     return <Navigate to="/rpp-submissions" replace />;
   }
 

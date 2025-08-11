@@ -33,7 +33,7 @@ export const TeacherEvaluationCards: React.FC<TeacherEvaluationCardsProps> = ({
 }) => {
 
   const getActionProps = (evaluation: TeacherEvaluationResponse) => {
-    const canEvaluateItem = userRole !== 'guru' && !!onEvaluate;
+    const canEvaluateItem = userRole !== 'GURU' && !!onEvaluate;
     const canEditItem = !!onEdit && !!canEdit && canEdit(evaluation);
 
     return {
