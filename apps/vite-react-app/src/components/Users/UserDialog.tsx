@@ -119,8 +119,10 @@ export const UserDialog: React.FC<UserDialogProps> = ({
             address: data.address || undefined,
             position: data.position || undefined,
           },
+          role: data.role,
           status: data.status,
           organization_id: data.organization_id,
+          password: data.password || undefined, // Only include password if provided
         };
         onSave(updateData);
       } else {
@@ -133,9 +135,10 @@ export const UserDialog: React.FC<UserDialogProps> = ({
             address: data.address || undefined,
             position: data.position || undefined,
           },
+          role: data.role,
           password: data.password,
           organization_id: data.organization_id,
-          // Status will be set to ACTIVE by service
+          status: UserStatus.ACTIVE, // Set default status for new users
         };
         onSave(createData);
       }
@@ -204,36 +207,34 @@ export const UserDialog: React.FC<UserDialogProps> = ({
                   )}
                 />
 
-{!isEdit && (
-                  <FormField
-                    control={form.control}
-                    name="role"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Role</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          disabled={loading}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih role" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {getRoleOptions().map((role) => (
-                              <SelectItem key={role.value} value={role.value}>
-                                {role.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
+<FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Role</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        disabled={loading}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih role" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {getRoleOptions().map((role) => (
+                            <SelectItem key={role.value} value={role.value}>
+                              {role.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 {isEdit && (
                   <FormField
@@ -299,26 +300,26 @@ export const UserDialog: React.FC<UserDialogProps> = ({
                   )}
                 />
 
-                {!isEdit && (
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="Masukkan password"
-                            disabled={loading}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
+<FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Password {isEdit && "(Biarkan kosong jika tidak ingin mengubah)"}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder={isEdit ? "Masukkan password baru" : "Masukkan password"}
+                          disabled={loading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}

@@ -30,6 +30,7 @@ export interface UserCreate {
     [key: string]: any;
   };
   organization_id?: number;
+  role?: UserRole;
   status?: UserStatus;
   password?: string;
 }
@@ -46,7 +47,13 @@ export interface AdminUserUpdate {
   };
   organization_id?: number;
   email?: string;
+  role?: UserRole;
   status?: UserStatus;
+  password?: string;
+}
+
+export interface AdminSetUserPassword {
+  new_password: string;
 }
 
 export interface UserChangePassword {

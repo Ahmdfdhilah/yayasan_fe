@@ -4,6 +4,7 @@ import {
   UserCreate,
   UserUpdate,
   AdminUserUpdate,
+  AdminSetUserPassword,
   UserChangePassword,
   UserResponse,
   UserListResponse,
@@ -81,6 +82,37 @@ class UserService extends BaseService {
     userId: number
   ): Promise<MessageResponse> {
     return this.delete(`/${userId}`);
+  }
+
+  async resetUserPassword(
+    userId: number
+  ): Promise<MessageResponse> {
+    return this.post(`/${userId}/reset-password`);
+  }
+
+  async setUserPassword(
+    userId: number,
+    passwordData: AdminSetUserPassword
+  ): Promise<MessageResponse> {
+    return this.post(`/${userId}/set-password`, passwordData);
+  }
+
+  async activateUser(
+    userId: number
+  ): Promise<UserResponse> {
+    return this.post(`/${userId}/activate`);
+  }
+
+  async deactivateUser(
+    userId: number
+  ): Promise<UserResponse> {
+    return this.post(`/${userId}/deactivate`);
+  }
+
+  async suspendUser(
+    userId: number
+  ): Promise<UserResponse> {
+    return this.post(`/${userId}/suspend`);
   }
 }
 
