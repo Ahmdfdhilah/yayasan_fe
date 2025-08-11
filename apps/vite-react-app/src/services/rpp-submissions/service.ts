@@ -88,6 +88,16 @@ class RPPSubmissionService extends BaseService {
   }
 
   /**
+   * Upload file to existing RPP submission item
+   */
+  async uploadFileToRPPItem(
+    itemId: number,
+    fileData: RPPSubmissionItemUpdate
+  ): Promise<RPPSubmissionItemResponse> {
+    return this.put(`/my-submission-item/${itemId}/upload`, fileData);
+  }
+
+  /**
    * Delete RPP submission item
    */
   async deleteRPPSubmissionItem(

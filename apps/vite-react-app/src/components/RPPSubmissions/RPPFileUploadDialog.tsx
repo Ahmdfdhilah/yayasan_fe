@@ -18,6 +18,7 @@ interface RPPFileUploadDialogProps {
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
   periodId: number;
+  itemId?: number; // If provided, update existing item instead of creating new
   title?: string;
   currentFileName?: string;
 }
@@ -27,6 +28,7 @@ export const RPPFileUploadDialog: React.FC<RPPFileUploadDialogProps> = ({
   onOpenChange,
   onSuccess,
   periodId,
+  itemId,
   title = "File RPP",
   currentFileName
 }) => {
@@ -73,9 +75,17 @@ export const RPPFileUploadDialog: React.FC<RPPFileUploadDialogProps> = ({
       }
       
       // Associate the file with the RPP submission
-      await rppSubmissionService.uploadRPPFile(periodId, {
-        file_id: fileId
-      });
+      if (itemId) {
+        // Update existing item
+        await rppSubmissionService.uploadFileToRPPItem(itemId, {
+          file_id: fileId
+        });
+      } else {
+        // Create new item (backward compatibility)
+        await rppSubmissionService.uploadRPPFile(periodId, {
+          file_id: fileId
+        });
+      }
 
       toast({
         title: 'Berhasil',

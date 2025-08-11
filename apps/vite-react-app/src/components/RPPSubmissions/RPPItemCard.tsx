@@ -2,6 +2,16 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@workspace/ui/components/alert-dialog';
+import {
   FileText,
 } from 'lucide-react';
 import { useToast } from '@workspace/ui/components/sonner';
@@ -28,16 +38,17 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
 }) => {
   const { toast } = useToast();
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handleUploadClick = () => {
     setUploadDialogOpen(true);
   };
 
-  const handleDeleteItem = async () => {
-    if (!confirm('Apakah Anda yakin ingin menghapus item RPP ini?')) {
-      return;
-    }
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
 
+  const handleDeleteConfirm = async () => {
     try {
       await rppSubmissionService.deleteRPPSubmissionItem(item.id);
       
@@ -46,6 +57,7 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
         description: 'Item RPP berhasil dihapus.',
       });
 
+      setDeleteDialogOpen(false);
       if (onItemDeleted) {
         onItemDeleted();
       }
@@ -55,6 +67,7 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
         description: 'Gagal menghapus item RPP.',
         variant: 'destructive'
       });
+      setDeleteDialogOpen(false);
     }
   };
 
@@ -176,7 +189,7 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
                     ...(canUpload && onItemDeleted ? [
                       {
                         label: 'Hapus Item',
-                        onClick: handleDeleteItem,
+                        onClick: handleDeleteClick,
                         icon: 'Trash2'
                       }
                     ] : [])
@@ -202,9 +215,34 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
         onOpenChange={setUploadDialogOpen}
         onSuccess={onFileUploaded}
         periodId={item.period_id}
+        itemId={item.id}
         title={item.name}
         currentFileName={item.file_name || undefined}
       />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Item RPP</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus item RPP "{item.name}"? 
+              {item.is_uploaded && " File yang sudah diupload juga akan terhapus."}
+              <br />
+              <br />
+              Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
