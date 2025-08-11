@@ -10,7 +10,6 @@ import {
 } from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
 import { Upload, FileText, Loader2 } from 'lucide-react';
-import { RPPType } from '@/services/rpp-submissions/types';
 import { rppSubmissionService, mediaFileService } from '@/services';
 import FileUpload from '@/components/common/FileUpload';
 
@@ -19,8 +18,7 @@ interface RPPFileUploadDialogProps {
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
   periodId: number;
-  rppType: RPPType;
-  rppTypeDisplayName: string;
+  title?: string;
   currentFileName?: string;
 }
 
@@ -29,8 +27,7 @@ export const RPPFileUploadDialog: React.FC<RPPFileUploadDialogProps> = ({
   onOpenChange,
   onSuccess,
   periodId,
-  rppType,
-  rppTypeDisplayName,
+  title = "File RPP",
   currentFileName
 }) => {
   const { toast } = useToast();
@@ -76,13 +73,13 @@ export const RPPFileUploadDialog: React.FC<RPPFileUploadDialogProps> = ({
       }
       
       // Associate the file with the RPP submission
-      await rppSubmissionService.uploadRPPFile(periodId, rppType, {
+      await rppSubmissionService.uploadRPPFile(periodId, {
         file_id: fileId
       });
 
       toast({
         title: 'Berhasil',
-        description: `File ${rppTypeDisplayName} berhasil diupload.`,
+        description: `File ${title} berhasil diupload.`,
       });
 
       onSuccess();
@@ -105,12 +102,12 @@ export const RPPFileUploadDialog: React.FC<RPPFileUploadDialogProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <FileText className="h-5 w-5" />
-            <span>Upload {rppTypeDisplayName}</span>
+            <span>Upload {title}</span>
           </DialogTitle>
           <DialogDescription>
             {currentFileName 
               ? `Pilih file baru untuk mengganti "${currentFileName}"`
-              : `Pilih file untuk ${rppTypeDisplayName}`
+              : `Pilih file untuk ${title}`
             }
           </DialogDescription>
         </DialogHeader>

@@ -2,11 +2,7 @@
 import { MessageResponse, PaginatedResponse } from "../base/types";
 
 // ===== ENUMS =====
-export enum RPPType {
-  RENCANA_PROGRAM_HARIAN = "RENCANA_PROGRAM_HARIAN",
-  RENCANA_PROGRAM_MINGGUAN = "RENCANA_PROGRAM_MINGGUAN",
-  RENCANA_PROGRAM_SEMESTER = "RENCANA_PROGRAM_SEMESTER"
-}
+// RPPType enum removed - now supports flexible RPP submissions without type constraints
 
 export enum RPPSubmissionStatus {
   DRAFT = "DRAFT",
@@ -19,7 +15,6 @@ export enum RPPSubmissionStatus {
 export interface RPPSubmissionItemBase {
   teacher_id: number;
   period_id: number;
-  rpp_type: RPPType;
   file_id?: number | null;
 }
 
@@ -33,7 +28,6 @@ export interface RPPSubmissionItemResponse extends RPPSubmissionItemBase {
   id: number;
   uploaded_at?: string | null;
   is_uploaded: boolean;
-  rpp_type_display_name: string;
   created_at: string;
   updated_at?: string | null;
   
@@ -120,7 +114,6 @@ export interface RPPSubmissionFilter {
 export interface RPPSubmissionItemFilter {
   teacher_id?: number;
   period_id?: number;
-  rpp_type?: RPPType;
   is_uploaded?: boolean;
   organization_id?: number;
 }
@@ -171,7 +164,6 @@ export interface RPPSubmissionFilterParams {
 export interface RPPSubmissionItemFilterParams {
   teacher_id?: number;
   period_id?: number;
-  rpp_type?: RPPType;
   is_uploaded?: boolean;
   limit?: number;
   offset?: number;

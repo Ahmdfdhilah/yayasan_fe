@@ -106,7 +106,7 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">{item.rpp_type_display_name}</CardTitle>
+            <CardTitle className="text-lg">File RPP #{item.id}</CardTitle>
             <Badge variant={item.is_uploaded ? "default" : "secondary"}>
               {item.is_uploaded ? "Sudah di Upload" : "Belum Upload"}
             </Badge>
@@ -162,8 +162,7 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
         onOpenChange={setUploadDialogOpen}
         onSuccess={onFileUploaded}
         periodId={item.period_id}
-        rppType={item.rpp_type}
-        rppTypeDisplayName={item.rpp_type_display_name}
+        title={`File RPP #${item.id}`}
         currentFileName={item.file_name || undefined}
       />
     </>

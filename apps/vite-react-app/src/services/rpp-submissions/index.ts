@@ -2,7 +2,6 @@
 export { rppSubmissionService } from "./service";
 export * from "./types";
 export {
-  RPPType,
   RPPSubmissionStatus,
   type RPPSubmissionResponse,
   type RPPSubmissionListResponse,

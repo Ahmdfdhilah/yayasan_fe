@@ -49,23 +49,6 @@ export const RPPSubmissionOverview: React.FC<RPPSubmissionOverviewProps> = ({
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Progress Section - Always Full Width on Mobile */}
-        <div className="space-y-2">
-          <Label>Progress</Label>
-          <div className="space-y-2">
-            <div className="w-full bg-gray-200 rounded-full h-3">
-              <div
-                className="bg-blue-600 h-3 rounded-full transition-all duration-300"
-                style={{ width: `${submission.completion_percentage}%` }}
-              ></div>
-            </div>
-            <div className="flex justify-between items-center">
-              <p className="text-sm">
-                {submission.completion_percentage.toFixed(1)}% Selesai
-              </p>
-            </div>
-          </div>
-        </div>
 
         {/* Dates Section - Responsive Grid */}
         {(submission.submitted_at || submission.reviewed_at) && (

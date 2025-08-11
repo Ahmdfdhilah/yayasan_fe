@@ -39,20 +39,19 @@ export const RPPSubmissionTable: React.FC<RPPSubmissionTableProps> = ({
             <TableHead>Jabatan</TableHead>
             <TableHead>Sekolah</TableHead>
             <TableHead className="text-center">Status</TableHead>
-            <TableHead className="text-center">Progress</TableHead>
             <TableHead className="text-center">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                 Memuat submission RPP...
               </TableCell>
             </TableRow>
           ) : submissions.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                 Tidak ada submission RPP ditemukan
               </TableCell>
             </TableRow>
@@ -70,19 +69,6 @@ export const RPPSubmissionTable: React.FC<RPPSubmissionTableProps> = ({
                 </TableCell>
                 <TableCell className="text-center">
                   {rppSubmissionService.getStatusDisplayName(submission.status)}
-                </TableCell>
-                <TableCell className="text-center">
-                  <div className="space-y-1">
-                    <div className="w-full bg-gray-200 rounded-full h-2 max-w-24 mx-auto">
-                      <div
-                        className="bg-blue-600 h-2 rounded-full"
-                        style={{ width: `${submission.completion_percentage}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      {submission.completion_percentage.toFixed(1)}%
-                    </span>
-                  </div>
                 </TableCell>
                 <TableCell className="text-center">
                   <ActionDropdown

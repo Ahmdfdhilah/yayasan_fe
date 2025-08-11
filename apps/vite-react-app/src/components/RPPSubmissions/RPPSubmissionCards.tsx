@@ -4,7 +4,6 @@ import { Card, CardContent } from '@workspace/ui/components/card';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { 
   FileText, 
-  BarChart3,
 } from 'lucide-react';
 import { rppSubmissionService } from '@/services';
 
@@ -95,22 +94,6 @@ export const RPPSubmissionCards: React.FC<RPPSubmissionCardsProps> = ({
                 <span>Status: {rppSubmissionService.getStatusDisplayName(submission.status)}</span>
               </div>
 
-              {/* Progress */}
-              <div className="flex items-start space-x-2 text-sm text-muted-foreground">
-                <BarChart3 className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <div className="flex justify-between items-center mb-1">
-                    <span>Progress</span>
-                    <span>{submission.completion_percentage.toFixed(1)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-600 h-2 rounded-full" 
-                      style={{ width: `${submission.completion_percentage}%` }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
             </div>
           </CardContent>
         </Card>

@@ -85,7 +85,6 @@ export type {
 } from "./teacher-evaluations";
 
 export type {
-  RPPType,
   RPPSubmissionStatus,
   RPPSubmissionResponse,
   RPPSubmissionListResponse,

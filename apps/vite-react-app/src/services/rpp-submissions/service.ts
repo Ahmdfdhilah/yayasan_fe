@@ -15,7 +15,6 @@ import {
   GenerateRPPSubmissionsResponse,
   RPPSubmissionStats,
   RPPSubmissionDashboard,
-  RPPType,
   RPPSubmissionStatus,
 } from "./types";
 
@@ -68,14 +67,13 @@ class RPPSubmissionService extends BaseService {
   }
 
   /**
-   * Upload RPP file for specific type
+   * Upload RPP file
    */
   async uploadRPPFile(
     periodId: number,
-    rppType: RPPType,
     fileData: RPPSubmissionItemUpdate
   ): Promise<RPPSubmissionItemResponse> {
-    return this.put(`/my-submission/${periodId}/upload/${rppType}`, fileData);
+    return this.put(`/my-submission/${periodId}/upload`, fileData);
   }
 
   /**
@@ -245,20 +243,9 @@ class RPPSubmissionService extends BaseService {
    * Check if submission can be submitted for approval
    */
   isSubmissionReady(submission: RPPSubmissionResponse): boolean {
-    return submission.can_be_submitted && submission.completion_percentage === 100;
+    return submission.can_be_submitted && submission.items.length > 0;
   }
 
-  /**
-   * Get RPP type display name
-   */
-  getRPPTypeDisplayName(rppType: RPPType): string {
-    const displayNames = {
-      [RPPType.RENCANA_PROGRAM_HARIAN]: "Rencana Program Harian",
-      [RPPType.RENCANA_PROGRAM_MINGGUAN]: "Rencana Program Mingguan", 
-      [RPPType.RENCANA_PROGRAM_SEMESTER]: "Rencana Program Semester"
-    };
-    return displayNames[rppType] || rppType;
-  }
 
   /**
    * Get submission status display name
@@ -314,7 +301,7 @@ class RPPSubmissionService extends BaseService {
       acc[teacherId].submissions.push(submission);
       acc[teacherId].totalSubmissions++;
       
-      if (submission.completion_percentage === 100) {
+      if (submission.items.length > 0) {
         acc[teacherId].completedSubmissions++;
       }
       
@@ -359,7 +346,7 @@ class RPPSubmissionService extends BaseService {
       acc[periodId].submissions.push(submission);
       acc[periodId].totalSubmissions++;
       
-      if (submission.completion_percentage === 100) {
+      if (submission.items.length > 0) {
         acc[periodId].completedSubmissions++;
       }
       
@@ -392,9 +379,9 @@ class RPPSubmissionService extends BaseService {
       };
     }
 
-    const completed = submissions.filter(s => s.completion_percentage === 100).length;
-    const inProgress = submissions.filter(s => s.completion_percentage > 0 && s.completion_percentage < 100).length;
-    const notStarted = submissions.filter(s => s.completion_percentage === 0).length;
+    const completed = submissions.filter(s => s.items.length > 0).length;
+    const inProgress = 0; // No longer applicable with new flexible system
+    const notStarted = submissions.filter(s => s.items.length === 0).length;
     
     const totalCompletion = submissions.reduce((sum, sub) => sum + sub.completion_percentage, 0);
     const averageCompletion = totalCompletion / total;
