@@ -62,10 +62,12 @@ export const CreateRPPItemDialog: React.FC<CreateRPPItemDialogProps> = ({
 
   const onSubmit = async (data: CreateItemFormData) => {
     try {
-      await rppSubmissionService.createRPPSubmissionItem(periodId, {
+      console.log('Creating RPP item with:', { periodId, data });
+      const result = await rppSubmissionService.createRPPSubmissionItem(periodId, {
         name: data.name,
         description: data.description || null,
       });
+      console.log('RPP item created successfully:', result);
 
       toast({
         title: 'Berhasil',
@@ -74,8 +76,10 @@ export const CreateRPPItemDialog: React.FC<CreateRPPItemDialogProps> = ({
 
       reset();
       onOpenChange(false);
+      console.log('Calling onSuccess callback...');
       onSuccess();
     } catch (error) {
+      console.error('Error creating RPP item:', error);
       toast({
         title: 'Error',
         description: 'Gagal membuat RPP item. Silakan coba lagi.',

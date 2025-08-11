@@ -253,6 +253,8 @@ const RPPSubmissionDetailPage: React.FC = () => {
       }
 
       setSubmission(submissionData);
+      console.log('Submission data loaded:', submissionData);
+      console.log('Number of items:', submissionData?.items?.length || 0);
     } catch (error: any) {
       console.error('Error loading submission detail:', error);
 
@@ -269,7 +271,9 @@ const RPPSubmissionDetailPage: React.FC = () => {
   };
 
   const handleFileUploaded = async () => {
+    console.log('handleFileUploaded called, reloading submission detail...');
     await loadSubmissionDetail();
+    console.log('loadSubmissionDetail completed');
   };
 
   const handleSubmitForApproval = async () => {
@@ -571,7 +575,10 @@ const RPPSubmissionDetailPage: React.FC = () => {
           })()}
         </div>
         <div className="grid grid-cols-1  gap-4">
-          {submission.items.map(renderRPPItem)}
+          {(() => {
+            console.log('Rendering items:', submission.items);
+            return submission.items.map(renderRPPItem);
+          })()}
         </div>
       </div>
 
