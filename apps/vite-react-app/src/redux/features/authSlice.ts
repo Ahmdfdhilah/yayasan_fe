@@ -20,9 +20,16 @@ export interface AuthState {
 
 export const updateProfileAsync = createAsyncThunk(
   'auth/updateProfile',
-  async (profileData: UserUpdate, { rejectWithValue }) => {
+  async (profileData: UserUpdate | { formData: FormData }, { rejectWithValue }) => {
     try {
-      const response = await userService.updateCurrentUser(profileData);
+      let response;
+      if ('formData' in profileData) {
+        // Multipart form data update (with image)
+        response = await userService.updateCurrentUserMultipart(profileData.formData);
+      } else {
+        // Regular JSON update
+        response = await userService.updateCurrentUser(profileData);
+      }
       return response;
     } catch (error: any) {
       // BaseService already handles error.response?.data?.detail extraction

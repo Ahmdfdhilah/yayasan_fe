@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@workspace/ui/components/button';
 import { ScrollToTopLink } from '@/components/common/ScrollToTopLink';
-import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -100,9 +100,13 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
           >
             <div className="relative">
               <Avatar className={cn("flex-shrink-0", collapsed ? "h-5 w-5" : "h-6 w-6")}>
-                <AvatarFallback className={cn(collapsed ? "text-[10px]" : "text-xs")}>
-                  {getUserInitials()}
-                </AvatarFallback>
+                {user.img_url ? (
+                  <AvatarImage src={user.img_url} alt={getUserDisplayName()} />
+                ) : (
+                  <AvatarFallback className={cn(collapsed ? "text-[10px]" : "text-xs")}>
+                    {getUserInitials()}
+                  </AvatarFallback>
+                )}
               </Avatar>
               {/* Active user indicator */}
               {user.status === 'active' && (

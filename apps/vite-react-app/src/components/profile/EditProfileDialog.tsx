@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -20,7 +20,9 @@ import {
   FormLabel,
   FormMessage,
 } from '@workspace/ui/components/form';
-import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
+import { FileUpload } from '@/components/common/FileUpload';
+import { Camera } from 'lucide-react';
 
 const editProfileSchema = z.object({
   name: z.string().min(1, 'Nama wajib diisi').min(2, 'Nama minimal 2 karakter'),
@@ -35,7 +37,7 @@ interface EditProfileDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   user: User;
-  onSave: (data: UserUpdate) => void;
+  onSave: (data: UserUpdate, imageFile?: File) => void;
   loading?: boolean;
 }
 
@@ -46,6 +48,9 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
   onSave,
   loading = false
 }) => {
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
   const form = useForm<EditProfileData>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
@@ -64,8 +69,25 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
         address: user.profile?.address || '',
         position: user.profile?.position || '',
       });
+      // Reset image selection when dialog opens
+      setSelectedImage(null);
+      setPreviewUrl(null);
     }
   }, [open, user, form]);
+
+  const handleImageSelect = (files: FileList | null) => {
+    if (files && files.length > 0) {
+      const file = files[0];
+      setSelectedImage(file);
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewUrl(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const onSubmit = (data: EditProfileData) => {
     const updateData: UserUpdate = {
@@ -77,7 +99,7 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
         position: data.position || undefined,
       },
     };
-    onSave(updateData);
+    onSave(updateData, selectedImage || undefined);
   };
 
   const getInitials = () => {
@@ -100,12 +122,44 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Profile Avatar */}
-              <div className="flex justify-center mb-6">
-                <Avatar className="w-24 h-24">
-                  <AvatarFallback className="text-2xl">
-                    {getInitials()}
-                  </AvatarFallback>
-                </Avatar>
+              <div className="flex flex-col items-center gap-4 mb-6">
+                <div className="relative">
+                  <Avatar className="w-24 h-24">
+                    {previewUrl ? (
+                      <AvatarImage src={previewUrl} alt="Preview" />
+                    ) : user.img_url ? (
+                      <AvatarImage src={user.img_url} alt={user.display_name} />
+                    ) : (
+                      <AvatarFallback className="text-2xl">
+                        {getInitials()}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0"
+                    onClick={() => document.getElementById('profile-image-upload')?.click()}
+                    disabled={loading}
+                  >
+                    <Camera className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <input
+                  id="profile-image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleImageSelect(e.target.files)}
+                />
+                
+                {selectedImage && (
+                  <p className="text-xs text-muted-foreground">
+                    Foto baru dipilih: {selectedImage.name}
+                  </p>
+                )}
               </div>
 
               {/* Form Fields */}

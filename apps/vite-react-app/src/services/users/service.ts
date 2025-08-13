@@ -28,6 +28,16 @@ class UserService extends BaseService {
     return this.put("/me", userData);
   }
 
+  async updateCurrentUserMultipart(
+    userData: FormData
+  ): Promise<UserResponse> {
+    return this.put("/me/multipart", userData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
+
   async changePassword(
     passwordData: UserChangePassword
   ): Promise<MessageResponse> {
@@ -62,7 +72,19 @@ class UserService extends BaseService {
       ...userData,
       status: 'active' as const,
     };
-    return this.post(`/${params}`, createData);
+    return this.post(`${params}`, createData);
+  }
+
+  async createUserMultipart(
+    userData: FormData,
+    organizationId?: number
+  ): Promise<UserResponse> {
+    const params = organizationId ? `?organization_id=${organizationId}` : '';
+    return this.post(`/multipart${params}`, userData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 
   async getUserById(
@@ -76,6 +98,17 @@ class UserService extends BaseService {
     userData: AdminUserUpdate
   ): Promise<UserResponse> {
     return this.put(`/${userId}`, userData);
+  }
+
+  async updateUserMultipart(
+    userId: number,
+    userData: FormData
+  ): Promise<UserResponse> {
+    return this.put(`/${userId}/multipart`, userData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 
   async deleteUser(

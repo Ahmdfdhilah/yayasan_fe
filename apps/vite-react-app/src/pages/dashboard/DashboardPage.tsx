@@ -100,7 +100,7 @@ export function DashboardPage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Dashboard PKG System</h1>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">
             Selamat datang, {user?.profile?.name || user?.display_name || 'User'}
           </p>

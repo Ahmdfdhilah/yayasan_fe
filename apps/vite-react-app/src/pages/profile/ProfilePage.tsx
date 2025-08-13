@@ -4,7 +4,7 @@ import { selectUser, selectAuthLoading, updateProfileAsync } from '@/redux/featu
 import { useToast } from '@workspace/ui/components/sonner';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
 import { PageHeader } from '@/components/common/PageHeader';
 import { EditProfileDialog } from '@/components/Profile/EditProfileDialog';
 import { ChangePasswordDialog } from '@/components/Profile/ChangePasswordDialog';
@@ -75,9 +75,21 @@ const ProfilePage: React.FC = () => {
     setIsPasswordDialogOpen(true);
   };
 
-  const handleProfileUpdate = async (data: UserUpdate) => {
+  const handleProfileUpdate = async (data: UserUpdate, imageFile?: File) => {
     try {
-      await dispatch(updateProfileAsync(data)).unwrap();
+      if (imageFile) {
+        // Use multipart update for image upload
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(data));
+        formData.append('image', imageFile);
+        
+        // Call the multipart endpoint through auth slice
+        await dispatch(updateProfileAsync({ formData })).unwrap();
+      } else {
+        // Use regular JSON update
+        await dispatch(updateProfileAsync(data)).unwrap();
+      }
+      
       toast({
         title: 'Profil berhasil diperbarui',
         description: 'Data profil Anda telah diperbarui.',
@@ -124,9 +136,13 @@ const ProfilePage: React.FC = () => {
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <Avatar className="w-24 h-24">
-                <AvatarFallback className="text-2xl">
-                  {getInitials()}
-                </AvatarFallback>
+                {user.img_url ? (
+                  <AvatarImage src={user.img_url} alt={user.display_name} />
+                ) : (
+                  <AvatarFallback className="text-2xl">
+                    {getInitials()}
+                  </AvatarFallback>
+                )}
               </Avatar>
             </div>
             <CardTitle className="text-xl">{getFullName()}</CardTitle>

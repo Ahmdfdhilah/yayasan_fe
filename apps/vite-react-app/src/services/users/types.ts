@@ -11,6 +11,7 @@ export interface User {
     name: string;
     [key: string]: any;
   };
+  img_url?: string;
   organization_id?: number;
   organization_name?: string;
   status: UserStatus;
@@ -29,6 +30,7 @@ export interface UserCreate {
     name: string;
     [key: string]: any;
   };
+  img_url?: string;
   organization_id?: number;
   role?: UserRole;
   status?: UserStatus;
@@ -39,12 +41,14 @@ export interface UserUpdate {
   profile?: {
     [key: string]: any;
   };
+  img_url?: string;
 }
 
 export interface AdminUserUpdate {
   profile?: {
     [key: string]: any;
   };
+  img_url?: string;
   organization_id?: number;
   email?: string;
   role?: UserRole;
