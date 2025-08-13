@@ -22,6 +22,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { getImageUrl } from '@/utils/imageUtils';
+import { useLogoutCountdown } from '@/hooks/useLogoutCountdown';
 
 const ProfilePage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -30,6 +31,11 @@ const ProfilePage: React.FC = () => {
   const { toast } = useToast();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  
+  const { startCountdown: startEmailChangeCountdown } = useLogoutCountdown({
+    seconds: 5,
+    reason: 'Email telah berubah, sistem akan logout untuk keamanan.'
+  });
 
   if (!user) {
     return (
@@ -77,6 +83,11 @@ const ProfilePage: React.FC = () => {
   };
 
   const handleProfileUpdate = async (data: UserUpdate, imageFile?: File) => {
+    if (!user) return;
+    
+    // Check if email is being changed
+    const isEmailChanged = data.email && data.email.trim() !== user.email?.trim();
+    
     try {
       if (imageFile) {
         // Use multipart update for image upload
@@ -91,12 +102,27 @@ const ProfilePage: React.FC = () => {
         await dispatch(updateProfileAsync(data)).unwrap();
       }
       
-      toast({
-        title: 'Profil berhasil diperbarui',
-        description: 'Data profil Anda telah diperbarui.',
-        variant: 'default'
-      });
-      setIsEditDialogOpen(false);
+      if (isEmailChanged) {
+        // Show success toast with logout warning
+        toast({
+          title: 'Email berhasil diperbarui',
+          description: 'Anda akan logout otomatis dalam 5 detik untuk keamanan.',
+          variant: 'default'
+        });
+        setIsEditDialogOpen(false);
+        
+        // Start countdown for email change logout
+        startEmailChangeCountdown();
+        
+      } else {
+        // Regular success toast for other profile updates
+        toast({
+          title: 'Profil berhasil diperbarui',
+          description: 'Data profil Anda telah diperbarui.',
+          variant: 'default'
+        });
+        setIsEditDialogOpen(false);
+      }
     } catch (error: any) {
       const errorMessage = error?.message || 'Terjadi kesalahan saat memperbarui profil.';
       toast({

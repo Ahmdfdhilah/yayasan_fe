@@ -38,6 +38,7 @@ export interface UserCreate {
 }
 
 export interface UserUpdate {
+  email?: string;
   profile?: {
     [key: string]: any;
   };

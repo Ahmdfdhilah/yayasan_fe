@@ -25,6 +25,7 @@ import { Camera } from 'lucide-react';
 import { getImageUrl } from '@/utils/imageUtils';
 
 const editProfileSchema = z.object({
+  email: z.string().email('Format email tidak valid').min(1, 'Email wajib diisi'),
   name: z.string().min(1, 'Nama wajib diisi').min(2, 'Nama minimal 2 karakter'),
   phone: z.string().optional().or(z.literal('')),
   address: z.string().optional().or(z.literal('')),
@@ -54,6 +55,7 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
   const form = useForm<EditProfileData>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
+      email: user.email || '',
       name: user.profile?.name || user.display_name || '',
       phone: user.profile?.phone || '',
       address: user.profile?.address || '',
@@ -64,6 +66,7 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
   useEffect(() => {
     if (open && user) {
       form.reset({
+        email: user.email || '',
         name: user.profile?.name || user.display_name || '',
         phone: user.profile?.phone || '',
         address: user.profile?.address || '',
@@ -91,6 +94,7 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
 
   const onSubmit = (data: EditProfileData) => {
     const updateData: UserUpdate = {
+      email: data.email,
       profile: {
         ...user.profile, // Preserve other existing profile fields
         name: data.name,
@@ -164,6 +168,25 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
 
               {/* Form Fields */}
               <div className="flex flex-col gap-6">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="Masukkan email"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="name"
