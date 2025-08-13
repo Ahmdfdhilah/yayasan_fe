@@ -81,10 +81,10 @@ const RPPSubmissionDetailPage: React.FC = () => {
   // Determine if this is user's own submission (teacher or principal)
   const isOwnSubmission = (isGuru() || isKepalaSekolah()) && currentUser?.id?.toString() === teacherId;
 
-  // Kepala sekolah can review submissions from teachers in their organization
+  // Kepala sekolah can review submissions from teachers in their organization (but NOT their own)
   // Admin can review submissions from principals (kepala sekolah)
-  const canReview = submission?.status === RPPSubmissionStatus.PENDING && (
-    (isKepalaSekolah() && teacher?.profile?.organization_id === currentUser?.profile?.organization_id) ||
+  const canReview = submission?.status === RPPSubmissionStatus.PENDING && !isOwnSubmission && (
+    (isKepalaSekolah() && teacher?.role === 'GURU' && teacher?.profile?.organization_id === currentUser?.profile?.organization_id) ||
     (isAdmin() && teacher?.role === 'KEPALA_SEKOLAH')
   );
 

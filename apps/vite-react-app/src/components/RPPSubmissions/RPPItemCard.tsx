@@ -17,6 +17,7 @@ import {
 import { useToast } from '@workspace/ui/components/sonner';
 import { RPPSubmissionItemResponse, RPPSubmissionStatus } from '@/services/rpp-submissions/types';
 import { RPPFileUploadDialog } from './RPPFileUploadDialog';
+import { EditRPPItemDialog } from './EditRPPItemDialog';
 import { mediaFileService } from '@/services/media-files/service';
 import { rppSubmissionService } from '@/services';
 import { API_BASE_URL } from '@/config/api';
@@ -38,10 +39,15 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
 }) => {
   const { toast } = useToast();
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handleUploadClick = () => {
     setUploadDialogOpen(true);
+  };
+
+  const handleEditClick = () => {
+    setEditDialogOpen(true);
   };
 
   const handleDeleteClick = () => {
@@ -186,6 +192,13 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
                         icon: 'Upload'
                       }
                     ] : []),
+                    ...(canUpload ? [
+                      {
+                        label: 'Edit Item',
+                        onClick: handleEditClick,
+                        icon: 'Edit'
+                      }
+                    ] : []),
                     ...(canUpload && onItemDeleted ? [
                       {
                         label: 'Hapus Item',
@@ -218,6 +231,13 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
         itemId={item.id}
         title={item.name}
         currentFileName={item.file_name || undefined}
+      />
+
+      <EditRPPItemDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        item={item}
+        onSuccess={onFileUploaded} // Same callback to refresh data
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

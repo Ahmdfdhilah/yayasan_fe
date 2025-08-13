@@ -8,6 +8,7 @@ import {
   RPPSubmissionItemUpdate,
   RPPSubmissionItemResponse,
   RPPSubmissionItemCreateRequest,
+  RPPSubmissionItemUpdateRequest,
   RPPSubmissionItemListResponse,
   RPPSubmissionItemFilterParams,
   RPPSubmissionSubmitRequest,
@@ -95,6 +96,16 @@ class RPPSubmissionService extends BaseService {
     fileData: RPPSubmissionItemUpdate
   ): Promise<RPPSubmissionItemResponse> {
     return this.put(`/my-submission-item/${itemId}/upload`, fileData);
+  }
+
+  /**
+   * Update RPP submission item details
+   */
+  async updateRPPSubmissionItemDetails(
+    itemId: number,
+    updateData: RPPSubmissionItemUpdateRequest
+  ): Promise<RPPSubmissionItemResponse> {
+    return this.put(`/my-submission-item/${itemId}/details`, updateData);
   }
 
   /**

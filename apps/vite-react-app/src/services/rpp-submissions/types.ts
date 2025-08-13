@@ -27,6 +27,11 @@ export interface RPPSubmissionItemCreateRequest {
   description?: string | null;
 }
 
+export interface RPPSubmissionItemUpdateRequest {
+  name: string;
+  description?: string | null;
+}
+
 export interface RPPSubmissionItemUpdate {
   file_id: number;
 }
