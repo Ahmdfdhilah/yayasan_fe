@@ -57,14 +57,15 @@ export interface LoginResponse extends TokenResponse {}
 
 // User Response Type (PKG system structure)
 export interface UserResponse {
-  organization_name: any;
   id: number;
   email: string;
   profile: {
     name: string;
     [key: string]: any;
   };
+  img_url?: string;
   organization_id?: number;
+  organization_name?: string;
   status: UserStatus;
   last_login_at?: string;
   created_at: string;

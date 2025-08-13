@@ -15,6 +15,7 @@ export interface AuthState {
   isLoading: boolean;
   user: UserResponse | null;
   error: string | null;
+  projectId?: string; // Add project identifier
   // Note: tokens are stored in HttpOnly cookies, not in Redux state
 }
 
@@ -30,7 +31,16 @@ export const updateProfileAsync = createAsyncThunk(
         // Regular JSON update
         response = await userService.updateCurrentUser(profileData);
       }
-      return response;
+      
+      // After successful update, refetch current user data to ensure we have the latest info
+      try {
+        const freshUserData = await userService.getCurrentUser();
+        return freshUserData;
+      } catch (fetchError) {
+        // If refetch fails, return the update response but log the error
+        console.warn('Failed to refetch user data after profile update:', fetchError);
+        return response;
+      }
     } catch (error: any) {
       // BaseService already handles error.response?.data?.detail extraction
       const errorMessage = error?.message || 'Profile update failed';
@@ -39,11 +49,15 @@ export const updateProfileAsync = createAsyncThunk(
   }
 );
 
+// Project identifier to prevent conflicts with other projects
+const PROJECT_ID = import.meta.env.VITE_PROJECT_ID || 'ta-fatur';
+
 const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
   user: null,
   error: null,
+  projectId: PROJECT_ID,
 };
 
 export const loginAsync = createAsyncThunk(
@@ -164,12 +178,23 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.user = null;
       state.error = null;
+      state.projectId = PROJECT_ID;
     },
     clearPersistAndAuth: (state) => {
       // This action will be handled by the AuthProvider to purge persist storage
       state.isAuthenticated = false;
       state.user = null;
       state.error = null;
+      state.projectId = PROJECT_ID;
+    },
+    validateProjectState: (state) => {
+      // Clear state if it's from a different project
+      if (state.projectId !== PROJECT_ID) {
+        state.isAuthenticated = false;
+        state.user = null;
+        state.error = null;
+        state.projectId = PROJECT_ID;
+      }
     },
     setUser: (state, action: PayloadAction<UserResponse>) => {
       state.user = action.payload;
@@ -291,10 +316,7 @@ const authSlice = createSlice({
       })
       .addCase(updateProfileAsync.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = {
-          ...action.payload,
-          organization_name: action.payload.organization_name || null
-        };
+        state.user = action.payload;
         state.error = null;
       })
       .addCase(updateProfileAsync.rejected, (state, action) => {
@@ -304,7 +326,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, clearAuth, clearPersistAndAuth, setUser, updateUser } = authSlice.actions;
+export const { clearError, clearAuth, clearPersistAndAuth, setUser, updateUser, validateProjectState } = authSlice.actions;
 
 export const selectAuth = (state: { auth: AuthState }) => state.auth;
 export const selectIsAuthenticated = (state: { auth: AuthState }) => state.auth.isAuthenticated;

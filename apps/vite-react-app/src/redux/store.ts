@@ -4,9 +4,9 @@ import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, 
 import storage from 'redux-persist/lib/storage';
 import { rootReducer } from './reducers';
 
-// Persist configuration
+// Persist configuration with project-specific key
 const persistConfig = {
-  key: 'root',
+  key: 'tafatur-root', // Unique key for this project
   storage,
   whitelist: ['auth', 'theme'] 
 };

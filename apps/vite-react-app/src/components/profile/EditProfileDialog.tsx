@@ -21,8 +21,8 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form';
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
-import { FileUpload } from '@/components/common/FileUpload';
 import { Camera } from 'lucide-react';
+import { getImageUrl } from '@/utils/imageUtils';
 
 const editProfileSchema = z.object({
   name: z.string().min(1, 'Nama wajib diisi').min(2, 'Nama minimal 2 karakter'),
@@ -128,7 +128,7 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
                     {previewUrl ? (
                       <AvatarImage src={previewUrl} alt="Preview" />
                     ) : user.img_url ? (
-                      <AvatarImage src={user.img_url} alt={user.display_name} />
+                      <AvatarImage src={getImageUrl(user.img_url)} alt={user.display_name} />
                     ) : (
                       <AvatarFallback className="text-2xl">
                         {getInitials()}

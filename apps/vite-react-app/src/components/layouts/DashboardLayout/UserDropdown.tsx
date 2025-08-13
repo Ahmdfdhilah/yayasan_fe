@@ -21,6 +21,7 @@ import { cn } from '@workspace/ui/lib/utils';
 import { useState } from 'react';
 import { useRole } from '@/hooks/useRole';
 import { useAuth } from '@/components/Auth/AuthProvider';
+import { getImageUrl } from '@/utils/imageUtils';
 
 interface UserDropdownProps {
   collapsed?: boolean;
@@ -101,7 +102,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
             <div className="relative">
               <Avatar className={cn("flex-shrink-0", collapsed ? "h-5 w-5" : "h-6 w-6")}>
                 {user.img_url ? (
-                  <AvatarImage src={user.img_url} alt={getUserDisplayName()} />
+                  <AvatarImage src={getImageUrl(user.img_url)} alt={getUserDisplayName()} />
                 ) : (
                   <AvatarFallback className={cn(collapsed ? "text-[10px]" : "text-xs")}>
                     {getUserInitials()}

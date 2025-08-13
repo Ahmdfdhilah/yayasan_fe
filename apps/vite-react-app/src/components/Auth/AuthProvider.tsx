@@ -9,7 +9,8 @@ import {
   getCurrentUserAsync,
   clearAuth,
   clearPersistAndAuth,
-  clearError
+  clearError,
+  validateProjectState
 } from '@/redux/features/authSlice';
 import type { User } from '@/services/users/types';
 
@@ -34,6 +35,7 @@ interface AuthContextType {
   login: (loginData: LoginData) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  refreshUserData: () => Promise<void>;
   changeUserPassword: (passwordData: PasswordChangeData) => Promise<void>;
   clearAuthError: () => void;
   clearPersistentAuth: () => Promise<void>;
@@ -88,6 +90,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const refreshUserData = async (): Promise<void> => {
+    try {
+      // Force refresh current user data regardless of existing user
+      await dispatch(getCurrentUserAsync()).unwrap();
+    } catch (error: any) {
+      console.error('Failed to refresh user data:', error);
+      // Don't clear auth on refresh failure, user might still be valid
+      throw error;
+    }
+  };
+
   const changeUserPassword = async (passwordData: PasswordChangeData): Promise<void> => {
     try {
       await dispatch(changePasswordAsync(passwordData)).unwrap();
@@ -127,8 +140,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return null;
   };
 
-  // Check auth on mount - this will work with both cookies and stored tokens
+  // Validate project state on mount and check auth
   useEffect(() => {
+    // First validate that the persisted state belongs to this project
+    dispatch(validateProjectState());
+    
+    // Then check authentication
     checkAuth();
   }, []); // Only run on mount
 
@@ -157,6 +174,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     logout,
     checkAuth,
+    refreshUserData,
     changeUserPassword,
     clearAuthError,
     clearPersistentAuth,

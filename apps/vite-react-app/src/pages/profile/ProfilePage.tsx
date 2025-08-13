@@ -21,6 +21,7 @@ import {
   IdCard,
   Lock,
 } from 'lucide-react';
+import { getImageUrl } from '@/utils/imageUtils';
 
 const ProfilePage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -137,7 +138,7 @@ const ProfilePage: React.FC = () => {
             <div className="flex justify-center mb-4">
               <Avatar className="w-24 h-24">
                 {user.img_url ? (
-                  <AvatarImage src={user.img_url} alt={user.display_name} />
+                  <AvatarImage src={getImageUrl(user.img_url)} alt={user.display_name} />
                 ) : (
                   <AvatarFallback className="text-2xl">
                     {getInitials()}
