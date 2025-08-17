@@ -29,6 +29,8 @@ import {
 import { User, UserCreate, AdminUserUpdate } from '@/services/users/types';
 import { UserRole, UserStatus } from '@/services/auth/types';
 import { getRoleOptions } from '@/utils/role';
+import { organizationService } from '@/services/organizations';
+import type { OrganizationResponse } from '@/services/organizations/types';
 
 const userFormSchema = z.object({
   email: z.string().email('Email tidak valid').min(1, 'Email wajib diisi'),
@@ -38,7 +40,7 @@ const userFormSchema = z.object({
   position: z.string().optional().or(z.literal('')),
   role: z.nativeEnum(UserRole, { required_error: 'Role wajib dipilih' }),
   status: z.nativeEnum(UserStatus).optional(),
-  organization_id: z.number().optional(),
+  organization_id: z.number().optional().nullable(),
   password: z.string().optional(),
 });
 
@@ -58,6 +60,8 @@ export const UserDialog: React.FC<UserDialogProps> = ({
   onSave
 }) => {
   const [loading, setLoading] = useState(false);
+  const [organizations, setOrganizations] = useState<OrganizationResponse[]>([]);
+  const [loadingOrganizations, setLoadingOrganizations] = useState(false);
   const isEdit = !!editingUser;
 
   const form = useForm<UserFormData>({
@@ -75,8 +79,28 @@ export const UserDialog: React.FC<UserDialogProps> = ({
     },
   });
 
+  // Load organizations when dialog opens
   useEffect(() => {
     if (open) {
+      const loadOrganizations = async () => {
+        setLoadingOrganizations(true);
+        try {
+          const response = await organizationService.getOrganizations({
+            size: 100,
+            sort_by: 'name',
+            sort_order: 'asc'
+          });
+          setOrganizations(response.items);
+        } catch (error) {
+          console.error('Error loading organizations:', error);
+          setOrganizations([]);
+        } finally {
+          setLoadingOrganizations(false);
+        }
+      };
+
+      loadOrganizations();
+
       if (editingUser) {
         form.reset({
           email: editingUser.email,
@@ -266,6 +290,36 @@ export const UserDialog: React.FC<UserDialogProps> = ({
 
                 <FormField
                   control={form.control}
+                  name="organization_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sekolah/Organisasi</FormLabel>
+                      <Select
+                        onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)}
+                        value={field.value?.toString() || ''}
+                        disabled={loading || loadingOrganizations}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={loadingOrganizations ? "Memuat..." : "Pilih sekolah/organisasi"} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="">Tidak ada organisasi</SelectItem>
+                          {organizations.map((org) => (
+                            <SelectItem key={org.id} value={org.id.toString()}>
+                              {org.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="position"
                   render={({ field }) => (
                     <FormItem>
@@ -348,15 +402,15 @@ export const UserDialog: React.FC<UserDialogProps> = ({
             type="button"
             variant="outline"
             onClick={handleCancel}
-            disabled={loading}
+            disabled={loading || loadingOrganizations}
           >
             Batal
           </Button>
           <Button
             onClick={form.handleSubmit(onSubmit)}
-            disabled={loading}
+            disabled={loading || loadingOrganizations}
           >
-            {loading ? 'Menyimpan...' : isEdit ? 'Perbarui Pengguna' : 'Tambah Pengguna'}
+            {loading ? 'Menyimpan...' : loadingOrganizations ? 'Memuat...' : isEdit ? 'Perbarui Pengguna' : 'Tambah Pengguna'}
           </Button>
         </DialogFooter>
       </DialogContent>
