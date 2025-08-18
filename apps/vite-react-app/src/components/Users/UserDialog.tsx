@@ -31,6 +31,7 @@ import { UserRole, UserStatus } from '@/services/auth/types';
 import { getRoleOptions } from '@/utils/role';
 import { organizationService } from '@/services/organizations';
 import type { OrganizationResponse } from '@/services/organizations/types';
+import { userService } from '@/services/users';
 
 const userFormSchema = z.object({
   email: z.string().email('Email tidak valid').min(1, 'Email wajib diisi'),
@@ -62,6 +63,8 @@ export const UserDialog: React.FC<UserDialogProps> = ({
   const [loading, setLoading] = useState(false);
   const [organizations, setOrganizations] = useState<OrganizationResponse[]>([]);
   const [loadingOrganizations, setLoadingOrganizations] = useState(false);
+  const [allowedRoles, setAllowedRoles] = useState<string[]>([]);
+  const [loadingRoles, setLoadingRoles] = useState(false);
   const isEdit = !!editingUser;
 
   const form = useForm<UserFormData>({
@@ -99,7 +102,21 @@ export const UserDialog: React.FC<UserDialogProps> = ({
         }
       };
 
+      const loadAllowedRoles = async () => {
+        setLoadingRoles(true);
+        try {
+          const roles = await userService.getAllowedRoles();
+          setAllowedRoles(roles);
+        } catch (error) {
+          console.error('Error loading allowed roles:', error);
+          setAllowedRoles([]);
+        } finally {
+          setLoadingRoles(false);
+        }
+      };
+
       loadOrganizations();
+      loadAllowedRoles();
 
       if (editingUser) {
         form.reset({
@@ -231,36 +248,47 @@ export const UserDialog: React.FC<UserDialogProps> = ({
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="role"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Role</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        disabled={loading}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih role" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {getRoleOptions().map((role) => (
-                            <SelectItem key={role.value} value={role.value}>
-                              {role.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+{!(editingUser && editingUser.role === 'SUPER_ADMIN') && (
+                  <FormField
+                    control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Role</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={loading || loadingRoles}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih role" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {loadingRoles ? (
+                              <SelectItem value="loading" disabled>
+                                Memuat roles...
+                              </SelectItem>
+                            ) : (
+                              allowedRoles.map((roleValue) => {
+                                const roleOption = getRoleOptions().find(role => role.value === roleValue);
+                                return roleOption ? (
+                                  <SelectItem key={roleValue} value={roleValue}>
+                                    {roleOption.label}
+                                  </SelectItem>
+                                ) : null;
+                              })
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-                {isEdit && (
+                {isEdit && !(editingUser && editingUser.role === 'SUPER_ADMIN') && (
                   <FormField
                     control={form.control}
                     name="status"

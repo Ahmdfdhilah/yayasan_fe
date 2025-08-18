@@ -25,6 +25,8 @@ interface UserCardsProps {
   onView: (user: User) => void;
   disableEdit?: boolean;
   editDisabledTooltip?: string;
+  canModifyUser?: (user: User) => boolean;
+  canDeleteUser?: (user: User) => boolean;
 }
 
 export const UserCards: React.FC<UserCardsProps> = ({
@@ -34,7 +36,9 @@ export const UserCards: React.FC<UserCardsProps> = ({
   onDelete,
   onView,
   disableEdit = false,
-  editDisabledTooltip = 'Edit tidak tersedia'
+  editDisabledTooltip = 'Edit tidak tersedia',
+  canModifyUser,
+  canDeleteUser
 }) => {
   const getStatusBadge = (status: UserStatus) => {
     return (
@@ -90,8 +94,8 @@ export const UserCards: React.FC<UserCardsProps> = ({
                 onView={() => onView(user)}
                 onEdit={() => onEdit(user)}
                 onDelete={() => onDelete(user)}
-                disableEdit={disableEdit}
-                editDisabledTooltip={editDisabledTooltip}
+                showEdit={!disableEdit && (!canModifyUser || canModifyUser(user))}
+                showDelete={!canDeleteUser || canDeleteUser(user)}
               />
             </div>
 

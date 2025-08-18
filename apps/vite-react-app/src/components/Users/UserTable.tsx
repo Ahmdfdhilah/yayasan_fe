@@ -20,6 +20,8 @@ interface UserTableProps {
   onView: (user: User) => void;
   disableEdit?: boolean;
   editDisabledTooltip?: string;
+  canModifyUser?: (user: User) => boolean;
+  canDeleteUser?: (user: User) => boolean;
 }
 
 export const UserTable: React.FC<UserTableProps> = ({
@@ -29,7 +31,9 @@ export const UserTable: React.FC<UserTableProps> = ({
   onDelete,
   onView,
   disableEdit = false,
-  editDisabledTooltip = 'Edit tidak tersedia'
+  editDisabledTooltip = 'Edit tidak tersedia',
+  canModifyUser,
+  canDeleteUser
 }) => {
 
 
@@ -90,8 +94,8 @@ export const UserTable: React.FC<UserTableProps> = ({
                     onView={() => onView(user)}
                     onEdit={() => onEdit(user)}
                     onDelete={() => onDelete(user)}
-                    disableEdit={disableEdit}
-                    editDisabledTooltip={editDisabledTooltip}
+                    showEdit={!disableEdit && (!canModifyUser || canModifyUser(user))}
+                    showDelete={!canDeleteUser || canDeleteUser(user)}
                   />
                 </TableCell>
               </TableRow>

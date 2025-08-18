@@ -52,7 +52,7 @@ interface UserPageFilters {
 }
 
 const UsersPage: React.FC = () => {
-  const { isAdmin } = useRole();
+  const { isAdmin, isSuperAdmin, currentRole } = useRole();
   const { toast } = useToast();
   
   // URL Filters configuration
@@ -127,12 +127,62 @@ const UsersPage: React.FC = () => {
   };
 
   const handleEdit = (user: User) => {
+    // Check if current user can edit this user
+    if (!canModifyUser(user)) {
+      const message = user.role === 'SUPER_ADMIN' 
+        ? 'Super Admin tidak dapat diubah untuk keamanan sistem.'
+        : 'Anda tidak memiliki akses untuk mengedit user ini.';
+      toast({
+        title: 'Akses Ditolak',
+        description: message,
+        variant: 'destructive'
+      });
+      return;
+    }
     setEditingUser(user);
     setIsDialogOpen(true);
   };
 
   const handleDelete = (user: User) => {
+    // Check if current user can delete this user
+    if (!canDeleteUser(user)) {
+      const message = user.role === 'SUPER_ADMIN' 
+        ? 'Super Admin tidak dapat dihapus untuk keamanan sistem.'
+        : 'Anda tidak memiliki akses untuk menghapus user ini.';
+      toast({
+        title: 'Akses Ditolak',
+        description: message,
+        variant: 'destructive'
+      });
+      return;
+    }
     setUserToDelete(user);
+  };
+
+  // Helper function to check if current user can modify target user
+  const canModifyUser = (targetUser: User) => {
+    // SUPER_ADMIN can modify anyone
+    if (isSuperAdmin()) {
+      return true;
+    }
+    
+    // ADMIN cannot modify other ADMINs or SUPER_ADMINs
+    if (isAdmin()) {
+      return !['ADMIN', 'SUPER_ADMIN'].includes(targetUser.role);
+    }
+    
+    // Other roles cannot modify anyone
+    return false;
+  };
+
+  // Helper function to check if current user can delete target user
+  const canDeleteUser = (targetUser: User) => {
+    // CRITICAL PROTECTION: SUPER_ADMIN accounts can NEVER be deleted
+    if (targetUser.role === 'SUPER_ADMIN') {
+      return false;
+    }
+    
+    return canModifyUser(targetUser);
   };
 
   const confirmDeleteUser = async () => {
@@ -332,6 +382,8 @@ const UsersPage: React.FC = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                canModifyUser={canModifyUser}
+                canDeleteUser={canDeleteUser}
               />
             </div>
 
@@ -343,6 +395,8 @@ const UsersPage: React.FC = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                canModifyUser={canModifyUser}
+                canDeleteUser={canDeleteUser}
               />
             </div>
 
@@ -376,7 +430,7 @@ const UsersPage: React.FC = () => {
             <DialogHeader>
               <DialogTitle>Detail User</DialogTitle>
             </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div>
                 <Label>Nama</Label>
                 <div className="p-2 bg-muted rounded text-sm">
@@ -418,7 +472,7 @@ const UsersPage: React.FC = () => {
                 </div>
               )}
               {viewingUser.profile?.address && (
-                <div className="md:col-span-2">
+                <div>
                   <Label>Alamat</Label>
                   <div className="p-2 bg-muted rounded text-sm">
                     {viewingUser.profile.address}

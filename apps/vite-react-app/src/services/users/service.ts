@@ -147,6 +147,10 @@ class UserService extends BaseService {
   ): Promise<UserResponse> {
     return this.post(`/${userId}/suspend`);
   }
+
+  async getAllowedRoles(): Promise<string[]> {
+    return this.get("/allowed-roles");
+  }
 }
 
 export const userService = new UserService();
