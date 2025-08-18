@@ -2,6 +2,7 @@
 
 // Enums from API
 export enum UserRole {
+  SUPER_ADMIN = "SUPER_ADMIN",
   ADMIN = "ADMIN",
   GURU = "GURU",
   KEPALA_SEKOLAH = "KEPALA_SEKOLAH"

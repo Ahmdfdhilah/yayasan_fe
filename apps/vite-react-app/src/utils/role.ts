@@ -16,6 +16,7 @@ export function getRoleDisplayName(role: UserRole | string | null | undefined): 
  */
 export function getRoleOptions() {
   return [
+    { value: USER_ROLES.SUPER_ADMIN, label: ROLE_LABELS[USER_ROLES.SUPER_ADMIN] },
     { value: USER_ROLES.ADMIN, label: ROLE_LABELS[USER_ROLES.ADMIN] },
     { value: USER_ROLES.GURU, label: ROLE_LABELS[USER_ROLES.GURU] },
     { value: USER_ROLES.KEPALA_SEKOLAH, label: ROLE_LABELS[USER_ROLES.KEPALA_SEKOLAH] },
@@ -27,6 +28,8 @@ export function getRoleOptions() {
  */
 export function getRoleBadgeVariant(role: UserRole | string | null | undefined): 'default' | 'secondary' | 'destructive' | 'outline' {
   switch (role) {
+    case USER_ROLES.SUPER_ADMIN:
+      return 'destructive';
     case USER_ROLES.ADMIN:
       return 'destructive';
     case USER_ROLES.KEPALA_SEKOLAH:

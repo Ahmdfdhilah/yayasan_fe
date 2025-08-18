@@ -2,6 +2,7 @@
 
 // PKG System User Role Constants
 export const USER_ROLES = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
   ADMIN: 'ADMIN',
   GURU: 'GURU',
   KEPALA_SEKOLAH: 'KEPALA_SEKOLAH'
@@ -11,6 +12,7 @@ export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
 
 // Role Display Labels
 export const ROLE_LABELS = {
+  [USER_ROLES.SUPER_ADMIN]: 'Super Administrator',
   [USER_ROLES.ADMIN]: 'Administrator',
   [USER_ROLES.GURU]: 'Guru',
   [USER_ROLES.KEPALA_SEKOLAH]: 'Kepala Sekolah'
