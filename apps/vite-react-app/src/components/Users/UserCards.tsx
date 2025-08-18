@@ -13,7 +13,8 @@ import {
   Calendar,
   User as UserIcon,
   Phone,
-  MapPin
+  MapPin,
+  Building
 } from 'lucide-react';
 
 interface UserCardsProps {
@@ -113,6 +114,14 @@ export const UserCards: React.FC<UserCardsProps> = ({
               <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
                 <Phone className="w-4 h-4" />
                 <span>{user.profile.phone}</span>
+              </div>
+            )}
+
+            {/* Organization */}
+            {user.organization_name && (
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
+                <Building className="w-4 h-4" />
+                <span>{user.organization_name}</span>
               </div>
             )}
 

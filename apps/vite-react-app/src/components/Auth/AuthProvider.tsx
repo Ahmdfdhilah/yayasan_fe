@@ -1,17 +1,15 @@
 // apps/vite-react-app/src/components/Auth/AuthProvider.tsx
 import React, { createContext, useContext, useEffect, ReactNode } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { persistor } from '@/redux/store';
 import {
   loginAsync,
   logoutAsync,
   changePasswordAsync,
   getCurrentUserAsync,
   clearAuth,
-  clearPersistAndAuth,
-  clearError,
-  validateProjectState
+  clearError
 } from '@/redux/features/authSlice';
+import { persistor } from '@/redux/store';
 import type { User } from '@/services/users/types';
 
 interface LoginData {
@@ -35,14 +33,11 @@ interface AuthContextType {
   login: (loginData: LoginData) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
-  refreshUserData: () => Promise<void>;
   changeUserPassword: (passwordData: PasswordChangeData) => Promise<void>;
   clearAuthError: () => void;
-  clearPersistentAuth: () => Promise<void>;
 
-  // Token management
-  isTokenValid: () => boolean;
-  getAccessToken: () => string | null;
+  // Session management
+  isSessionValid: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -74,30 +69,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Logout error:', error);
       // Force clear auth even if logout request fails
       dispatch(clearAuth());
+    } finally {
+      // Always purge persist storage to ensure complete logout
+      try {
+        await persistor.purge();
+        localStorage.removeItem('persist:tafatur-root');
+        sessionStorage.clear();
+      } catch (persistError) {
+        console.error('Error clearing persist storage:', persistError);
+      }
     }
   };
 
   const checkAuth = async (): Promise<void> => {
     try {
-      // Try to get current user using cookies
-      // This will succeed if valid authentication cookies exist
-      if (!user) {
-        await dispatch(getCurrentUserAsync()).unwrap();
+      // Prevent multiple concurrent checkAuth calls
+      if (loading) {
+        return;
       }
-    } catch (error: any) {
-      // Clear any stale Redux state
-      await clearPersistentAuth();
-    }
-  };
 
-  const refreshUserData = async (): Promise<void> => {
-    try {
-      // Force refresh current user data regardless of existing user
+      // If we have user data and authenticated state persisted, just verify
+      if (user && isAuthenticated) {
+        // User data already exists, no need to fetch again
+        return;
+      }
+
+      // Only fetch user data if we don't have it
       await dispatch(getCurrentUserAsync()).unwrap();
-    } catch (error: any) {
-      console.error('Failed to refresh user data:', error);
-      // Don't clear auth on refresh failure, user might still be valid
-      throw error;
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      dispatch(clearAuth());
     }
   };
 
@@ -113,55 +114,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch(clearError());
   };
 
-  const clearPersistentAuth = async (): Promise<void> => {
-    try {
-      // Clear Redux state
-      dispatch(clearPersistAndAuth());
-      // Clear persistent storage
-      await persistor.purge();
-      // Clear localStorage items that might contain auth data
-      localStorage.removeItem('rememberMe');
-    } catch (error) {
-      console.error('Error clearing persistent auth:', error);
-      // Fallback to just clearing Redux state
-      dispatch(clearAuth());
-    }
-  };
-
-  const isTokenValid = (): boolean => {
+  const isSessionValid = (): boolean => {
     // With cookie-based auth, we check if user exists
     // Actual token validation happens server-side
     return isAuthenticated && !!user;
   };
 
-  const getAccessToken = (): string | null => {
-    // Tokens are stored in HttpOnly cookies, not accessible to JavaScript
-    // Return null to indicate tokens are handled by cookies
-    return null;
-  };
-
-  // Validate project state on mount and check auth
+  // Check auth on mount to restore session after refresh - SIMPLE VERSION
   useEffect(() => {
-    // First validate that the persisted state belongs to this project
-    dispatch(validateProjectState());
-    
-    // Then check authentication
-    checkAuth();
-  }, []); // Only run on mount
-
-  // Auto-refresh token before expiration (handled by server-side cookie expiry)
-  // No need for client-side token refresh timing with HttpOnly cookies
-
-  // Periodic authentication check (every 10 minutes)
-  useEffect(() => {
-    if (isAuthenticated) {
-      const interval = setInterval(() => {
-        checkAuth();
-      }, 10 * 60 * 1000); // Check every 10 minutes
-
-      return () => clearInterval(interval);
+    // If we have user data and authenticated state persisted, no need to check
+    if (user && isAuthenticated) {
+      return;
     }
-  }, [isAuthenticated]);
+    // If no user data and not authenticated, try to check auth once
+    if (!user && !isAuthenticated) {
+      checkAuth();
+    }
+  }, []); // Only run on mount
 
   const value: AuthContextType = {
     // State
@@ -174,14 +143,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     logout,
     checkAuth,
-    refreshUserData,
     changeUserPassword,
     clearAuthError,
-    clearPersistentAuth,
 
-    // Token management
-    isTokenValid,
-    getAccessToken
+    // Session management
+    isSessionValid
   };
 
   return (

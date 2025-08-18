@@ -145,7 +145,7 @@ export const UserDialog: React.FC<UserDialogProps> = ({
           },
           role: data.role,
           status: data.status,
-          organization_id: data.organization_id,
+          organization_id: data.organization_id || undefined,
           password: data.password || undefined, // Only include password if provided
         };
         onSave(updateData);
@@ -161,7 +161,7 @@ export const UserDialog: React.FC<UserDialogProps> = ({
           },
           role: data.role,
           password: data.password,
-          organization_id: data.organization_id,
+          organization_id: data.organization_id || undefined,
           status: UserStatus.ACTIVE, // Set default status for new users
         };
         onSave(createData);
@@ -231,7 +231,7 @@ export const UserDialog: React.FC<UserDialogProps> = ({
                   )}
                 />
 
-<FormField
+                <FormField
                   control={form.control}
                   name="role"
                   render={({ field }) => (
@@ -305,7 +305,6 @@ export const UserDialog: React.FC<UserDialogProps> = ({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Tidak ada organisasi</SelectItem>
                           {organizations.map((org) => (
                             <SelectItem key={org.id} value={org.id.toString()}>
                               {org.name}
@@ -354,7 +353,7 @@ export const UserDialog: React.FC<UserDialogProps> = ({
                   )}
                 />
 
-<FormField
+                <FormField
                   control={form.control}
                   name="password"
                   render={({ field }) => (

@@ -39,16 +39,16 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
     user, 
     loading, 
     checkAuth,
-    isTokenValid 
+    isSessionValid 
   } = useAuth();
   const location = useLocation();
 
-  // Check auth on mount and when location changes
+  // Check auth on location changes only if authenticated and session might be expired
   useEffect(() => {
-    if (isAuthenticated && !isTokenValid()) {
+    if (isAuthenticated && !isSessionValid()) {
       checkAuth();
     }
-  }, [isAuthenticated, location.pathname]);
+  }, [location.pathname]); // Keep it simple like contoh-frontend
 
   // Show loading spinner while authentication is being checked
   if (loading) {
@@ -156,19 +156,22 @@ export const PublicRoute: React.FC<{ children: ReactNode; redirectTo?: string }>
   children, 
   redirectTo = '/dashboard' 
 }) => {
-  const { isAuthenticated, loading, user, isTokenValid, checkAuth } = useAuth();
+  const { isAuthenticated, loading, user, isSessionValid, checkAuth } = useAuth();
 
-  // Check authentication on mount
+  // Only check authentication on mount if user appears to be authenticated but session might be invalid
   useEffect(() => {
-    checkAuth();
-  }, []);
+    if (isAuthenticated && user && !isSessionValid()) {
+      // Only check auth if session appears to be expired
+      checkAuth();
+    }
+  }, []); // Simple like contoh-frontend
 
   if (loading) {
     return <LoadingSpinner message="Checking authentication..." />;
   }
 
-  // If already authenticated with valid token and user data, redirect to dashboard
-  if (isAuthenticated && user && isTokenValid()) {
+  // If already authenticated with valid session and user data, redirect to dashboard
+  if (isAuthenticated && user && isSessionValid()) {
     return <Navigate to={redirectTo} replace />;
   }
 

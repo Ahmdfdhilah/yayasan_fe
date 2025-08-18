@@ -41,6 +41,7 @@ export const UserTable: React.FC<UserTableProps> = ({
             <TableHead>Nama</TableHead>
             <TableHead>Posisi</TableHead>
             <TableHead>Email</TableHead>
+            <TableHead>Organisasi</TableHead>
             <TableHead>Role</TableHead>
             <TableHead>Telepon</TableHead>
             <TableHead>Status</TableHead>
@@ -71,6 +72,9 @@ export const UserTable: React.FC<UserTableProps> = ({
                 </TableCell>
                 <TableCell>
                   {user.email}
+                </TableCell>
+                <TableCell>
+                  {user.organization_name || '-'}
                 </TableCell>
                 <TableCell>
                   {getRoleDisplayName(user.role)}

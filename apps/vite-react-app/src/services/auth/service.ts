@@ -35,7 +35,7 @@ class AuthService extends BaseService {
   }
 
   async getCurrentUser(): Promise<UserResponse> {
-    return this.get("/me");
+    return this.get<UserResponse>("/me");
   }
 
   async requestPasswordReset(

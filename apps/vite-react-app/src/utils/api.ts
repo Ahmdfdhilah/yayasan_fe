@@ -29,11 +29,11 @@ const configureInterceptors = (api: AxiosInstance) => {
       const originalRequest = error.config;
 
       // If error is 401 and we haven't already tried to refresh
-      if (error.response?.status === 401 && !originalRequest._retry) {
+      if (!originalRequest._retry) {
         originalRequest._retry = true;
         
-        // Don't try to refresh if the original request was already a refresh request
-        if (!originalRequest.url?.includes('/refresh')) {
+        // Don't try to refresh if the original request was already a refresh request or /me request
+        if (!originalRequest.url?.includes('/refresh') && !originalRequest.url?.includes('/me')) {
           try {
             // Try to refresh the token using cookie-based refresh
             await store.dispatch(refreshTokenAsync()).unwrap();
@@ -45,6 +45,8 @@ const configureInterceptors = (api: AxiosInstance) => {
             store.dispatch(clearAuth());
           }
         } else {
+          // Don't refresh for /me or /refresh endpoints, just clear auth
+          console.log('Auth failed for critical endpoint, clearing auth');
           store.dispatch(clearAuth());
         }
       }
