@@ -52,7 +52,7 @@ interface UserPageFilters {
 }
 
 const UsersPage: React.FC = () => {
-  const { isAdmin, isSuperAdmin, currentRole } = useRole();
+  const { isAdmin, isSuperAdmin } = useRole();
   const { toast } = useToast();
   
   // URL Filters configuration

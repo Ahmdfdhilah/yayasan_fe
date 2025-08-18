@@ -31,7 +31,6 @@ export const UserTable: React.FC<UserTableProps> = ({
   onDelete,
   onView,
   disableEdit = false,
-  editDisabledTooltip = 'Edit tidak tersedia',
   canModifyUser,
   canDeleteUser
 }) => {

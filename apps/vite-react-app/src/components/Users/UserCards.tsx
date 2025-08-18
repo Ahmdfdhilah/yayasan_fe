@@ -36,7 +36,6 @@ export const UserCards: React.FC<UserCardsProps> = ({
   onDelete,
   onView,
   disableEdit = false,
-  editDisabledTooltip = 'Edit tidak tersedia',
   canModifyUser,
   canDeleteUser
 }) => {
