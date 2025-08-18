@@ -54,9 +54,10 @@ export function DashboardPage() {
 
   const getRoleDisplayName = (role: string) => {
     switch (role) {
-      case 'admin': return 'Administrator';
-      case 'guru': return 'Guru';
-      case 'kepala_sekolah': return 'Kepala Sekolah';
+      case 'SUPER_ADMIN': return 'Super Administrator';
+      case 'ADMIN': return 'Administrator';
+      case 'GURU': return 'Guru';
+      case 'KEPALA_SEKOLAH': return 'Kepala Sekolah';
       default: return role;
     }
   };
@@ -102,7 +103,7 @@ export function DashboardPage() {
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">
-            Selamat datang, {user?.profile?.name || user?.display_name || 'User'}
+            Selamat datang, {user?.profile?.name}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">

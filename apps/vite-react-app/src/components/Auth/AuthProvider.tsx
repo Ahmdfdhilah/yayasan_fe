@@ -126,8 +126,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (user && isAuthenticated) {
       return;
     }
-    // If no user data and not authenticated, try to check auth once
-    if (!user && !isAuthenticated) {
+    // If no user data and not authenticated, and not loading, try to check auth once
+    if (!user && !isAuthenticated && !loading) {
       checkAuth();
     }
   }, []); // Only run on mount

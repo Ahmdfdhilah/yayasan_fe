@@ -45,10 +45,11 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 
   // Check auth on location changes only if authenticated and session might be expired
   useEffect(() => {
-    if (isAuthenticated && !isSessionValid()) {
+    // Only check auth if we're authenticated, session is invalid, and we're not already loading
+    if (isAuthenticated && !isSessionValid() && !loading) {
       checkAuth();
     }
-  }, [location.pathname]); // Keep it simple like contoh-frontend
+  }, [location.pathname, isAuthenticated, loading]); // Add loading dependency
 
   // Show loading spinner while authentication is being checked
   if (loading) {
@@ -131,20 +132,24 @@ export const withAuthGuard = (
 };
 
 // Role-specific guards for PKG system
+export const SuperAdminGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
+  <AuthGuard {...props} requireRoles={['SUPER_ADMIN']} />
+);
+
 export const AdminGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
-  <AuthGuard {...props} requireRoles={['admin']} />
+  <AuthGuard {...props} requireRoles={['SUPER_ADMIN', 'ADMIN']} />
 );
 
 export const GuruGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
-  <AuthGuard {...props} requireRoles={['guru']} />
+  <AuthGuard {...props} requireRoles={['GURU']} />
 );
 
 export const KepalaSekolahGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
-  <AuthGuard {...props} requireRoles={['kepala_sekolah']} />
+  <AuthGuard {...props} requireRoles={['KEPALA_SEKOLAH']} />
 );
 
 export const AdminOrKepalaSekolahGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
-  <AuthGuard {...props} requireRoles={['admin', 'kepala_sekolah']} />
+  <AuthGuard {...props} requireRoles={['SUPER_ADMIN', 'ADMIN', 'KEPALA_SEKOLAH']} />
 );
 
 export const MfaGuard: React.FC<Omit<AuthGuardProps, 'requireMfa'>> = (props) => (

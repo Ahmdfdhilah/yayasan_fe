@@ -54,6 +54,8 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
   // Get user role display
   const getUserRole = () => {
     switch (currentRole) {
+      case 'SUPER_ADMIN':
+        return 'Super Administrator';
       case 'ADMIN':
         return 'Administrator';
       case 'GURU':

@@ -118,45 +118,45 @@ function App() {
 
                       {/* Admin only routes */}
                       <Route path="users" element={
-                        <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                        <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
                           <UsersPage />
                         </RoleProtectedRoute>
                       } />
 
                       <Route path="cms/organizations" element={
-                        <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                        <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
                           <OrganizationsPage />
                         </RoleProtectedRoute>
                       } />
                       <Route path="periods" element={
-                        <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                        <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
                           <PeriodsPage />
                         </RoleProtectedRoute>
                       } />
 
                       <Route path="evaluation-aspects" element={
-                        <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                        <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
                           <EvaluationAspectsPage />
                         </RoleProtectedRoute>
                       } />
 
                       {/* Evaluation Reports - Admin only */}
                       <Route path="evaluations/reports" element={
-                        <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                        <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
                           <EvaluationReportsPage />
                         </RoleProtectedRoute>
                       } />
 
                       {/* Teacher Evaluations - Admin and Kepala Sekolah */}
                       <Route path="teacher-evaluations" element={
-                        <RoleProtectedRoute allowedRoles={['ADMIN', 'KEPALA_SEKOLAH']}>
+                        <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN', 'KEPALA_SEKOLAH']}>
                           <TeacherEvaluationsPage />
                         </RoleProtectedRoute>
                       } />
 
                       {/* Teacher Evaluation Detail - Admin, Kepala Sekolah, and Guru */}
                       <Route path="teacher-evaluations/:teacherId" element={
-                        <RoleProtectedRoute allowedRoles={['ADMIN', 'KEPALA_SEKOLAH', 'GURU']}>
+                        <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN', 'KEPALA_SEKOLAH', 'GURU']}>
                           <TeacherEvaluationDetailPage />
                         </RoleProtectedRoute>
                       } />
@@ -178,14 +178,14 @@ function App() {
 
                       {/* RPP Submissions List - Admin and Kepala Sekolah */}
                       <Route path="rpp-submissions" element={
-                        <RoleProtectedRoute allowedRoles={['ADMIN', 'KEPALA_SEKOLAH']}>
+                        <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN', 'KEPALA_SEKOLAH']}>
                           <RPPSubmissionsPage />
                         </RoleProtectedRoute>
                       } />
 
                       {/* RPP Submission Detail - Admin/Kepala Sekolah viewing teacher's submission */}
                       <Route path="rpp-submissions/teacher/:teacherId" element={
-                        <RoleProtectedRoute allowedRoles={['ADMIN', 'KEPALA_SEKOLAH', 'GURU']}>
+                        <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN', 'KEPALA_SEKOLAH', 'GURU']}>
                           <RPPSubmissionDetailPage />
                         </RoleProtectedRoute>
                       } />
@@ -193,42 +193,42 @@ function App() {
                       <Route path='/cms'>
                         {/* Content Management Routes - Admin only */}
                         <Route path="board-members" element={
-                          <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                          <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
                             <BoardMembersPage />
                           </RoleProtectedRoute>
                         } />
 
                         <Route path="articles" element={
-                          <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                          <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
                             <ArticlesPage />
                           </RoleProtectedRoute>
                         } />
 
                         <Route path="galleries" element={
-                          <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                          <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
                             <GalleriesPage />
                           </RoleProtectedRoute>
                         } />
 
                         <Route path="messages" element={
-                          <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                          <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
                             <MessagesPage />
                           </RoleProtectedRoute>
                         } />
 
                         <Route path="mitra" element={
-                          <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                          <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
                             <MitraPage />
                           </RoleProtectedRoute>
                         } />
 
                         <Route path="program" element={
-                          <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                          <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
                             <ProgramPage />
                           </RoleProtectedRoute>
                         } />
                         <Route path="statistik" element={
-                          <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                          <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
                             <StatisticsPage />
                           </RoleProtectedRoute>
                         } />

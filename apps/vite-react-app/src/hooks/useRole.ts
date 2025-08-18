@@ -11,8 +11,12 @@ export const useRole = () => {
     return currentRole === role;
   }, [currentRole]);
 
+  const isSuperAdmin = useCallback(() => {
+    return currentRole === USER_ROLES.SUPER_ADMIN;
+  }, [currentRole]);
+
   const isAdmin = useCallback(() => {
-    return currentRole === USER_ROLES.ADMIN;
+    return currentRole === USER_ROLES.ADMIN || currentRole === USER_ROLES.SUPER_ADMIN;
   }, [currentRole]);
 
   const isGuru = useCallback(() => {
@@ -38,7 +42,7 @@ export const useRole = () => {
 
   // Permission helpers for PKG system
   const canManageUsers = useCallback(() => {
-    return isAdmin();
+    return isAdmin(); // Now includes SUPER_ADMIN
   }, [isAdmin]);
 
   const canManageOrganization = useCallback(() => {
@@ -61,6 +65,7 @@ export const useRole = () => {
     currentRole,
     user,
     isRole,
+    isSuperAdmin,
     isAdmin,
     isGuru,
     isKepalaSekolah,

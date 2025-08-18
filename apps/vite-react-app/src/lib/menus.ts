@@ -19,6 +19,7 @@ import {
 
 // PKG System Role definitions
 export type UserRole =
+  | 'SUPER_ADMIN'
   | 'ADMIN'
   | 'GURU'
   | 'KEPALA_SEKOLAH';
@@ -40,20 +41,20 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Dashboard',
     href: '/dashboard',
     icon: BarChart3,
-    allowedRoles: ['ADMIN', 'GURU', 'KEPALA_SEKOLAH'],
+    allowedRoles: ['SUPER_ADMIN', 'ADMIN', 'GURU', 'KEPALA_SEKOLAH'],
   },
 
   // RPP Management - Teachers and Principals
   {
     title: 'RPP Guru',
     icon: FileText,
-    allowedRoles: ['KEPALA_SEKOLAH', 'ADMIN', 'GURU'],
+    allowedRoles: ['SUPER_ADMIN', 'KEPALA_SEKOLAH', 'ADMIN', 'GURU'],
     children: [
       {
         title: 'Daftar RPP',
         href: '/rpp-submissions',
         icon: ClipboardCheck,
-        allowedRoles: ['KEPALA_SEKOLAH', 'ADMIN'],
+        allowedRoles: ['SUPER_ADMIN', 'KEPALA_SEKOLAH', 'ADMIN'],
       },
       {
         title: 'RPP Saya',
@@ -68,13 +69,13 @@ export const appMenuItems: SidebarItem[] = [
   {
     title: 'Evaluasi Guru',
     icon: GraduationCap,
-    allowedRoles: ['KEPALA_SEKOLAH', 'ADMIN', 'GURU'],
+    allowedRoles: ['SUPER_ADMIN', 'KEPALA_SEKOLAH', 'ADMIN', 'GURU'],
     children: [
       {
         title: 'Daftar Evaluasi',
         href: '/teacher-evaluations',
         icon: ClipboardCheck,
-        allowedRoles: ['KEPALA_SEKOLAH', 'ADMIN'],
+        allowedRoles: ['SUPER_ADMIN', 'KEPALA_SEKOLAH', 'ADMIN'],
       },
       {
         title: 'Evaluasi Saya',
@@ -86,7 +87,7 @@ export const appMenuItems: SidebarItem[] = [
         title: 'Laporan Evaluasi',
         href: '/evaluations/reports',
         icon: BarChart3,
-        allowedRoles: ['ADMIN'],
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
       },
     ],
   },
@@ -95,25 +96,25 @@ export const appMenuItems: SidebarItem[] = [
   {
     title: 'Manajemen Sistem',
     icon: Settings,
-    allowedRoles: ['ADMIN'],
+    allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
     children: [
       {
         title: 'Aspek Evaluasi',
         href: '/evaluation-aspects',
         icon: BookOpen,
-        allowedRoles: ['ADMIN'],
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
       },
       {
         title: 'Periode',
         href: '/periods',
         icon: Calendar,
-        allowedRoles: ['ADMIN'],
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
       },
       {
         title: 'Pengguna',
         href: '/users',
         icon: Users,
-        allowedRoles: ['ADMIN'],
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
       },
     ],
   },
@@ -122,55 +123,55 @@ export const appMenuItems: SidebarItem[] = [
   {
     title: 'Manajemen Konten',
     icon: Building,
-    allowedRoles: ['ADMIN'],
+    allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
     children: [
       {
         title: 'Pengurus',
         href: '/cms/board-members',
         icon: UserCheck,
-        allowedRoles: ['ADMIN'],
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
       },
       {
         title: 'Sekolah',
         href: '/cms/organizations',
         icon: Building,
-        allowedRoles: ['ADMIN'],
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
       },
       {
         title: 'Artikel',
         href: '/cms/articles',
         icon: Newspaper,
-        allowedRoles: ['ADMIN'],
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
       },
       {
         title: 'Galeri',
         href: '/cms/galleries',
         icon: Image,
-        allowedRoles: ['ADMIN'],
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
       },
       {
         title: 'Pesan',
         href: '/cms/messages',
         icon: MessageSquare,
-        allowedRoles: ['ADMIN'],
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
       },
       {
         title: 'Mitra',
         href: '/cms/mitra',
         icon: Building2,
-        allowedRoles: ['ADMIN'],
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
       },
       {
         title: 'Program',
         href: '/cms/program',
         icon: Target,
-        allowedRoles: ['ADMIN'],
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
       },
       {
         title: 'Statistik',
         href: '/cms/statistik',
         icon: BarChart3,
-        allowedRoles: ['ADMIN'],
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
       },
     ],
   }

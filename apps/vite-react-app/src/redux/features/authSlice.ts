@@ -303,12 +303,9 @@ const authSlice = createSlice({
       .addCase(getCurrentUserAsync.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
-        // Clear auth if token is invalid (401/403 errors typically mean token issues)
-        const errorMsg = action.payload as string;
-        if (errorMsg.includes('401') || errorMsg.includes('403') || errorMsg.includes('Unauthorized') || errorMsg.includes('Forbidden')) {
-          state.isAuthenticated = false;
-          state.user = null;
-        }
+        // Always clear auth on getCurrentUser rejection - if we can't get user, we're not authenticated
+        state.isAuthenticated = false;
+        state.user = null;
       })
       .addCase(updateProfileAsync.pending, (state) => {
         state.isLoading = true;

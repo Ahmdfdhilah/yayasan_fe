@@ -137,7 +137,8 @@ export function useRoleAccess() {
     return roles.length === 1 && roles.includes(userRole);
   };
 
-  const isAdmin = userRole === USER_ROLES.ADMIN;
+  const isSuperAdmin = userRole === USER_ROLES.SUPER_ADMIN;
+  const isAdmin = userRole === USER_ROLES.ADMIN || userRole === USER_ROLES.SUPER_ADMIN;
   const isGuru = userRole === USER_ROLES.GURU;
   const isKepalaSekolah = userRole === USER_ROLES.KEPALA_SEKOLAH;
 
@@ -147,6 +148,7 @@ export function useRoleAccess() {
     checkRole,
     hasAnyRole,
     hasAllRoles,
+    isSuperAdmin,
     isAdmin,
     isGuru,
     isKepalaSekolah,
