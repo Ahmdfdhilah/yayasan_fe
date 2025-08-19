@@ -29,7 +29,7 @@ const ContactPage = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const toast = useToast()
+  const { error, success } = useToast()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -44,14 +44,14 @@ const ContactPage = () => {
 
     // Basic validation
     if (!formData.name.trim() || !formData.email.trim() || !formData.title.trim() || !formData.message.trim()) {
-      toast.error('Semua field harus diisi');
+      error({ title: 'Semua field harus diisi' });
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      toast.error('Format email tidak valid');
+      error({ title: 'Format email tidak valid' });
       return;
     }
 
@@ -75,10 +75,9 @@ const ContactPage = () => {
         message: ''
       });
 
-      toast.success('Pesan berhasil dikirim! Kami akan segera merespons.');
+      success({ title: 'Pesan berhasil dikirim! Kami akan segera merespons.' });
     } catch (error) {
       console.error('Error submitting message:', error);
-      toast.error('Gagal mengirim pesan. Silakan coba lagi.');
     } finally {
       setIsSubmitting(false);
     }
