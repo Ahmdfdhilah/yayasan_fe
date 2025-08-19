@@ -15,8 +15,6 @@ import type { Gallery } from '@/services/galleries/types';
 import type { Article } from '@/services/articles/types';
 import type { Organization } from '@/services/organizations/types';
 
-
-
 const HomePage = () => {
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);

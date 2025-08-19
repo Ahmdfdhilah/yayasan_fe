@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import bgSekolah from '@/assets/bg-sekolah.webp';
 import { Link } from 'react-router-dom';
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
@@ -60,7 +61,7 @@ const OrganizationsListPage = () => {
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <img
-            src="https://picsum.photos/1920/600?random=schools"
+            src={bgSekolah}
             alt="Jenjang Pendidikan"
             className="w-full h-full object-cover"
           />

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import bgTentang from '@/assets/bg-tentang.webp';
 import { Badge } from "@workspace/ui/components/badge";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { Skeleton } from "@workspace/ui/components/skeleton";
@@ -14,6 +15,7 @@ import { getBoardImageUrl, getNewsImageUrl } from '@/utils/imageUtils';
 import type { BoardMember, BoardGroup } from '@/services/board-members/types';
 import type { Mitra } from '@/services/mitra/types';
 import type { Program } from '@/services/program/types';
+import yayasan from '@/assets/yayasan.webp';
 
 const LeadershipSkeleton = () => (
   <div className="max-w-4xl mx-auto">
@@ -297,7 +299,7 @@ const AboutPage = () => {
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <img
-            src="https://picsum.photos/1920/600?random=about"
+            src={bgTentang}
             alt="Tentang Yayasan"
             className="w-full h-full object-cover"
           />
@@ -382,7 +384,7 @@ const AboutPage = () => {
             <div className="space-y-6">
               <div className="relative">
                 <img
-                  src="https://picsum.photos/600/400"
+                  src={yayasan}
                   alt="Yayasan Baitul Muslim"
                   className="rounded-lg shadow-lg w-full"
                 />

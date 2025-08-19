@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import bgKontak from '@/assets/bg-kontak.webp';
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent} from "@workspace/ui/components/card";
@@ -100,7 +101,7 @@ const ContactPage = () => {
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <img
-            src="https://picsum.photos/1920/600?random=contact"
+            src={bgKontak}
             alt="Kontak Kami"
             className="w-full h-full object-cover"
           />

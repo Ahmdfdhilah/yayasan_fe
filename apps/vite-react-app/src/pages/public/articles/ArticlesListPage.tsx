@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import bgArtikel from '@/assets/bg-artikel.webp';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
@@ -153,7 +154,7 @@ const ArticlesListPage = () => {
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <img
-            src="https://picsum.photos/1920/600?random=articles"
+            src={bgArtikel}
             alt="Artikel & Berita"
             className="w-full h-full object-cover"
           />

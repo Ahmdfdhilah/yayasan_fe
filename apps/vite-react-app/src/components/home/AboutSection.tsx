@@ -2,6 +2,8 @@ import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
 import { ArrowRight, MapPin, Calendar, Users } from 'lucide-react';
 import { ScrollToTopLink } from "../common/ScrollToTopLink";
+import yayasan from '@/assets/yayasan.webp';
+
 
 const highlights = [
   {
@@ -71,7 +73,7 @@ export const AboutSection = () => {
           <div className="space-y-6">
             <div className="relative">
               <img
-                src="https://picsum.photos/600/400"
+                src={yayasan}
                 alt="Yayasan Baitul Muslim"
                 className="rounded-lg shadow-lg w-full"
               />

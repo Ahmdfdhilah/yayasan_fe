@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import bgGaleri from '@/assets/bg-galeri.webp';
 import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
@@ -170,7 +171,7 @@ const GalleriesListPage = () => {
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <img
-            src="https://picsum.photos/1920/600?random=galleries"
+            src={bgGaleri}
             alt="Galeri Foto"
             className="w-full h-full object-cover"
           />
