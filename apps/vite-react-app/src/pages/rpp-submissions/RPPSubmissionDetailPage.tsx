@@ -5,7 +5,6 @@ import { useAuth } from '@/components/Auth/AuthProvider';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { Button } from '@workspace/ui/components/button';
-import { Badge } from '@workspace/ui/components/badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -111,7 +110,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
   useEffect(() => {
     if (teacherId && !periodId && periods.length > 0 && !filters.period_id) {
       let selectedPeriodId: string;
-      
+
       if (activePeriod) {
         // Use active period if exists
         selectedPeriodId = activePeriod.id.toString();
@@ -119,7 +118,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
         // Use first period as fallback
         selectedPeriodId = periods[0].id.toString();
       }
-      
+
       updateURL({ period_id: selectedPeriodId });
     }
   }, [teacherId, periodId, activePeriod, periods, filters.period_id, updateURL]);
@@ -369,16 +368,6 @@ const RPPSubmissionDetailPage: React.FC = () => {
                 : `RPP Submission - ${teacher?.profile?.name || teacher?.display_name || 'Unknown'}`
               }
             </span>
-            {isAdminView && (
-              <Badge variant="outline" className="text-blue-600">
-                Admin View
-              </Badge>
-            )}
-            {isKepalaSekolahView && (
-              <Badge variant="outline" className="text-purple-600">
-                Kepala Sekolah
-              </Badge>
-            )}
           </div>
         }
         description={
@@ -459,16 +448,6 @@ const RPPSubmissionDetailPage: React.FC = () => {
                 : `RPP Submission - ${teacher?.profile?.name || teacher?.display_name || 'Unknown'}`
               }
             </span>
-            {isAdminView && (
-              <Badge variant="outline" className="text-blue-600">
-                Admin View
-              </Badge>
-            )}
-            {isKepalaSekolahView && (
-              <Badge variant="outline" className="text-purple-600">
-                Kepala Sekolah
-              </Badge>
-            )}
           </div>
         }
         description={
@@ -562,7 +541,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
             const statusAllowsUpload = isDraftStatus || isRejectedStatus;
             const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
             const canCreateItem = isOwnSubmission && statusAllowsUpload && isActivePeriod;
-            
+
             return canCreateItem && (
               <Button
                 onClick={() => setCreateItemDialogOpen(true)}

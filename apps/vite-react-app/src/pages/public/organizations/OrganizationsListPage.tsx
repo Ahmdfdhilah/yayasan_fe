@@ -38,8 +38,6 @@ const OrganizationsListPage = () => {
         const response = await organizationService.getOrganizations({
           page: 1,
           size: 100,
-          sort_by: 'name',
-          sort_order: 'asc'
         });
 
         setOrganizations(response.items);
