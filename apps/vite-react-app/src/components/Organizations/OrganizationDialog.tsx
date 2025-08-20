@@ -33,6 +33,7 @@ const organizationFormSchema = z.object({
   description: z.string().optional().or(z.literal('')),
   excerpt: z.string().optional().or(z.literal('')),
   head_id: z.number().optional().or(z.literal('')),
+  display_order: z.number().min(1, 'Urutan minimal 1'),
 });
 
 type OrganizationFormData = z.infer<typeof organizationFormSchema>;
@@ -65,6 +66,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
       description: '',
       excerpt: '',
       head_id: undefined,
+      display_order: 1,
     },
   });
 
@@ -98,6 +100,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
           description: editingOrganization.description || '',
           excerpt: editingOrganization.excerpt || '',
           head_id: editingOrganization.head_id,
+          display_order: editingOrganization.display_order,
         });
       } else {
         form.reset({
@@ -105,6 +108,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
           description: '',
           excerpt: '',
           head_id: undefined,
+          display_order: 1,
         });
       }
       // Reset search and load initial users
@@ -123,6 +127,7 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
         description: data.description || undefined,
         excerpt: data.excerpt || undefined,
         head_id: data.head_id || undefined,
+        display_order: data.display_order,
       };
 
       const imageFile = selectedFiles.length > 0 ? selectedFiles[0] : undefined;
@@ -212,6 +217,35 @@ export const OrganizationDialog: React.FC<OrganizationDialogProps> = ({
                         />
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="display_order"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Urutan Tampil</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="1"
+                          placeholder="1"
+                          {...field}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                          onFocus={(e) => {
+                            if (e.target.value === '1') {
+                              e.target.select();
+                            }
+                          }}
+                          disabled={loading}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      <div className="text-sm text-muted-foreground">
+                        Urutan tampil di website (1 = paling atas)
+                      </div>
                     </FormItem>
                   )}
                 />

@@ -10,6 +10,7 @@ export interface Organization {
   excerpt?: string;
   img_url?: string;
   head_id?: number;
+  display_order: number;
   created_at: string;
   updated_at?: string;
   display_name: string;
@@ -23,6 +24,7 @@ export interface OrganizationCreate {
   description?: string;
   excerpt?: string;
   head_id?: number;
+  display_order: number;
 }
 
 export interface OrganizationUpdate {
@@ -30,6 +32,7 @@ export interface OrganizationUpdate {
   description?: string;
   excerpt?: string;
   head_id?: number;
+  display_order?: number;
 }
 
 // Response Types
