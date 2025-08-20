@@ -26,20 +26,20 @@ const Footer = () => {
                 <li className="flex items-start gap-2">
                   <MapPin className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
                   <span className="text-sm text-muted-foreground">
-                    Jl. Ir. H. Djuanda No. 19<br />
-                    Way Jepara, Lampung Timur
+                    Lokasi: Jalan Batin Kyai, Labuhan Ratu 1<br />
+                    Way Jepara, Lampung Timur, Lampung
                   </span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-primary flex-shrink-0" />
                   <span className="text-sm text-muted-foreground">
-                    +62 xxx-xxxx-xxxx
+                    Telp: 0852-1972-0205
                   </span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-primary flex-shrink-0" />
                   <span className="text-sm text-muted-foreground">
-                    info@baitulmuslim.sch.id
+                    Email: humasbaitulmuslim.official@gmail.com
                   </span>
                 </li>
               </ul>
@@ -51,13 +51,14 @@ const Footer = () => {
             <h3 className="font-semibold text-foreground">Lokasi Kami</h3>
             <div className="aspect-video w-full rounded-lg overflow-hidden border">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3970.096116324821!2d105.6164884!3d-5.2139046!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e40c4f8e0b7e259%3A0x4ef2ef143a22e33!2sJl.%20Ir.%20H.%20Djuanda%20No.19%2C%20Way%20Jepara%2C%20Kabupaten%20Lampung%20Timur%2C%20Lampung!5e0!3m2!1sid!2sid!4v1722571000000"
-                width="100%"
-                height="100%"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3058.5982747005614!2d105.69910082151554!3d5.165405647055576!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e408b02872137bf%3A0xc56ae07f86b61515!2sYayasan%20Baitul%20Muslim%20Lampung%20Timur!5e1!3m2!1sid!2sid!4v1755648097208!5m2!1sid!2sid"
+                width="600"
+                height="450"
+                style={{ border: 0 }}   
+                allowFullScreen
                 loading="lazy"
-                title="Lokasi Yayasan Baitul Muslim">
-              </iframe>
-
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
             <p className="text-xs text-muted-foreground">
               Klik peta untuk membuka di Google Maps

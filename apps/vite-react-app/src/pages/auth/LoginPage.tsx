@@ -323,13 +323,13 @@ export function LoginPage() {
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <CardContent className="space-y-4">
                   {/* Error Alert */}
-                  {loginError && (
+                  {/* {loginError && (
                     <Alert variant="destructive">
                       <AlertDescription>
                         {loginError}
                       </AlertDescription>
                     </Alert>
-                  )}
+                  )} */}
 
                   {/* Success Alert */}
                   {successMessage && (

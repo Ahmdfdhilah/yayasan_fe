@@ -9,11 +9,11 @@ import { Users, Target, Eye, MapPin, Calendar, Fullscreen, ChevronDown, BookOpen
 import { RichTextDisplay } from '@/components/common/RichTextDisplay';
 import ImageViewDialog from '@/components/common/ImageViewDialog';
 import { boardMemberService } from '@/services/board-members';
-import { mitraService } from '@/services/mitra';
+// import { mitraService } from '@/services/mitra';
 import { programService } from '@/services/program';
 import { getBoardImageUrl, getNewsImageUrl } from '@/utils/imageUtils';
 import type { BoardMember, BoardGroup } from '@/services/board-members/types';
-import type { Mitra } from '@/services/mitra/types';
+// import type { Mitra } from '@/services/mitra/types';
 import type { Program } from '@/services/program/types';
 import yayasan from '@/assets/yayasan.webp';
 
@@ -57,10 +57,10 @@ const LeadershipSkeleton = () => (
 const AboutPage = () => {
   const [boardMembers, setBoardMembers] = useState<BoardMember[]>([]);
   const [boardGroups, setBoardGroups] = useState<BoardGroup[]>([]);
-  const [mitras, setMitras] = useState<Mitra[]>([]);
+  // const [mitras, setMitras] = useState<Mitra[]>([]);
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
-  const [mitraLoading, setMitraLoading] = useState(true);
+  // const [mitraLoading, setMitraLoading] = useState(true);
   const [programLoading, setProgramLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<{
     src: string;
@@ -95,18 +95,18 @@ const AboutPage = () => {
       }
     };
 
-    const loadMitras = async () => {
-      try {
-        const response = await mitraService.getMitras({
-          limit: 50
-        });
-        setMitras(response.items);
-      } catch (error) {
-        console.error('Error loading mitra data:', error);
-      } finally {
-        setMitraLoading(false);
-      }
-    };
+    // const loadMitras = async () => {
+    //   try {
+    //     const response = await mitraService.getMitras({
+    //       limit: 50
+    //     });
+    //     setMitras(response.items);
+    //   } catch (error) {
+    //     console.error('Error loading mitra data:', error);
+    //   } finally {
+    //     setMitraLoading(false);
+    //   }
+    // };
 
     const loadPrograms = async () => {
       try {
@@ -122,7 +122,7 @@ const AboutPage = () => {
     };
 
     loadData();
-    loadMitras();
+    // loadMitras();
     loadPrograms();
   }, []);
 
@@ -155,36 +155,36 @@ const AboutPage = () => {
   };
 
 
-  // Render mitra card for carousel
-  const renderMitraCard = (mitra: Mitra) => (
-    <Card key={mitra.id} className="h-full">
-      <CardContent className="p-6 text-center h-full flex flex-col">
-        <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden bg-muted">
-          {mitra.img_url ? (
-            <img
-              src={getNewsImageUrl(mitra.img_url)}
-              alt={mitra.title}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = `https://picsum.photos/200/200?random=${mitra.id}`;
-              }}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Users className="w-8 h-8 text-muted-foreground" />
-            </div>
-          )}
-        </div>
-        <h3 className="font-semibold text-foreground mb-2">{mitra.title}</h3>
-        {mitra.description && (
-          <div className="text-sm text-muted-foreground leading-relaxed flex-1">
-            <RichTextDisplay content={mitra.description} />
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
+  // // Render mitra card for carousel
+  // const renderMitraCard = (mitra: Mitra) => (
+  //   <Card key={mitra.id} className="h-full">
+  //     <CardContent className="p-6 text-center h-full flex flex-col">
+  //       <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden bg-muted">
+  //         {mitra.img_url ? (
+  //           <img
+  //             src={getNewsImageUrl(mitra.img_url)}
+  //             alt={mitra.title}
+  //             className="w-full h-full object-cover"
+  //             onError={(e) => {
+  //               const target = e.target as HTMLImageElement;
+  //               target.src = `https://picsum.photos/200/200?random=${mitra.id}`;
+  //             }}
+  //           />
+  //         ) : (
+  //           <div className="w-full h-full flex items-center justify-center">
+  //             <Users className="w-8 h-8 text-muted-foreground" />
+  //           </div>
+  //         )}
+  //       </div>
+  //       <h3 className="font-semibold text-foreground mb-2">{mitra.title}</h3>
+  //       {mitra.description && (
+  //         <div className="text-sm text-muted-foreground leading-relaxed flex-1">
+  //           <RichTextDisplay content={mitra.description} />
+  //         </div>
+  //       )}
+  //     </CardContent>
+  //   </Card>
+  // );
 
   // Render program card for carousel
   const renderProgramCard = (program: Program) => (
@@ -522,7 +522,7 @@ const AboutPage = () => {
       </section>
 
       {/* Section 4: Foundation Partners */}
-      <section className="py-16 bg-muted/20">
+      {/* <section className="py-16 bg-muted/20">
         <div className="max-w-screen-xl mx-auto px-4">
           <div className="text-center mb-12">
             <Badge variant="outline" className="mb-4 border-primary text-primary">
@@ -576,7 +576,7 @@ const AboutPage = () => {
             )}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Section 5: Foundation Programs */}
       <section className="py-16">

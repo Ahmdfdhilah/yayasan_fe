@@ -26,7 +26,7 @@ import { BoardGroup, BoardGroupCreate, BoardGroupUpdate } from '@/services/board
 
 const boardGroupFormSchema = z.object({
   title: z.string().min(1, 'Nama grup wajib diisi').max(255, 'Nama grup maksimal 255 karakter'),
-  display_order: z.number().min(0, 'Urutan tidak boleh negatif'),
+  display_order: z.number().min(1, 'Urutan minimal 1'),
   description: z.string().optional().or(z.literal('')),
 });
 
@@ -56,7 +56,7 @@ export const BoardGroupDialog: React.FC<BoardGroupDialogProps> = ({
     resolver: zodResolver(boardGroupFormSchema),
     defaultValues: {
       title: '',
-      display_order: 0,
+      display_order: 1,
       description: '',
     },
   });
@@ -72,7 +72,7 @@ export const BoardGroupDialog: React.FC<BoardGroupDialogProps> = ({
       } else {
         form.reset({
           title: '',
-          display_order: 0,
+          display_order: 1,
           description: '',
         });
       }
@@ -145,12 +145,12 @@ export const BoardGroupDialog: React.FC<BoardGroupDialogProps> = ({
                   <FormControl>
                     <Input
                       type="number"
-                      min="0"
-                      placeholder="0"
+                      min="1"
+                      placeholder="1"
                       {...field}
-                      onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
                       onFocus={(e) => {
-                        if (e.target.value === '0') {
+                        if (e.target.value === '1') {
                           e.target.select();
                         }
                       }}
@@ -158,7 +158,7 @@ export const BoardGroupDialog: React.FC<BoardGroupDialogProps> = ({
                     />
                   </FormControl>
                   <FormDescription>
-                    Urutan tampil di website (0 = paling atas)
+                    Urutan tampil di website (1 = paling atas)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

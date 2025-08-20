@@ -37,7 +37,7 @@ const boardMemberFormSchema = z.object({
   position: z.string().min(1, 'Posisi wajib diisi').max(255, 'Posisi maksimal 255 karakter'),
   group_id: z.number().min(1, 'Grup wajib dipilih'),
   description: z.string().optional().or(z.literal('')),
-  member_order: z.number().min(0, 'Urutan tidak boleh negatif'),
+  member_order: z.number().min(1, 'Urutan minimal 1'),
 });
 
 type BoardMemberFormData = z.infer<typeof boardMemberFormSchema>;
@@ -72,7 +72,7 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
       position: '',
       group_id: 0,
       description: '',
-      member_order: 0,
+      member_order: 1,
     },
   });
 
@@ -92,7 +92,7 @@ export const BoardMemberDialog: React.FC<BoardMemberDialogProps> = ({
           position: '',
           group_id: 0,
           description: '',
-          member_order: 0,
+          member_order: 1,
         });
       }
       setSelectedFiles([]);

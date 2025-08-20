@@ -13,7 +13,7 @@ import {
   Image,
   MessageSquare,
   Settings,
-  Building2,
+  // Building2,
   Target,
 } from "lucide-react";
 
@@ -155,12 +155,12 @@ export const appMenuItems: SidebarItem[] = [
         icon: MessageSquare,
         allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
       },
-      {
-        title: 'Mitra',
-        href: '/cms/mitra',
-        icon: Building2,
-        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
-      },
+      // {
+      //   title: 'Mitra',
+      //   href: '/cms/mitra',
+      //   icon: Building2,
+      //   allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
+      // },
       {
         title: 'Program',
         href: '/cms/program',
