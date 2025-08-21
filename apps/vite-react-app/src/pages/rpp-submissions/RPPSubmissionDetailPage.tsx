@@ -49,9 +49,8 @@ interface DetailPageFilters {
 }
 
 const RPPSubmissionDetailPage: React.FC = () => {
-  const { teacherId, periodId } = useParams<{
+  const { teacherId } = useParams<{
     teacherId?: string;
-    periodId?: string;
   }>();
   const { isAdmin, isKepalaSekolah, isGuru } = useRole();
   const { user: currentUser } = useAuth();
@@ -60,7 +59,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
   // URL Filters configuration for period selection (when teacherId is provided)
   const { updateURL, getCurrentFilters } = useURLFilters<DetailPageFilters>({
     defaults: {
-      period_id: periodId || '',
+      period_id: '',
     },
     cleanDefaults: true,
   });
@@ -97,18 +96,18 @@ const RPPSubmissionDetailPage: React.FC = () => {
   useEffect(() => {
     loadInitialData();
     loadActivePeriod();
-  }, [teacherId, periodId]);
+  }, [teacherId]);
 
   // Load submission when filter changes
   useEffect(() => {
-    if (periods.length > 0 && !periodId && teacherId && filters.period_id && !isLoadingSubmission) {
+    if (teacherId && filters.period_id && !isLoadingSubmission) {
       loadSubmissionDetail();
     }
-  }, [filters.period_id]);
+  }, [filters.period_id, teacherId]);
 
   // Auto-select period only once when data is ready
   useEffect(() => {
-    if (teacherId && !periodId && periods.length > 0 && activePeriod && !filters.period_id) {
+    if (teacherId && periods.length > 0 && activePeriod && !filters.period_id) {
       updateURL({ period_id: activePeriod.id.toString() });
     }
   }, [activePeriod?.id]);
@@ -174,19 +173,16 @@ const RPPSubmissionDetailPage: React.FC = () => {
     try {
       let targetPeriodId: number;
 
-      if (periodId) {
-        // Direct period access (from my-submission route)
-        targetPeriodId = Number(periodId);
-      } else if (teacherId) {
+      if (teacherId) {
         // Teacher selection route - determine period from filters
-        if (periods.length === 0 || !filters.period_id) {
+        if (!filters.period_id) {
           setIsLoadingSubmission(false);
           return;
         }
 
         targetPeriodId = Number(filters.period_id);
       } else {
-        throw new Error('No teacher or period specified');
+        throw new Error('No teacher specified');
       }
 
       // Get period by ID for display info
@@ -207,7 +203,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
       // Load submission data
       let submissionData: RPPSubmissionResponse;
 
-      if (isOwnSubmission || periodId) {
+      if (isOwnSubmission) {
         // Teacher viewing own submission or direct period access
         try {
           submissionData = await rppSubmissionService.getMySubmissionForPeriod(targetPeriodId);
@@ -377,7 +373,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
       />
 
       {/* Period Filter (only for teacher view) */}
-      {teacherId && !periodId && periods.length > 0 && (
+      {teacherId && periods.length > 0 && (
         <Filtering>
           <div className="space-y-2">
             <Label htmlFor="period-filter">Periode</Label>
@@ -407,7 +403,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
               : 'Belum ada RPP submission untuk periode ini.'
             }
           </p>
-          {teacherId && !periodId && periods.length > 0 && (
+          {teacherId && periods.length > 0 && (
             <p className="text-sm text-muted-foreground">
               Pilih periode lain menggunakan filter di atas untuk mencari RPP submission.
             </p>
@@ -497,7 +493,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
       />
 
       {/* Period Filter (only for teacher view) */}
-      {teacherId && !periodId && periods.length > 0 && (
+      {teacherId && periods.length > 0 && (
         <Filtering>
           <div className="space-y-2">
             <Label htmlFor="period-filter">Periode</Label>

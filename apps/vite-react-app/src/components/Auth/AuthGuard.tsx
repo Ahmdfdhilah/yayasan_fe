@@ -51,11 +51,6 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
     }
   }, [location.pathname, isAuthenticated, loading]); // Add loading dependency
 
-  // Show loading spinner while authentication is being checked
-  if (loading) {
-    return <LoadingSpinner message="Verifying authentication..." />;
-  }
-
   // If unauthenticated access is allowed, render children
   if (allowUnauthenticated) {
     return <>{children}</>;

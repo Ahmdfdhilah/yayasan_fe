@@ -164,6 +164,7 @@ export interface RPPSubmissionDashboard {
 
 // ===== SERVICE FILTER PARAMS =====
 export interface RPPSubmissionFilterParams {
+  organization_id?: number;
   teacher_id?: number;
   period_id?: number;
   status?: RPPSubmissionStatus;

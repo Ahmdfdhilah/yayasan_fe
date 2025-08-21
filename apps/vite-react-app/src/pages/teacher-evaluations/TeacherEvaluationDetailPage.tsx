@@ -195,10 +195,20 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   }, [teacherId]);
 
   useEffect(() => {
-    if (teacherId && periods.length > 0 && filters.period_id) {
+    if (teacherId && filters.period_id) {
       loadEvaluationDetail();
     }
   }, [teacherId, filters.period_id]);
+
+  // Handle initial load from URL query parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlPeriodId = urlParams.get('period_id');
+    
+    if (teacherId && urlPeriodId && !filters.period_id) {
+      updateURL({ period_id: urlPeriodId });
+    }
+  }, [teacherId]);
 
   // Auto-select period only if no period_id in URL
   useEffect(() => {

@@ -107,8 +107,10 @@ const RPPSubmissionsPage: React.FC = () => {
         params.search = filters.search.trim();
       }
 
-      // Auto-filter by organization for kepala sekolah, or allow admin to choose
-      // Note: This will be handled by backend based on user permissions
+      // Handle organization filter (only for admin)
+      if (isAdmin() && filters.organization_id !== 'all') {
+        params.organization_id = Number(filters.organization_id);
+      }
 
       const response = await rppSubmissionService.getSubmissions(params);
       setSubmissions(response.items || []);
