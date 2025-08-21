@@ -94,13 +94,16 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       return false;
     }
 
+    // Check if user is viewing their own evaluation
+    const isOwnEvaluation = user?.id === Number(teacherId);
+
     if (isAdmin()) {
       return true;
     }
 
     if (isKepalaSekolah()) {
-      // Kepala sekolah can only edit evaluations in their organization
-      return evaluation.teacher?.organization_id === user?.organization_id;
+      // Kepala sekolah can only edit evaluations in their organization (but NOT their own)
+      return !isOwnEvaluation && evaluation.teacher?.organization_id === user?.organization_id;
     }
 
     return false;
