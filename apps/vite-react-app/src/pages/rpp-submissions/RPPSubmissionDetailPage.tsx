@@ -101,14 +101,14 @@ const RPPSubmissionDetailPage: React.FC = () => {
 
   // Additional effect to load submission when periods are loaded
   useEffect(() => {
-    if (periods.length > 0 && !periodId && teacherId) {
+    if (periods.length > 0 && !periodId && teacherId && filters.period_id) {
       loadSubmissionDetail();
     }
-  }, [periods, teacherId, periodId]);
+  }, [periods, teacherId, periodId, filters.period_id]);
 
   // Auto-select period only if no period_id in URL (for teacherId route)
   useEffect(() => {
-    if (teacherId && !periodId && periods.length > 0 && !filters.period_id) {
+    if (teacherId && !periodId && periods.length > 0 && activePeriod !== null && !filters.period_id) {
       let selectedPeriodId: string;
 
       if (activePeriod) {

@@ -96,14 +96,14 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   }, [teacherId]);
 
   useEffect(() => {
-    if (teacherId && periods.length > 0) {
+    if (teacherId && periods.length > 0 && filters.period_id) {
       loadEvaluationDetail();
     }
   }, [teacherId, filters.period_id, periods]);
 
   // Auto-select period only if no period_id in URL
   useEffect(() => {
-    if (periods.length > 0 && !filters.period_id) {
+    if (periods.length > 0 && activePeriod !== null && !filters.period_id) {
       let selectedPeriodId: string;
       
       if (activePeriod) {
