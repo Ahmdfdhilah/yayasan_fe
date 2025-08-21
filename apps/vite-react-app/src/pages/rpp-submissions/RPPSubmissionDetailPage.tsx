@@ -97,31 +97,21 @@ const RPPSubmissionDetailPage: React.FC = () => {
   useEffect(() => {
     loadInitialData();
     loadActivePeriod();
-  }, [teacherId, periodId, filters.period_id]);
+  }, [teacherId, periodId]);
 
-  // Additional effect to load submission when periods are loaded
+  // Load submission when filter changes
   useEffect(() => {
-    if (periods.length > 0 && !periodId && teacherId && filters.period_id) {
+    if (periods.length > 0 && !periodId && teacherId && filters.period_id && !isLoadingSubmission) {
       loadSubmissionDetail();
     }
-  }, [periods, teacherId, periodId, filters.period_id]);
+  }, [filters.period_id]);
 
-  // Auto-select period only if no period_id in URL (for teacherId route)
+  // Auto-select period only once when data is ready
   useEffect(() => {
-    if (teacherId && !periodId && periods.length > 0 && activePeriod !== null && !filters.period_id) {
-      let selectedPeriodId: string;
-
-      if (activePeriod) {
-        // Use active period if exists
-        selectedPeriodId = activePeriod.id.toString();
-      } else {
-        // Use first period as fallback
-        selectedPeriodId = periods[0].id.toString();
-      }
-
-      updateURL({ period_id: selectedPeriodId });
+    if (teacherId && !periodId && periods.length > 0 && activePeriod && !filters.period_id) {
+      updateURL({ period_id: activePeriod.id.toString() });
     }
-  }, [teacherId, periodId, activePeriod, periods, filters.period_id, updateURL]);
+  }, [activePeriod?.id]);
 
   const loadInitialData = async () => {
     try {

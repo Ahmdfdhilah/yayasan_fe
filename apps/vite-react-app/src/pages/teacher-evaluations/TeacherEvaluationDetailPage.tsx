@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -74,7 +74,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   const [periods, setPeriods] = useState<Period[]>([]);
   const [currentPeriod, setCurrentPeriod] = useState<Period | null>(null);
   const [activePeriod, setActivePeriod] = useState<Period | null>(null);
-  const [loading, setLoading] = useState(true);
+
   const [saving, setSaving] = useState(false);
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [isLoadingEvaluation, setIsLoadingEvaluation] = useState(false);
@@ -86,58 +86,6 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       notes: '',
     },
   });
-
-  useEffect(() => {
-    if (teacherId) {
-      loadPeriods();
-      loadCategoriesWithAspects();
-      loadActivePeriod();
-    }
-  }, [teacherId]);
-
-  useEffect(() => {
-    if (teacherId && periods.length > 0 && filters.period_id) {
-      loadEvaluationDetail();
-    }
-  }, [teacherId, filters.period_id, periods]);
-
-  // Auto-select period only if no period_id in URL
-  useEffect(() => {
-    if (periods.length > 0 && activePeriod !== null && !filters.period_id) {
-      let selectedPeriodId: string;
-      
-      if (activePeriod) {
-        // Use active period if exists
-        selectedPeriodId = activePeriod.id.toString();
-      } else {
-        // Use first period as fallback
-        selectedPeriodId = periods[0].id.toString();
-      }
-      
-      updateURL({ period_id: selectedPeriodId });
-    }
-  }, [activePeriod, periods, filters.period_id, updateURL]);
-
-  // Handle edit mode from URL and check permissions
-  useEffect(() => {
-    const editParam = searchParams.get('edit');
-    if (editParam === 'true' && evaluation && currentPeriod && activePeriod) {
-      // Check if user can edit this evaluation
-      const canEdit = canEditEvaluation(evaluation, currentPeriod, activePeriod);
-      if (canEdit) {
-        setMode('edit');
-      } else {
-        setMode('view');
-        toast({
-          title: "Akses Ditolak",
-          description: "Anda tidak memiliki izin untuk mengedit evaluasi ini.",
-          variant: "destructive",
-        });
-      }
-    } else {
-      setMode('view');
-    }
-  }, [searchParams, evaluation, currentPeriod, activePeriod, isAdmin, isKepalaSekolah, user]);
 
   // Check if user can edit specific evaluation
   const canEditEvaluation = (evaluation: TeacherEvaluationDetailResponse, period: Period, activePeriod: Period) => {
@@ -162,12 +110,13 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     try {
       const response = await periodService.getPeriods({ page: 1, size: 100 });
       setPeriods(response.items || []);
+
     } catch (error) {
       console.error('Error loading periods:', error);
     }
   };
 
-  const loadEvaluationDetail = async () => {
+  const loadEvaluationDetail = useCallback(async () => {
     // Prevent multiple concurrent calls
     if (isLoadingEvaluation) {
       return;
@@ -176,7 +125,6 @@ const TeacherEvaluationDetailPage: React.FC = () => {
     setIsLoadingEvaluation(true);
 
     try {
-      setLoading(true);
 
       if (!filters.period_id) {
         setIsLoadingEvaluation(false);
@@ -184,13 +132,13 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       }
 
       const periodId = Number(filters.period_id);
-      
+
       // Get teacher evaluation by period - direct endpoint for single evaluation
       const evaluationResponse = await teacherEvaluationService.getTeacherEvaluationByPeriod(
         Number(teacherId),
         periodId
       );
-      
+
       // Get period by ID for display info
       if (!currentPeriod || currentPeriod.id !== periodId) {
         try {
@@ -223,21 +171,62 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       setMode('view');
     } catch (error) {
       console.error('Error loading evaluation detail:', error);
-      
+
       // Handle evaluation not found errors
-      if ((error as any)?.message?.includes('tidak ditemukan') || 
-          (error as any)?.message?.includes('not found')) {
+      if ((error as any)?.message?.includes('tidak ditemukan') ||
+        (error as any)?.message?.includes('not found')) {
         setEvaluation(null);
         setIsLoadingEvaluation(false);
         return;
       }
-      
+
       // Error handling is done in base service, no need to show toast here
     } finally {
-      setLoading(false);
       setIsLoadingEvaluation(false);
     }
-  };
+  }, [teacherId, filters.period_id]);
+
+  useEffect(() => {
+    if (teacherId) {
+      loadPeriods();
+      loadCategoriesWithAspects();
+      loadActivePeriod();
+    }
+  }, [teacherId]);
+
+  useEffect(() => {
+    if (teacherId && periods.length > 0 && filters.period_id) {
+      loadEvaluationDetail();
+    }
+  }, [teacherId, filters.period_id]);
+
+  // Auto-select period only if no period_id in URL
+  useEffect(() => {
+    if (periods.length > 0 && activePeriod && !filters.period_id) {
+      updateURL({ period_id: activePeriod.id.toString() });
+    }
+  }, [activePeriod, filters.period_id, updateURL]);
+
+  // Handle edit mode from URL and check permissions
+  useEffect(() => {
+    const editParam = searchParams.get('edit');
+    if (editParam === 'true' && evaluation && currentPeriod && activePeriod) {
+      // Check if user can edit this evaluation
+      const canEdit = canEditEvaluation(evaluation, currentPeriod, activePeriod);
+      if (canEdit) {
+        setMode('edit');
+      } else {
+        setMode('view');
+        toast({
+          title: "Akses Ditolak",
+          description: "Anda tidak memiliki izin untuk mengedit evaluasi ini.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      setMode('view');
+    }
+  }, [searchParams, evaluation, currentPeriod, activePeriod, isAdmin, isKepalaSekolah, user]);
 
   const loadCategoriesWithAspects = async () => {
     try {
@@ -370,9 +359,9 @@ const TeacherEvaluationDetailPage: React.FC = () => {
 
   const toggleMode = () => {
     const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
-    
+
     if (!evaluation || !currentPeriod || !activePeriod) return;
-    
+
     const canEdit = canEditEvaluation(evaluation, currentPeriod, activePeriod);
     const finalCanEdit = canEdit && categoriesWithAspects.length > 0 && isActivePeriod;
 
@@ -437,15 +426,6 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   };
 
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-
   const handlePeriodFilterChange = (period_id: string) => {
     updateURL({ period_id });
   };
@@ -454,10 +434,10 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   const sortedCategories = categoriesWithAspects;
 
   const isActivePeriod = activePeriod && currentPeriod && activePeriod.id === currentPeriod.id;
-  
+
   // Check if user can edit - using the centralized permission function
-  const canEdit = evaluation && currentPeriod && activePeriod ? 
-    canEditEvaluation(evaluation, currentPeriod, activePeriod) && isActivePeriod : 
+  const canEdit = evaluation && currentPeriod && activePeriod ?
+    canEditEvaluation(evaluation, currentPeriod, activePeriod) && isActivePeriod :
     false;
 
 
@@ -468,8 +448,8 @@ const TeacherEvaluationDetailPage: React.FC = () => {
   });
 
   // Get teacher info from evaluation or use teacherId
-  const teacherInfo = evaluation || { 
-    teacher_name: `Teacher ${teacherId}`, 
+  const teacherInfo = evaluation || {
+    teacher_name: `Teacher ${teacherId}`,
     teacher_id: Number(teacherId),
     teacher: { display_name: `Teacher ${teacherId}` }
   };
@@ -564,7 +544,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       </Filtering>
 
       {/* No evaluation aspects found message */}
-      {!loading && categoriesWithAspects.length === 0 && (
+      {categoriesWithAspects.length === 0 && (
         <Card>
           <CardContent className="py-12">
             <div className="text-center">
@@ -581,7 +561,7 @@ const TeacherEvaluationDetailPage: React.FC = () => {
       )}
 
       {/* No evaluation found message - when aspects exist but no evaluation data */}
-      {!loading && categoriesWithAspects.length > 0 && !evaluation && (
+      {categoriesWithAspects.length > 0 && !evaluation && (
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <h2 className="text-xl font-semibold mb-2">Evaluasi Guru Belum Ada</h2>
