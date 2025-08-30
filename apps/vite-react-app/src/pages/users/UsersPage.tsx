@@ -81,7 +81,7 @@ const UsersPage: React.FC = () => {
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   // Calculate access control
-  const hasAccess = isAdmin();
+  const hasAccess = isAdmin() || isSuperAdmin();
 
   // Fetch users function
   const fetchUsers = async () => {
@@ -128,7 +128,7 @@ const UsersPage: React.FC = () => {
 
   const handleEdit = (user: User) => {
     // Check if current user can edit this user
-    if (!canModifyUser(user)) {
+    if (!canModifyUser()) {
       const message = user.role === 'SUPER_ADMIN' 
         ? 'Super Admin tidak dapat diubah untuk keamanan sistem.'
         : 'Anda tidak memiliki akses untuk mengedit user ini.';
@@ -145,7 +145,7 @@ const UsersPage: React.FC = () => {
 
   const handleDelete = (user: User) => {
     // Check if current user can delete this user
-    if (!canDeleteUser(user)) {
+    if (!canDeleteUser()) {
       const message = user.role === 'SUPER_ADMIN' 
         ? 'Super Admin tidak dapat dihapus untuk keamanan sistem.'
         : 'Anda tidak memiliki akses untuk menghapus user ini.';
@@ -160,29 +160,24 @@ const UsersPage: React.FC = () => {
   };
 
   // Helper function to check if current user can modify target user
-  const canModifyUser = (targetUser: User) => {
+  const canModifyUser = () => {
     // SUPER_ADMIN can modify anyone
     if (isSuperAdmin()) {
       return true;
     }
-    
-    // ADMIN cannot modify other ADMINs or SUPER_ADMINs
-    if (isAdmin()) {
-      return !['ADMIN', 'SUPER_ADMIN'].includes(targetUser.role);
-    }
-    
+
     // Other roles cannot modify anyone
     return false;
   };
 
   // Helper function to check if current user can delete target user
-  const canDeleteUser = (targetUser: User) => {
+  const canDeleteUser = () => {
     // CRITICAL PROTECTION: SUPER_ADMIN accounts can NEVER be deleted
-    if (targetUser.role === 'SUPER_ADMIN') {
+    if (isSuperAdmin()) {
       return false;
     }
     
-    return canModifyUser(targetUser);
+    return canModifyUser();
   };
 
   const confirmDeleteUser = async () => {
