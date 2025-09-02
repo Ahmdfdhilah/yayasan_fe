@@ -248,73 +248,70 @@ export const UserDialog: React.FC<UserDialogProps> = ({
                   )}
                 />
 
-{!(editingUser && editingUser.role === 'SUPER_ADMIN') && (
-                  <FormField
-                    control={form.control}
-                    name="role"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Role</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          disabled={loading || loadingRoles}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih role" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {loadingRoles ? (
-                              <SelectItem value="loading" disabled>
-                                Memuat roles...
-                              </SelectItem>
-                            ) : (
-                              allowedRoles.map((roleValue) => {
-                                const roleOption = getRoleOptions().find(role => role.value === roleValue);
-                                return roleOption ? (
-                                  <SelectItem key={roleValue} value={roleValue}>
-                                    {roleOption.label}
-                                  </SelectItem>
-                                ) : null;
-                              })
-                            )}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
+                <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Role</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        disabled={loading || loadingRoles}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih role" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {loadingRoles ? (
+                            <SelectItem value="loading" disabled>
+                              Memuat roles...
+                            </SelectItem>
+                          ) : (
+                            allowedRoles.map((roleValue) => {
+                              const roleOption = getRoleOptions().find(role => role.value === roleValue);
+                              return roleOption ? (
+                                <SelectItem key={roleValue} value={roleValue}>
+                                  {roleOption.label}
+                                </SelectItem>
+                              ) : null;
+                            })
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                {isEdit && !(editingUser && editingUser.role === 'SUPER_ADMIN') && (
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Status</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          disabled={loading}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih status" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value={UserStatus.ACTIVE}>Aktif</SelectItem>
-                            <SelectItem value={UserStatus.INACTIVE}>Tidak Aktif</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        disabled={loading}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value={UserStatus.ACTIVE}>Aktif</SelectItem>
+                          <SelectItem value={UserStatus.INACTIVE}>Tidak Aktif</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
 
                 <FormField
                   control={form.control}

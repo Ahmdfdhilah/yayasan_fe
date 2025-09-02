@@ -162,7 +162,7 @@ const UsersPage: React.FC = () => {
   // Helper function to check if current user can modify target user
   const canModifyUser = () => {
     // SUPER_ADMIN can modify anyone
-    if (isSuperAdmin()) {
+    if (isSuperAdmin() || isAdmin()) {
       return true;
     }
 
