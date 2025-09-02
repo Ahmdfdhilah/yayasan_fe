@@ -37,7 +37,7 @@ export const UserTable: React.FC<UserTableProps> = ({
 
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border overflow-x-scroll">
       <Table>
         <TableHeader>
           <TableRow>
