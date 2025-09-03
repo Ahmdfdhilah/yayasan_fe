@@ -135,7 +135,7 @@ export const RPPReviewSection: React.FC<RPPReviewSectionProps> = ({
             <AlertDialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
               <AlertDialogTrigger asChild>
                 <Button
-                  disabled={reviewing && !reviewNotes}
+                  disabled={reviewing || !reviewNotes.trim()}
                   variant="destructive"
                 >
                   {reviewing ? (
