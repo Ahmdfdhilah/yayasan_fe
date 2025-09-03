@@ -16,9 +16,9 @@ import {
 } from '@workspace/ui/components/alert-dialog';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@workspace/ui/components/sonner';
-import { 
-  RPPSubmissionResponse, 
-  RPPSubmissionStatus 
+import {
+  RPPSubmissionResponse,
+  RPPSubmissionStatus
 } from '@/services/rpp-submissions/types';
 import { rppSubmissionService } from '@/services';
 
@@ -60,7 +60,7 @@ export const RPPReviewSection: React.FC<RPPReviewSectionProps> = ({
       // Close dialogs
       setApproveDialogOpen(false);
       setRejectDialogOpen(false);
-      
+
       onReviewComplete();
     } catch (error: any) {
       console.error('Error reviewing submission:', error);
@@ -121,7 +121,7 @@ export const RPPReviewSection: React.FC<RPPReviewSectionProps> = ({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Batal</AlertDialogCancel>
-                  <AlertDialogAction 
+                  <AlertDialogAction
                     onClick={() => handleReview(RPPSubmissionStatus.APPROVED)}
                     className="bg-green-600 hover:bg-green-700"
                   >
@@ -135,7 +135,7 @@ export const RPPReviewSection: React.FC<RPPReviewSectionProps> = ({
             <AlertDialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
               <AlertDialogTrigger asChild>
                 <Button
-                  disabled={reviewing}
+                  disabled={reviewing && !reviewNotes}
                   variant="destructive"
                 >
                   {reviewing ? (
@@ -155,7 +155,7 @@ export const RPPReviewSection: React.FC<RPPReviewSectionProps> = ({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Batal</AlertDialogCancel>
-                  <AlertDialogAction 
+                  <AlertDialogAction
                     onClick={() => handleReview(RPPSubmissionStatus.REJECTED)}
                     className="bg-red-600 hover:bg-red-700"
                   >
