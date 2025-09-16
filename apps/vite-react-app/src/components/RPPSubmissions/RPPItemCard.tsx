@@ -60,7 +60,7 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
       
       toast({
         title: 'Berhasil',
-        description: 'Item RPP berhasil dihapus.',
+        description: 'Item berhasil dihapus.',
       });
 
       setDeleteDialogOpen(false);
@@ -243,9 +243,9 @@ export const RPPItemCard: React.FC<RPPItemCardProps> = ({
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Item RPP</AlertDialogTitle>
+            <AlertDialogTitle>Hapus Item</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus item RPP "{item.name}"? 
+              Apakah Anda yakin ingin menghapus item"{item.name}"? 
               {item.is_uploaded && " File yang sudah diupload juga akan terhapus."}
               <br />
               <br />

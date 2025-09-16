@@ -150,7 +150,7 @@ export const RPPReviewSection: React.FC<RPPReviewSectionProps> = ({
                 <AlertDialogHeader>
                   <AlertDialogTitle>Konfirmasi Penolakan</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Apakah Anda yakin ingin menolak Submission ini? Setelah ditolak, guru dapat memperbaiki dan submit ulang RPP mereka. Pastikan Anda telah memberikan catatan review yang jelas.
+                    Apakah Anda yakin ingin menolak Submission ini? Setelah ditolak, guru dapat memperbaiki dan submit ulang submission mereka. Pastikan Anda telah memberikan catatan review yang jelas.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

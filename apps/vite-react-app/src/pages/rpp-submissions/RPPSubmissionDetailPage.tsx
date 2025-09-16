@@ -267,7 +267,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
     if (!rppSubmissionService.isSubmissionReady(submission)) {
       toast({
         title: 'Tidak dapat submit',
-        description: 'Pastikan semua RPP telah diupload sebelum submit.',
+        description: 'Pastikan semua submission telah diupload sebelum submit.',
         variant: 'destructive'
       });
       return;
@@ -466,7 +466,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
                     <AlertDialogDescription>
                       {submission.status === RPPSubmissionStatus.REJECTED
                         ? 'Apakah Anda yakin ingin submit ulang submission ini untuk review?'
-                        : 'Apakah Anda yakin ingin submit submission ini untuk review? Setelah disubmit, Anda tidak dapat mengubah file RPP hingga mendapat feedback.'}
+                        : 'Apakah Anda yakin ingin submit submission ini untuk review? Setelah disubmit, Anda tidak dapat mengubah file hingga mendapat feedback.'}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -520,7 +520,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
       {/* RPP Items */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">RPP Files</h3>
+          <h3 className="text-lg font-semibold">Submission File</h3>
           {(() => {
             const isDraftStatus = submission.status === RPPSubmissionStatus.DRAFT;
             const isRejectedStatus = submission.status === RPPSubmissionStatus.REJECTED;

@@ -117,8 +117,8 @@ const RPPSubmissionsPage: React.FC = () => {
       setTotalItems(response.total || 0);
       setTotalPages(response.pages || 0);
     } catch (error: any) {
-      console.error('Error loading RPP submissions:', error);
-      const errorMessage = error?.message || 'Gagal memuat data RPP submissions. Silakan coba lagi.';
+      console.error('Error loading  submissions:', error);
+      const errorMessage = error?.message || 'Gagal memuat data  submissions. Silakan coba lagi.';
       toast({
         title: 'Error',
         description: errorMessage,

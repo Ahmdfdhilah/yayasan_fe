@@ -130,26 +130,28 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Statistik RPP Sistem
+            Statistik Submission Sistem
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
-              title="Total RPP"
+              title="Total Submission"
               value={data.rpp_stats.total_submissions}
-            />
-            <StatCard
-              title="Pending Review"
-              value={data.rpp_stats.pending_submissions}
-              subtitle="Menunggu review"
+              subtitle='Jumlah Submission'
             />
             <StatCard
               title="Disetujui"
               value={data.rpp_stats.approved_submissions}
+              subtitle="Submission yang disetujui"
             />
             <StatCard
-              title="Tingkat Completion"
+              title="Pending Review"
+              value={data.rpp_stats.pending_submissions}
+              subtitle="Submission yang Menunggu review"
+            />
+            <StatCard
+              title="Tingkat Penyelesaian"
               value={Math.round(data.rpp_stats.submission_rate)}
               formatter={(v) => `${v}%`}
             />
@@ -223,10 +225,10 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
                       <Badge variant="outline">{org.total_teachers || 0} Guru</Badge>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-muted-foreground">
-                      <div>RPP: {org.rpp_stats?.total_submissions || 0}</div>
-                      <div>Approved: {org.rpp_stats?.approved_submissions || 0}</div>
-                      <div>Evaluasi: {org.evaluation_stats?.total_evaluations || 0}</div>
-                      <div>Avg Score: {(org.evaluation_stats?.avg_score || 0).toFixed(1)}</div>
+                      <div>Submission: {org.rpp_stats?.total_submissions || 0}</div>
+                      <div>Submission Disetujui: {org.rpp_stats?.approved_submissions || 0}</div>
+                      <div>Jumlah Evaluasi: {org.evaluation_stats?.total_evaluations || 0}</div>
+                      <div>Rata-rata Nilai: {(org.evaluation_stats?.avg_score || 0).toFixed(1)}</div>
                     </div>
                   </div>
                 ))}

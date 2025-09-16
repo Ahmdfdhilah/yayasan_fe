@@ -108,27 +108,28 @@ export function PrincipalDashboard({ periodId }: PrincipalDashboardProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Statistik RPP Saya
+            Statistik Submission Saya
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
-              title="Total RPP"
+              title="Total Submission"
               value={data.my_rpp_stats.total_submissions}
+              subtitle='Jumlah Submission'
             />
             <StatCard
               title="Disetujui"
               value={data.my_rpp_stats.approved_submissions}
-              subtitle="RPP approved"
+              subtitle="Submission yang disetujui"
             />
             <StatCard
               title="Pending"
               value={data.my_rpp_stats.pending_submissions}
-              subtitle="Menunggu review"
+              subtitle="Submission yang Menunggu review"
             />
             <StatCard
-              title="Tingkat Completion"
+              title="Tingkat Penyelesaian"
               value={Math.round(data.my_rpp_stats.submission_rate)}
               formatter={(v) => `${v}%`}
             />
@@ -150,6 +151,7 @@ export function PrincipalDashboard({ periodId }: PrincipalDashboardProps) {
               <StatCard
                 title="Total Evaluasi"
                 value={data.my_evaluation_stats.total_evaluations}
+                subtitle='Jumlah Evaluasi'
               />
               <StatCard
                 title="Rata-rata Skor"
@@ -208,14 +210,15 @@ export function PrincipalDashboard({ periodId }: PrincipalDashboardProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Statistik RPP Sekolah
+            Statistik Submission Sekolah
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
-              title="Total RPP"
+              title="Total Submission"
               value={data.rpp_stats.total_submissions}
+              subtitle='Jumlah Submission'
             />
             <StatCard
               title="Pending Review"
@@ -299,7 +302,7 @@ export function PrincipalDashboard({ periodId }: PrincipalDashboardProps) {
                     <div>
                       <p className="font-medium">{teacher.teacher_name || 'Unknown Teacher'}</p>
                       <p className="text-sm text-muted-foreground">
-                        {teacher.total_rpps || 0} RPP total, {teacher.approved_rpps || 0} disetujui
+                        {teacher.total_rpps || 0} Submission total, {teacher.approved_rpps || 0} disetujui
                       </p>
                     </div>
                     {teacher.completion_rate !== undefined && (

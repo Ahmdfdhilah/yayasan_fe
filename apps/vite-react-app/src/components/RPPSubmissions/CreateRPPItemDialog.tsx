@@ -26,7 +26,7 @@ import { rppSubmissionService } from '@/services';
 
 const createItemSchema = z.object({
   name: z.string()
-    .min(1, 'Nama RPP item harus diisi')
+    .min(1, 'Nama submission item harus diisi')
     .max(255, 'Nama terlalu panjang (maksimal 255 karakter)'),
   description: z.string()
     .max(1000, 'Deskripsi terlalu panjang (maksimal 1000 karakter)')
@@ -71,7 +71,7 @@ export const CreateRPPItemDialog: React.FC<CreateRPPItemDialogProps> = ({
 
       toast({
         title: 'Berhasil',
-        description: 'RPP item berhasil dibuat.',
+        description: 'Submission item berhasil dibuat.',
       });
 
       reset();
@@ -79,10 +79,10 @@ export const CreateRPPItemDialog: React.FC<CreateRPPItemDialogProps> = ({
       console.log('Calling onSuccess callback...');
       onSuccess();
     } catch (error) {
-      console.error('Error creating RPP item:', error);
+      console.error('Error creating submission item:', error);
       toast({
         title: 'Error',
-        description: 'Gagal membuat RPP item. Silakan coba lagi.',
+        description: 'Gagal membuat submission item. Silakan coba lagi.',
         variant: 'destructive',
       });
     }
@@ -97,9 +97,9 @@ export const CreateRPPItemDialog: React.FC<CreateRPPItemDialogProps> = ({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Buat RPP Item Baru</DialogTitle>
+          <DialogTitle>Buat Submission Item Baru</DialogTitle>
           <DialogDescription>
-            Buat item RPP baru untuk periode ini. Anda bisa mengupload file nanti.
+            Buat item Submission baru untuk periode ini. Anda bisa mengupload file nanti.
           </DialogDescription>
         </DialogHeader>
 
@@ -110,10 +110,10 @@ export const CreateRPPItemDialog: React.FC<CreateRPPItemDialogProps> = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama RPP *</FormLabel>
+                  <FormLabel>Nama Submission *</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Contoh: RPP Matematika Kelas 7"
+                      placeholder="Contoh: Modul Matematika Kelas 7"
                       {...field}
                     />
                   </FormControl>
@@ -130,7 +130,7 @@ export const CreateRPPItemDialog: React.FC<CreateRPPItemDialogProps> = ({
                   <FormLabel>Deskripsi (Opsional)</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Deskripsi singkat mengenai RPP ini..."
+                      placeholder="Deskripsi singkat mengenai submission ini..."
                       rows={3}
                       {...field}
                     />

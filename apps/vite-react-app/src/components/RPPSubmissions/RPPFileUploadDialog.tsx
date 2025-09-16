@@ -95,7 +95,7 @@ export const RPPFileUploadDialog: React.FC<RPPFileUploadDialogProps> = ({
       onSuccess();
       handleClose();
     } catch (error: any) {
-      console.error('Error uploading RPP file:', error);
+      console.error('Error uploading file:', error);
       toast({
         title: 'Error',
         description: error.message || 'Gagal upload file RPP.',

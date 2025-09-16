@@ -37,7 +37,7 @@ export const RPPSubmissionCards: React.FC<RPPSubmissionCardsProps> = ({
   if (submissions.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        Tidak ada submission RPP ditemukan
+        Tidak ada submission ditemukan
       </div>
     );
   }

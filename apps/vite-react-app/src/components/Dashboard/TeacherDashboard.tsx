@@ -108,27 +108,28 @@ export function TeacherDashboard({ periodId }: TeacherDashboardProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Statistik RPP Saya
+            Statistik Submission Saya
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
-              title="Total RPP"
+              title="Total Submission"
               value={data.my_rpp_stats.total_submissions}
+              subtitle='Jumlah Submission'
             />
             <StatCard
               title="Disetujui"
               value={data.my_rpp_stats.approved_submissions}
-              subtitle="RPP approved"
+              subtitle="Submission yang disetujui"
             />
             <StatCard
               title="Pending"
               value={data.my_rpp_stats.pending_submissions}
-              subtitle="Menunggu review"
+              subtitle="Submission yang Menunggu review"
             />
             <StatCard
-              title="Tingkat Completion"
+              title="Tingkat Penyelesaian"
               value={Math.round(data.my_rpp_stats.submission_rate)}
               formatter={(v) => `${v}%`}
             />

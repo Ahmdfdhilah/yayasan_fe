@@ -52,7 +52,7 @@ export const RPPSubmissionTable: React.FC<RPPSubmissionTableProps> = ({
           ) : submissions.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                Tidak ada submission RPP ditemukan
+                Tidak ada submission ditemukan
               </TableCell>
             </TableRow>
           ) : (
