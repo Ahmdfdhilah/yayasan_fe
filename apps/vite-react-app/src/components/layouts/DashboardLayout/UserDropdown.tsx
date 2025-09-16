@@ -121,7 +121,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
             </div>
             {!collapsed && (
               <>
-                <div className="flex flex-col items-start flex-1 min-w-0">
+                <div className="flex flex-col items-start text-left flex-1 min-w-0">
                   <span className="text-sm font-medium text-sidebar-foreground truncate w-full">
                     {getUserDisplayName()}
                   </span>
