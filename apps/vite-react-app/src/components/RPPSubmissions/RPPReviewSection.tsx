@@ -48,8 +48,8 @@ export const RPPReviewSection: React.FC<RPPReviewSectionProps> = ({
       const statusMessages: Record<RPPSubmissionStatus, string> = {
         [RPPSubmissionStatus.DRAFT]: 'Status berhasil diubah ke draft.',
         [RPPSubmissionStatus.PENDING]: 'Status berhasil diubah ke pending.',
-        [RPPSubmissionStatus.APPROVED]: 'RPP submission berhasil disetujui.',
-        [RPPSubmissionStatus.REJECTED]: 'RPP submission berhasil ditolak.',
+        [RPPSubmissionStatus.APPROVED]: 'Submission berhasil disetujui.',
+        [RPPSubmissionStatus.REJECTED]: 'Submission berhasil ditolak.',
       };
 
       toast({
@@ -66,7 +66,7 @@ export const RPPReviewSection: React.FC<RPPReviewSectionProps> = ({
       console.error('Error reviewing submission:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Gagal mereview RPP submission.',
+        description: error.message || 'Gagal mereview submission.',
         variant: 'destructive'
       });
       // Close dialogs on error too
@@ -116,7 +116,7 @@ export const RPPReviewSection: React.FC<RPPReviewSectionProps> = ({
                 <AlertDialogHeader>
                   <AlertDialogTitle>Konfirmasi Persetujuan</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Apakah Anda yakin ingin menyetujui RPP submission ini? Setelah disetujui, status submission akan berubah menjadi "Approved" dan guru akan mendapat notifikasi.
+                    Apakah Anda yakin ingin menyetujui Submission ini? Setelah disetujui, status submission akan berubah menjadi "Approved" dan guru akan mendapat notifikasi.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -150,7 +150,7 @@ export const RPPReviewSection: React.FC<RPPReviewSectionProps> = ({
                 <AlertDialogHeader>
                   <AlertDialogTitle>Konfirmasi Penolakan</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Apakah Anda yakin ingin menolak RPP submission ini? Setelah ditolak, guru dapat memperbaiki dan submit ulang RPP mereka. Pastikan Anda telah memberikan catatan review yang jelas.
+                    Apakah Anda yakin ingin menolak Submission ini? Setelah ditolak, guru dapat memperbaiki dan submit ulang RPP mereka. Pastikan Anda telah memberikan catatan review yang jelas.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

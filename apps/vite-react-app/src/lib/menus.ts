@@ -46,19 +46,19 @@ export const appMenuItems: SidebarItem[] = [
 
   // RPP Management - Teachers and Principals
   {
-    title: 'RPP Guru',
+    title: 'Submission',
     icon: FileText,
     allowedRoles: ['SUPER_ADMIN', 'KEPALA_SEKOLAH', 'ADMIN', 'GURU'],
     children: [
       {
-        title: 'Daftar RPP',
-        href: '/rpp-submissions',
+        title: 'Daftar Submission',
+        href: '/submissions',
         icon: ClipboardCheck,
         allowedRoles: ['SUPER_ADMIN', 'KEPALA_SEKOLAH', 'ADMIN'],
       },
       {
-        title: 'RPP Saya',
-        href: '/my-rpp-submissions',
+        title: 'Submission Saya',
+        href: '/my-submissions',
         icon: Upload,
         allowedRoles: ['GURU', 'KEPALA_SEKOLAH'],
       },

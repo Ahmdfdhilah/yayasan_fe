@@ -13,7 +13,7 @@ const MyRPPSubmissionsPage: React.FC = () => {
 
   // Redirect admin users to main RPP submissions page
   if (currentRole === 'ADMIN') {
-    return <Navigate to="/rpp-submissions" replace />;
+    return <Navigate to="/submissions" replace />;
   }
 
   // Check access first - allow both teachers and principal
@@ -32,7 +32,7 @@ const MyRPPSubmissionsPage: React.FC = () => {
         
         if (activePeriod?.id) {
           // Redirect to submission detail page with current user and active period
-          navigate(`/rpp-submissions/teacher/${user.id}?period_id=${activePeriod.id}`, { replace: true });
+          navigate(`/submissions/teacher/${user.id}?period_id=${activePeriod.id}`, { replace: true });
         } else {
           // No active period found
           toast({
@@ -61,7 +61,7 @@ const MyRPPSubmissionsPage: React.FC = () => {
     <div className="flex items-center justify-center h-64">
       <div className="text-center space-y-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        <p className="text-muted-foreground">Mengalihkan ke RPP submission Anda...</p>
+        <p className="text-muted-foreground">Mengalihkan ke  submission Anda...</p>
       </div>
     </div>
   );

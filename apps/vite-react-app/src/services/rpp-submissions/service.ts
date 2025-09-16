@@ -22,7 +22,7 @@ import {
 
 class RPPSubmissionService extends BaseService {
   constructor() {
-    super("/rpp-submissions");
+    super("/submissions");
   }
 
   // ===== ADMIN ENDPOINTS =====

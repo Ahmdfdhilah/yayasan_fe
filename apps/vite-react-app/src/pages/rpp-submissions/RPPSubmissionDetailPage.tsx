@@ -277,7 +277,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
       await rppSubmissionService.submitForApproval(submission.id);
       toast({
         title: 'Berhasil',
-        description: 'RPP submission berhasil disubmit untuk review.',
+        description: 'Submission berhasil disubmit untuk review.',
       });
       setSubmitDialogOpen(false);
       await loadSubmissionDetail();
@@ -285,7 +285,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
       console.error('Error submitting for approval:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Gagal submit RPP submission.',
+        description: error.message || 'Gagal submit Submission.',
         variant: 'destructive'
       });
       setSubmitDialogOpen(false);
@@ -326,7 +326,7 @@ const RPPSubmissionDetailPage: React.FC = () => {
           <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
           <p className="text-muted-foreground">
             {isKepalaSekolah()
-              ? "Anda hanya dapat melihat RPP submission dari guru di Sekolah Anda."
+              ? "Anda hanya dapat melihat Submission dari guru di Sekolah Anda."
               : "Anda tidak memiliki akses untuk melihat halaman ini."
             }
           </p>
@@ -350,8 +350,8 @@ const RPPSubmissionDetailPage: React.FC = () => {
           <div className="flex items-center space-x-3">
             <span>
               {isOwnSubmission
-                ? "RPP Submission Saya"
-                : `RPP Submission - ${teacher?.profile?.name || teacher?.display_name || 'Unknown'}`
+                ? "Submission Saya"
+                : `Submission - ${teacher?.profile?.name || teacher?.display_name || 'Unknown'}`
               }
             </span>
           </div>
@@ -360,8 +360,8 @@ const RPPSubmissionDetailPage: React.FC = () => {
           <div>
             <p>
               {currentPeriod?.academic_year && currentPeriod?.semester
-                ? `Detail RPP submission untuk periode ${currentPeriod.academic_year} - ${currentPeriod.semester}`
-                : 'Detail RPP submission'}
+                ? `Detail submission untuk periode ${currentPeriod.academic_year} - ${currentPeriod.semester}`
+                : 'Detail submission'}
             </p>
             {teacher?.profile?.organization_name && (
               <p className="text-sm text-muted-foreground mt-1">
@@ -396,16 +396,16 @@ const RPPSubmissionDetailPage: React.FC = () => {
 
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">RPP Submission Belum Ada</h2>
+          <h2 className="text-xl font-semibold mb-2">Submission Belum Ada</h2>
           <p className="text-muted-foreground mb-4">
             {currentPeriod?.academic_year && currentPeriod?.semester
-              ? `Belum ada RPP submission untuk periode ${currentPeriod.academic_year} - ${currentPeriod.semester}.`
-              : 'Belum ada RPP submission untuk periode ini.'
+              ? `Belum ada submission untuk periode ${currentPeriod.academic_year} - ${currentPeriod.semester}.`
+              : 'Belum ada submission untuk periode ini.'
             }
           </p>
           {teacherId && periods.length > 0 && (
             <p className="text-sm text-muted-foreground">
-              Pilih periode lain menggunakan filter di atas untuk mencari RPP submission.
+              Pilih periode lain menggunakan filter di atas untuk mencari submission.
             </p>
           )}
         </div>
@@ -430,8 +430,8 @@ const RPPSubmissionDetailPage: React.FC = () => {
           <div className="flex items-center space-x-3">
             <span>
               {isOwnSubmission
-                ? "RPP Submission Saya"
-                : `RPP Submission - ${teacher?.profile?.name || teacher?.display_name || 'Unknown'}`
+                ? "Submission Saya"
+                : `Submission - ${teacher?.profile?.name || teacher?.display_name || 'Unknown'}`
               }
             </span>
           </div>
@@ -440,8 +440,8 @@ const RPPSubmissionDetailPage: React.FC = () => {
           <div>
             <p>
               {currentPeriod?.academic_year && currentPeriod?.semester
-                ? `Detail RPP submission untuk periode ${currentPeriod.academic_year} - ${currentPeriod.semester}`
-                : 'Detail RPP submission'}
+                ? `Detail submission untuk periode ${currentPeriod.academic_year} - ${currentPeriod.semester}`
+                : 'Detail submission'}
             </p>
             {teacher?.profile?.organization_name && (
               <p className="text-sm text-muted-foreground mt-1">
@@ -465,8 +465,8 @@ const RPPSubmissionDetailPage: React.FC = () => {
                     <AlertDialogTitle>Konfirmasi Submit</AlertDialogTitle>
                     <AlertDialogDescription>
                       {submission.status === RPPSubmissionStatus.REJECTED
-                        ? 'Apakah Anda yakin ingin submit ulang RPP submission ini untuk review?'
-                        : 'Apakah Anda yakin ingin submit RPP submission ini untuk review? Setelah disubmit, Anda tidak dapat mengubah file RPP hingga mendapat feedback.'}
+                        ? 'Apakah Anda yakin ingin submit ulang submission ini untuk review?'
+                        : 'Apakah Anda yakin ingin submit submission ini untuk review? Setelah disubmit, Anda tidak dapat mengubah file RPP hingga mendapat feedback.'}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>

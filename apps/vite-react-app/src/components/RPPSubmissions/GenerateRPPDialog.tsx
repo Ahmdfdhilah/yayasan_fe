@@ -48,7 +48,7 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
       });
 
       toast({
-        title: result.success ? 'Berhasil Membuat RPP Submissions' : 'RPP Submissions Selesai',
+        title: result.success ? 'Berhasil Membuat Submissions' : 'Submissions Selesai',
         description: result.message || `${result.created_evaluations} submissions berhasil dibuat, ${result.skipped_evaluations} sudah ada sebelumnya. Periode: ${result.period_name}`,
       });
 
@@ -60,10 +60,10 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
       // Close dialog
       setIsOpen(false);
     } catch (error: any) {
-      console.error('Error generating RPP submissions:', error);
+      console.error('Error generating submissions:', error);
       toast({
         title: 'Error',
-        description: error?.message || 'Gagal membuat RPP submissions. Silakan coba lagi.',
+        description: error?.message || 'Gagal membuat submissions. Silakan coba lagi.',
         variant: 'destructive'
       });
     } finally {
@@ -78,7 +78,7 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
   const defaultTriggerButton = (
     <Button>
       <Plus className="h-4 w-4 mr-2" />
-      Buat RPP untuk Periode
+      Buat Submission
     </Button>
   );
 
@@ -89,15 +89,15 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Buat RPP Submissions</DialogTitle>
+          <DialogTitle>Buat Submissions</DialogTitle>
           <DialogDescription>
             {activePeriod ? (
               <>
-                Membuat RPP submissions untuk semua guru di periode aktif: <strong>{activePeriod.academic_year} - {activePeriod.semester}</strong>. 
-                Sistem akan membuat template RPP kosong yang dapat diisi oleh masing-masing guru.
+                Membuat submissions untuk semua guru dan kepala sekolah di periode aktif: <strong>{activePeriod.academic_year} - {activePeriod.semester}</strong>. 
+                Sistem akan membuat template submission kosong yang dapat diisi oleh masing-masing guru dan kepala sekolah.
               </>
             ) : (
-              'Tidak ada periode aktif yang tersedia. Pastikan ada periode yang sedang aktif untuk membuat RPP submissions.'
+              'Tidak ada periode aktif yang tersedia. Pastikan ada periode yang sedang aktif untuk membuat submissions.'
             )}
           </DialogDescription>
         </DialogHeader>
@@ -111,7 +111,7 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
                   {activePeriod.academic_year} - {activePeriod.semester}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">
-                  RPP akan otomatis dibuat untuk periode yang sedang aktif
+                  Submission akan otomatis dibuat untuk periode yang sedang aktif
                 </div>
               </div>
             </div>
@@ -121,7 +121,7 @@ const GenerateRPPDialog: React.FC<GenerateRPPDialogProps> = ({
                 Tidak ada periode aktif
               </div>
               <div className="text-sm text-muted-foreground mt-1">
-                Pastikan ada periode yang sedang aktif untuk membuat RPP submissions
+                Pastikan ada periode yang sedang aktif untuk membuat submissions
               </div>
             </div>
           )}

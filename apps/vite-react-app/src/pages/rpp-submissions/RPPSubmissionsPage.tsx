@@ -46,7 +46,7 @@ const RPPSubmissionsPage: React.FC = () => {
   
   // Redirect guru to my-rpp-submissions (but not kepala_sekolah)
   if (currentRole === 'GURU') {
-    return <Navigate to="/my-rpp-submissions" replace />;
+    return <Navigate to="/my-submissions" replace />;
   }
 
   // URL Filters configuration
@@ -197,12 +197,12 @@ const RPPSubmissionsPage: React.FC = () => {
 
   const handleViewSubmission = (submission: RPPSubmissionResponse) => {
     // Navigate to submission detail page with teacher ID and period ID in URL
-    navigate(`/rpp-submissions/teacher/${submission.teacher_id}?period_id=${submission.period_id}`);
+    navigate(`/submissions/teacher/${submission.teacher_id}?period_id=${submission.period_id}`);
   };
 
   const handleReviewSubmission = async (submission: RPPSubmissionResponse) => {
     // Navigate to detail for review with teacher ID and period ID in URL
-    navigate(`/rpp-submissions/teacher/${submission.teacher_id}?period_id=${submission.period_id}&review=true`);
+    navigate(`/submissions/teacher/${submission.teacher_id}?period_id=${submission.period_id}&review=true`);
   };
 
   const handleItemsPerPageChange = (value: string) => {
@@ -245,7 +245,7 @@ const RPPSubmissionsPage: React.FC = () => {
 
   // Generate composite title
   const getCompositeTitle = () => {
-    let title = "RPP Submissions";
+    let title = "Submissions";
     const activeFilters = [];
     
     if (filters.status !== 'all') {
@@ -301,8 +301,8 @@ const RPPSubmissionsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="RPP Submissions"
-        description="Kelola dan review RPP submissions dari semua guru"
+        title="Submissions"
+        description="Kelola dan review submissions dari semua guru"
         actions={
           isAdmin() && (
             <GenerateRPPDialog
@@ -377,7 +377,7 @@ const RPPSubmissionsPage: React.FC = () => {
           <div className="space-y-4">
             <ListHeaderComposite
               title={getCompositeTitle()}
-              subtitle="Kelola dan review RPP submissions dari semua guru"
+              subtitle="Kelola dan review submissions dari semua guru"
             />
 
             <SearchContainer

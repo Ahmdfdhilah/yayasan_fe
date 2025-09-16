@@ -13,7 +13,7 @@ const MyEvaluationsPage: React.FC = () => {
 
   // Check access first
   if (currentRole === 'ADMIN') {
-    return <Navigate to="/rpp-submissions" replace />;
+    return <Navigate to="/submissions" replace />;
   }
 
   // Redirect logic

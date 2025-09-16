@@ -170,21 +170,21 @@ function App() {
 
                       {/* RPP Submissions Routes */}
                       {/* My RPP Submissions - Guru only */}
-                      <Route path="my-rpp-submissions" element={
+                      <Route path="my-submissions" element={
                         <RoleProtectedRoute allowedRoles={['GURU', 'KEPALA_SEKOLAH']}>
                           <MyRPPSubmissionsPage />
                         </RoleProtectedRoute>
                       } />
 
                       {/* RPP Submissions List - Admin and Kepala Sekolah */}
-                      <Route path="rpp-submissions" element={
+                      <Route path="submissions" element={
                         <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN', 'KEPALA_SEKOLAH']}>
                           <RPPSubmissionsPage />
                         </RoleProtectedRoute>
                       } />
 
                       {/* RPP Submission Detail - Admin/Kepala Sekolah viewing teacher's submission */}
-                      <Route path="rpp-submissions/teacher/:teacherId" element={
+                      <Route path="submissions/teacher/:teacherId" element={
                         <RoleProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN', 'KEPALA_SEKOLAH', 'GURU']}>
                           <RPPSubmissionDetailPage />
                         </RoleProtectedRoute>
