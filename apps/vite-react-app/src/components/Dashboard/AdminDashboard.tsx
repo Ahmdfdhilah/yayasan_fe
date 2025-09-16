@@ -154,6 +154,7 @@ export function AdminDashboard({ periodId, organizationId }: AdminDashboardProps
               title="Tingkat Penyelesaian"
               value={Math.round(data.rpp_stats.submission_rate)}
               formatter={(v) => `${v}%`}
+              subtitle='Persen penyelesaian submission yang ada'
             />
           </div>
         </CardContent>

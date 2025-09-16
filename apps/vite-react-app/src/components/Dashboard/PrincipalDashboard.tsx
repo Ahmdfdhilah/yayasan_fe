@@ -132,6 +132,7 @@ export function PrincipalDashboard({ periodId }: PrincipalDashboardProps) {
               title="Tingkat Penyelesaian"
               value={Math.round(data.my_rpp_stats.submission_rate)}
               formatter={(v) => `${v}%`}
+              subtitle='Persen penyelesaian submission yang ada'
             />
           </div>
         </CardContent>

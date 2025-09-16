@@ -121,15 +121,13 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
             </div>
             {!collapsed && (
               <>
-                <div className="flex flex-col items-start flex-1 min-w-0">
-                  <span className="text-sm font-medium text-sidebar-foreground truncate w-full">
+                <div className="flex flex-col items-start justify-center flex-1 min-w-0 space-y-0">
+                  <span className="text-sm font-medium text-sidebar-foreground truncate w-full leading-tight">
                     {getUserDisplayName()}
                   </span>
-                  <div className="flex items-center gap-1 w-full">
-                    <span className="text-xs text-muted-foreground truncate">
-                      {getUserRole()}
-                    </span>
-                  </div>
+                  <span className="text-xs text-muted-foreground truncate w-full leading-tight">
+                    {getUserRole()}
+                  </span>
                 </div>
                 <ChevronDown className="h-4 w-4 flex-shrink-0" />
               </>
