@@ -357,7 +357,7 @@ const AboutPage = () => {
                   {
                     icon: MapPin,
                     title: "Lokasi Strategis",
-                    description: "Jl. Ir. H. Djuanda No. 19, Way Jepara, Lampung Timur"
+                    description: "Jalan Batin Kyai, Labuhan Ratu 1 Way Jepara, Lampung Timur, Lampung"
                   },
                   {
                     icon: Users,
