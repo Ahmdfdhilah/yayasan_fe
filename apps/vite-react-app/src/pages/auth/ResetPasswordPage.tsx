@@ -16,6 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 import logo from '@/assets/logo.png';
 import bgImage from '@/assets/bg.webp';
+import { useToast } from '@workspace/ui/components/sonner';
 
 const resetPasswordSchema = z.object({
   new_password: z.string()
@@ -30,6 +31,7 @@ const resetPasswordSchema = z.object({
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 export function ResetPasswordPage() {
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
@@ -70,16 +72,23 @@ export function ResetPasswordPage() {
     setError('');
 
     try {
-      await dispatch(confirmPasswordResetAsync({ 
-        token, 
-        new_password: data.new_password 
+      await dispatch(confirmPasswordResetAsync({
+        token,
+        new_password: data.new_password
       })).unwrap();
-      
+
       navigate('/login', {
         state: { message: 'Password berhasil direset. Silakan login dengan password baru.' }
       });
     } catch (error: any) {
-      const errorMessage = error?.message || 'Terjadi kesalahan saat reset password';
+      const errorMessage = typeof error === 'string' ? error : (error?.message || 'Terjadi kesalahan saat login');
+
+      toast({
+        title: 'Reset Password Gagal',
+        description: errorMessage,
+        variant: 'destructive'
+      });
+
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -242,7 +251,7 @@ export function ResetPasswordPage() {
                         'Reset Password'
                       )}
                     </Button>
-                    
+
                     <Button
                       type="button"
                       variant="outline"
@@ -386,7 +395,7 @@ export function ResetPasswordPage() {
                       'Reset Password'
                     )}
                   </Button>
-                  
+
                   <Button
                     type="button"
                     variant="outline"
