@@ -113,7 +113,7 @@ export const CreateRPPItemDialog: React.FC<CreateRPPItemDialogProps> = ({
                   <FormLabel>Nama Submission *</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Contoh: Modul Matematika Kelas 7"
+                      placeholder="Contoh: TP[Nomor]_[Mata Pelajaran][Kelas]"
                       {...field}
                     />
                   </FormControl>
