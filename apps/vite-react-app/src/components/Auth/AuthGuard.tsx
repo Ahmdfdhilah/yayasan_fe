@@ -2,7 +2,7 @@
 import React, { ReactNode, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
-import { Loader2 } from 'lucide-react';
+// import { Loader2 } from 'lucide-react';
 import { USER_STATUS } from '@/lib/constants';
 
 interface AuthGuardProps {
@@ -14,18 +14,18 @@ interface AuthGuardProps {
   allowUnauthenticated?: boolean;
 }
 
-interface LoadingSpinnerProps {
-  message?: string;
-}
+// interface LoadingSpinnerProps {
+//   message?: string;
+// }
 
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ message = "Loading..." }) => (
-  <div className="flex items-center justify-center min-h-screen bg-background">
-    <div className="flex flex-col items-center space-y-4">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      <p className="text-muted-foreground text-sm">{message}</p>
-    </div>
-  </div>
-);
+// const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ message = "Loading..." }) => (
+//   <div className="flex items-center justify-center min-h-screen bg-background">
+//     <div className="flex flex-col items-center space-y-4">
+//       <Loader2 className="h-8 w-8 animate-spin text-primary" />
+//       <p className="text-muted-foreground text-sm">{message}</p>
+//     </div>
+//   </div>
+// );
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ 
   children, 
@@ -156,7 +156,7 @@ export const PublicRoute: React.FC<{ children: ReactNode; redirectTo?: string }>
   children, 
   redirectTo = '/dashboard' 
 }) => {
-  const { isAuthenticated, loading, user, isSessionValid, checkAuth } = useAuth();
+  const { isAuthenticated, user, isSessionValid, checkAuth } = useAuth();
 
   // Only check authentication on mount if user appears to be authenticated but session might be invalid
   useEffect(() => {
@@ -165,10 +165,6 @@ export const PublicRoute: React.FC<{ children: ReactNode; redirectTo?: string }>
       checkAuth();
     }
   }, []); // Simple like contoh-frontend
-
-  if (loading) {
-    return <LoadingSpinner message="Checking authentication..." />;
-  }
 
   // If already authenticated with valid session and user data, redirect to dashboard
   if (isAuthenticated && user && isSessionValid()) {
