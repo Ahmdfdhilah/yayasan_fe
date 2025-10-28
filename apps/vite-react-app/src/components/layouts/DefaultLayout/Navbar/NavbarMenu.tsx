@@ -46,13 +46,13 @@ export const NavMenu = (props: ComponentProps<typeof NavigationMenu>) => (
                 </NavigationMenuLink>
             </NavigationMenuItem>
            
-            <NavigationMenuItem>
+            {/* <NavigationMenuItem>
                 <NavigationMenuLink asChild>
                     <ScrollToTopLink to="/contact" className="text-foreground hover:text-primary transition-colors">
                         Kontak
                     </ScrollToTopLink>
                 </NavigationMenuLink>
-            </NavigationMenuItem>
+            </NavigationMenuItem> */}
         </NavigationMenuList>
     </NavigationMenu>
 );

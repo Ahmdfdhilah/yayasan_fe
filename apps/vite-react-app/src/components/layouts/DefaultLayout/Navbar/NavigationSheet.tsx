@@ -71,13 +71,13 @@ export const NavigationSheet = () => {
                   >
                     Sekolah
                   </MobileNavLink>
-                  <MobileNavLink
+                  {/* <MobileNavLink
                     to="/contact"
                     className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
                     onNavigate={handleClose}
                   >
                     Kontak
-                  </MobileNavLink>
+                  </MobileNavLink> */}
                 </nav>
               </div>
               <ScrollBar orientation="vertical" />
