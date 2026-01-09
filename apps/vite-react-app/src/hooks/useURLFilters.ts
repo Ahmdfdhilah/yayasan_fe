@@ -37,11 +37,11 @@ export const useURLFilters = <T extends Filters>(config: FilterConfig<T>) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { defaults, cleanDefaults = true } = config;
-  
+
   // Prevent infinite loops by tracking last update
   const isUpdatingRef = useRef<boolean>(false);
   const pendingUpdateRef = useRef<Partial<T> | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Clear updating flag when location actually changes
   useEffect(() => {
@@ -50,7 +50,7 @@ export const useURLFilters = <T extends Filters>(config: FilterConfig<T>) => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-      
+
       // Set a new timeout to reset flags
       timeoutRef.current = setTimeout(() => {
         pendingUpdateRef.current = null;
@@ -72,7 +72,7 @@ export const useURLFilters = <T extends Filters>(config: FilterConfig<T>) => {
       const urlValue = searchParams.get(key);
       if (urlValue !== null) {
         const defaultValue = defaults[key];
-        
+
         // Type casting based on default value type
         if (typeof defaultValue === 'number') {
           const numValue = parseInt(urlValue);
@@ -101,11 +101,11 @@ export const useURLFilters = <T extends Filters>(config: FilterConfig<T>) => {
     if (isUpdatingRef.current) {
       return;
     }
-    
+
     const { replace = true, preserveOthers = true } = options || {};
-    
+
     let searchParams: URLSearchParams;
-    
+
     if (preserveOthers) {
       // Start with existing params
       searchParams = new URLSearchParams(location.search);
@@ -113,12 +113,12 @@ export const useURLFilters = <T extends Filters>(config: FilterConfig<T>) => {
       // Start fresh
       searchParams = new URLSearchParams();
     }
-    
+
     // Update or remove parameters
     Object.entries(newFilters).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
         const defaultValue = defaults[key as keyof T];
-        
+
         // Remove parameter if it matches default value and cleanDefaults is true
         if (cleanDefaults && value === defaultValue) {
           searchParams.delete(key);
@@ -134,17 +134,17 @@ export const useURLFilters = <T extends Filters>(config: FilterConfig<T>) => {
     // Navigate with new search params
     const newSearch = searchParams.toString();
     const newPath = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`;
-    
+
     // Only prevent if this is exactly the same URL we're currently on
     if (newPath === `${location.pathname}${location.search}`) {
       return;
     }
-    
+
     // Set updating flag
     isUpdatingRef.current = true;
-    
+
     navigate(newPath, { replace });
-    
+
     // The useEffect will handle clearing the flags when location.search changes
   }, [navigate, location.pathname, location.search, defaults, cleanDefaults]);
 
@@ -189,7 +189,7 @@ export const useURLFilters = <T extends Filters>(config: FilterConfig<T>) => {
    */
   const hasActiveFilters = useCallback((): boolean => {
     const current = getFiltersFromURL();
-    return Object.keys(defaults).some(key => 
+    return Object.keys(defaults).some(key =>
       current[key as keyof T] !== defaults[key as keyof T]
     );
   }, [getFiltersFromURL, defaults]);

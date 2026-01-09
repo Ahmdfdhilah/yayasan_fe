@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { 
-  HeroSection, 
-  StatsSection, 
-  AboutSection, 
-  ArticlesSection, 
-  SchoolsSection 
-} from '@/components/Home';
+import {
+  HeroSection,
+  StatsSection,
+  AboutSection,
+  ArticlesSection,
+  SchoolsSection
+} from '@/components/home';
 
 // Import services and types
 import { galleryService } from '@/services/galleries';
@@ -35,7 +35,7 @@ const HomePage = () => {
           sort_by: 'published_at',
           sort_order: 'desc'
         });
-        
+
         // Load organizations as schools (limit to 5)
         const organizationsResponse = await organizationService.getOrganizations({
           size: 5,

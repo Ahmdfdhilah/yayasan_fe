@@ -8,13 +8,13 @@ import {
   Building,
   ClipboardCheck,
   Upload,
-  // UserCheck,
+  UserCheck,
   Newspaper,
   Image,
-  // MessageSquare,
+  MessageSquare,
   Settings,
-  // Building2,
-  // Target,
+  Building2,
+  Target,
 } from "lucide-react";
 
 // PKG System Role definitions
@@ -125,43 +125,43 @@ export const appMenuItems: SidebarItem[] = [
     icon: Building,
     allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
     children: [
-      // {
-      //   title: 'Pengurus',
-      //   href: '/cms/board-members',
-      //   icon: UserCheck,
-      //   allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
-      // },
-      // {
-      //   title: 'Sekolah',
-      //   href: '/cms/organizations',
-      //   icon: Building,
-      //   allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
-      // },
+      {
+        title: 'Pengurus',
+        href: '/cms/board-members',
+        icon: UserCheck,
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
+      },
+      {
+        title: 'Sekolah',
+        href: '/cms/organizations',
+        icon: Building,
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
+      },
 
-      // {
-      //   title: 'Pesan',
-      //   href: '/cms/messages',
-      //   icon: MessageSquare,
-      //   allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
-      // },
-      // {
-      //   title: 'Mitra',
-      //   href: '/cms/mitra',
-      //   icon: Building2,
-      //   allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
-      // },
-      // {
-      //   title: 'Program',
-      //   href: '/cms/program',
-      //   icon: Target,
-      //   allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
-      // },
-      // {
-      //   title: 'Statistik',
-      //   href: '/cms/statistik',
-      //   icon: BarChart3,
-      //   allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
-      // },
+      {
+        title: 'Pesan',
+        href: '/cms/messages',
+        icon: MessageSquare,
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
+      },
+      {
+        title: 'Mitra',
+        href: '/cms/mitra',
+        icon: Building2,
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
+      },
+      {
+        title: 'Program',
+        href: '/cms/program',
+        icon: Target,
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
+      },
+      {
+        title: 'Statistik',
+        href: '/cms/statistik',
+        icon: BarChart3,
+        allowedRoles: ['SUPER_ADMIN', 'ADMIN'],
+      },
 
       {
         title: 'Artikel',

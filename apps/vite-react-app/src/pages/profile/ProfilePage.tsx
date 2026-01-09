@@ -6,8 +6,8 @@ import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
 import { PageHeader } from '@/components/common/PageHeader';
-import { EditProfileDialog } from '@/components/Profile/EditProfileDialog';
-import { ChangePasswordDialog } from '@/components/Profile/ChangePasswordDialog';
+import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
+import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { UserUpdate } from '@/services/users/types';
@@ -31,7 +31,7 @@ const ProfilePage: React.FC = () => {
   const { toast } = useToast();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
-  
+
   const { startCountdown: startEmailChangeCountdown } = useLogoutCountdown({
     seconds: 5,
     reason: 'Email telah berubah, sistem akan logout untuk keamanan.'
@@ -84,24 +84,24 @@ const ProfilePage: React.FC = () => {
 
   const handleProfileUpdate = async (data: UserUpdate, imageFile?: File) => {
     if (!user) return;
-    
+
     // Check if email is being changed
     const isEmailChanged = data.email && data.email.trim() !== user.email?.trim();
-    
+
     try {
       if (imageFile) {
         // Use multipart update for image upload
         const formData = new FormData();
         formData.append('data', JSON.stringify(data));
         formData.append('image', imageFile);
-        
+
         // Call the multipart endpoint through auth slice
         await dispatch(updateProfileAsync({ formData })).unwrap();
       } else {
         // Use regular JSON update
         await dispatch(updateProfileAsync(data)).unwrap();
       }
-      
+
       if (isEmailChanged) {
         // Show success toast with logout warning
         toast({
@@ -110,10 +110,10 @@ const ProfilePage: React.FC = () => {
           variant: 'default'
         });
         setIsEditDialogOpen(false);
-        
+
         // Start countdown for email change logout
         startEmailChangeCountdown();
-        
+
       } else {
         // Regular success toast for other profile updates
         toast({

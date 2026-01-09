@@ -14,7 +14,7 @@ export const useLogoutCountdown = ({
   onComplete
 }: UseLogoutCountdownProps = {}) => {
   const { logout } = useAuth();
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const startCountdown = () => {
     // Clear any existing timeout
@@ -24,7 +24,7 @@ export const useLogoutCountdown = ({
 
     onStart?.();
 
-    
+
 
     // No need for interval toast updates - just the timeout for logout
 
